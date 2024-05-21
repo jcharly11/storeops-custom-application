@@ -1,0 +1,113 @@
+name: Create IoT Edge Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      loglevel:
+        description: "Log level"
+        type: choice
+        required: true
+        options:
+          - CRITICAL
+          - ERROR
+          - WARNING
+          - INFO
+          - DEBUG
+        default: "INFO"
+      version:
+        description: "Image version"
+        type: string
+        required: true
+        default: "v0.0.1"
+      target:
+        description: "Target condition"
+        type: string
+        required: true
+        default: "tags.accountId='4500'"
+      server:
+        description: "Server URL"
+        type: choice
+        required: true
+        options:
+          - http://sfero-test-server
+        default: "http://sfero-test-server"
+      serverusername:
+        description: "Username"
+        type: string
+        required: true
+        default: "ckp"
+      serverpassword:
+        description: "Password"
+        type: string
+        required: true
+        default: "test"
+      responsetime:
+        description: "Response tolerance time (ms)"
+        type: number
+        required: true
+        default: 200
+      delayedsound:
+        description: "Enable sound on delayed response?"
+        type: boolean
+        required: true
+        default: false
+      delayedlight:
+        description: "Enable light on delayed response?"
+        type: boolean
+        required: true
+        default: true
+      delayedcolor:
+        description: "Light color on delayed response"
+        type: choice
+        required: true
+        options:
+          - red
+          - green
+          - yellow
+          - blue
+          - pink
+          - cyan
+          - white
+          - default
+        default: "blue"
+
+jobs:
+  deployment:
+    name: Host OS
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [azure-focal-runner]
+
+    steps:
+      - name: Check deployment parameters
+        id: check_deployment_parameters
+        run: |
+          echo "Log level: ${{ inputs.loglevel }}"
+          echo "Image version: ${{ inputs.version }}"
+          echo "Target condition: ${{ inputs.target }}"
+          echo "Server URL: ${{ inputs.server }}"
+          echo "Server username: ${{ inputs.serverusername }}"
+          echo "Response tolerance time: ${{ inputs.responsetime }}"
+          echo "Enable sound: ${{ inputs.delayedsound }}"
+          echo "Enable light: ${{ inputs.delayedlight }}"
+          echo "Light color: ${{ inputs.delayedcolor }}"
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Azure
+        id: deploy_to_azure
+        run: |
+          cd iotedge
+          ./deploy.sh -v "${{ inputs.version }}" \
+            -c "${{ inputs.target }}" \
+            -u "${{ inputs.server }}" \
+            -t ${{ inputs.responsetime }} \
+            -s ${{ inputs.delayedsound == true && 1 || 0 }} \
+            -l ${{ inputs.delayedlight == true && 1 || 0 }} \
+            -r "${{ inputs.delayedcolor }}" \
+            -a "${{ inputs.serverusername }}" \
+            -p "${{ inputs.serverpassword }}" \
+            -f "${{ inputs.loglevel }}"

@@ -1,0 +1,105 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "modules": {
+          "<APPLICATION_ID>": {
+            "env": {
+              "SERVER_URL": {
+                "value": "<SERVER_URL>"
+              },
+              "SERVER_RESPONSE_TOLERANCE_MS": {
+                "value": <SERVER_RESPONSE_TOLERANCE_MS>
+              },
+              "ALARM_DELAYED_SOUND_ENABLE": {
+                "value": <ALARM_DELAYED_SOUND_ENABLE>
+              },
+              "ALARM_DELAYED_SOUND_VOLUME": {
+                "value": <ALARM_DELAYED_SOUND_VOLUME>
+              },
+              "ALARM_DELAYED_LIGHT_ENABLE": {
+                "value": <ALARM_DELAYED_LIGHT_ENABLE>
+              },
+              "ALARM_DELAYED_LIGHT_COLOR": {
+                "value": "<ALARM_DELAYED_LIGHT_COLOR>"
+              },
+              "SERVER_USERNAME": {
+                "value": "<SERVER_USERNAME>"
+              },
+              "SERVER_PASSWORD": {
+                "value": "<SERVER_PASSWORD>"
+              },
+              "LOG_LEVEL": {
+                "value": "<LOG_LEVEL>"
+              }
+            },
+            "restartPolicy": "always",
+            "settings": {
+              "image": "docker.io/checkpt/<APPLICATION_ID>:<VERSION>",
+
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/var/log/<APPLICATION_ID>:/app/logs\",\"/usr/share/cockpit/<APPLICATION_ID>:/app/cockpit\",\"/var/environment/<APPLICATION_ID>:/app/environment\",\"/var/scripts/<APPLICATION_ID>:/app/shell-scripts\],\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
+
+            },
+            "status": "running",
+            "type": "docker"
+          }
+        },
+        "runtime": {
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "registryCredentials": {
+              "DockerHub": {
+                "address": "docker.io",
+                "password": "forest",
+                "username": "ckpforest"
+              }
+            }
+          },
+          "type": "docker"
+        },
+        "schemaVersion": "1.1",
+        "systemModules": {
+          "edgeAgent": {
+            "env": {
+              "UpstreamProtocol": {
+                "value": "MQTT"
+              }
+            },
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.2",
+              "createOptions": "{\"HostConfig\":{\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
+            },
+            "type": "docker"
+          },
+          "edgeHub": {
+            "env": {
+              "UpstreamProtocol": {
+                "value": "MQTT"
+              }
+            },
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.2",
+              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"443/tcp\":[{\"HostPort\":\"8443\"}],\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}]},\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
+            },
+            "status": "running",
+            "type": "docker"
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "routes": {
+          "iothub": {
+            "route": "FROM /messages/* INTO $upstream"
+          }
+        },
+        "schemaVersion": "1.1",
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}

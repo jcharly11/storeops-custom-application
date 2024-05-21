@@ -1,0 +1,7 @@
+#!/bin/bash
+
+mosquitto_pub -t 'Wirama/EPC/All' -m '{"epc": "F000000000000A0000CDAC33", "event_type": 1, "ip_address": "172.20.30.51:7240", "type": "eas", "timestamp": "2023-02-23 17:41:06.453", "sold": false, "audible_alarm": false, "readcount": "1:2", "disable_light": false, "disable_sound": false}'
+mosquitto_pub -t 'Wirama/EPC/All' -m '{"epc": "3034DC7DCC39CA00000003E9", "event_type": 0, "ip_address": "172.20.30.51:7240", "type": "eas", "timestamp": "2023-02-23 17:41:13.010", "sold": false, "audible_alarm": true, "readcount": "1:4", "disable_light": false, "disable_sound": false}'
+mosquitto_pub -t 'Wirama/EPC/All' -m '{"epc": "4034DC7DCC39CA00000003E9", "event_type": 0, "ip_address": "172.20.30.51:7240", "type": "eas", "timestamp": "2023-02-23 17:41:13.010", "sold": false, "audible_alarm": true, "readcount": "1:4", "disable_light": false, "disable_sound": false}'
+mosquitto_pub -t 'Wirama/EPC/All' -m '{"epc": "3034DC7DCC39CA00000003E9", "event_type": 0, "ip_address": "172.20.30.51:7240", "type": "eas", "timestamp": "2023-02-23 17:41:13.010", "sold": false, "audible_alarm": true, "readcount": "1:4", "disable_light": false, "disable_sound": false}'
+mosquitto_pub -t 'Wirama/EPC/All' -m '{"epc": "5034DC7DCC39CA00000003E9", "event_type": 0, "ip_address": "172.20.30.51:7240", "type": "eas", "timestamp": "2023-02-23 17:41:13.010", "sold": false, "audible_alarm": true, "readcount": "1:4", "disable_light": false, "disable_sound": false}'

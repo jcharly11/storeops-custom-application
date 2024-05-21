@@ -1,0 +1,41 @@
+.divName {
+   
+  margin: auto;
+  text-align: center;
+  display: inline-block;
+  width: 30vw;
+  padding-top: 20px;
+  padding-bottom: 5px;
+  height: 30px;
+}
+
+.divValue {  
+  margin: auto;
+  text-align: left;
+
+  width: 30vw;
+  height:30px;
+  padding-top: 20px;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+hr {
+ margin-left: 10%;
+ margin-right: 10%;
+
+}
+#container{
+
+  text-align: center;
+}
+
+input {
+
+  width: 250px;
+}
+hr.dashed {
+  border-top: 3px dashed #bbb;
+  margin-left: 10%;
+  margin-right: 10%;
+}

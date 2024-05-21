@@ -1,0 +1,78 @@
+name: Publish Debian Package
+on:
+  release:
+    types: [published, edited]
+
+jobs:
+  build-debian:
+    name: Build Debian
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          [
+            jammy-amd64-runner,
+            jammy-arm64-runner,
+            focal-amd64-runner,
+            focal-arm64-runner,
+            bullseye-amd64-runner,
+            bullseye-arm64-runner,
+            buster-amd64-runner,
+            buster-arm64-runner,
+          ]
+
+    steps:
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Set up dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-dev python3-venv
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run the build script
+        id: build
+        env:
+          TAG_NAME: ${{ steps.get_release.outputs.tag_name }}
+        run: |
+          cd pkg
+          ./build.sh ${TAG_NAME}
+          echo "deb_package=$(ls -t *.deb | tail -1)" >> $GITHUB_OUTPUT
+
+      - name: Upload files
+        id: upload_files
+        uses: shogo82148/actions-upload-release-asset@v1.6.6
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: pkg/${{ steps.build.outputs.deb_package }}
+          asset_name: ${{ steps.build.outputs.deb_package }}
+          asset_content_type: application/vnd.debian.binary-package
+          overwrite: true
+
+      - name: Publish to APT server
+        id: publish_apt
+        env:
+          GIT_ACTOR: ${{ github.actor }}
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          RELEASE_NAME: ${{ steps.get_release.outputs.name }}
+        run: |
+          cd pkg
+          publish-to-pool-apt-apollo.sh "${RELEASE_NAME}" "${GIT_ACTOR}" "${GIT_TOKEN}"
+          echo "upload_output=$(cat ./publish_output.txt)" >> $GITHUB_OUTPUT
+
+      - name: Update release
+        id: update_release
+        uses: tubone24/update_release@v1.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          release_name: ${{ steps.publish_apt.outputs.upload_output }}

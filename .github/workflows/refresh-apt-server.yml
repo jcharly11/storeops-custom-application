@@ -1,0 +1,49 @@
+name: Refresh APT server
+
+on:
+  workflow_dispatch:
+    inputs:
+      dev:
+        description: "DEV"
+        type: boolean
+        required: false
+        default: false
+      preprod:
+        description: "PRE-PROD"
+        type: boolean
+        required: false
+        default: false
+      prod:
+        description: "PROD"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  event-testing:
+    name: Host OS
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [jammy-arm64-runner]
+
+    steps:
+      - name: Refresh DEV APT server
+        id: refresh_dev_apt
+        if: ${{ inputs.dev }}
+        run: |
+          echo "Refreshing DEV APT server..."
+          update-apollo-dev-apt.sh
+      - name: Refresh PRE-PROD APT server
+        id: refresh_preprod_apt
+        if: ${{ inputs.preprod }}
+        run: |
+          echo "Refreshing PRE-PROD APT server..."
+          update-apollo-preprod-apt.sh
+      - name: Refresh PROD APT server
+        id: refresh_prod_apt
+        if: ${{ inputs.prod }}
+        run: |
+          echo "Refreshing PROD APT server..."
+          update-apollo-prod-apt.sh
