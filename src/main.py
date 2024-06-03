@@ -3,6 +3,7 @@ import logging
 import queue
 import time
 import datetime
+import uuid
 import config.settings as settings
 import os
 import signal
@@ -14,7 +15,9 @@ from fastapi_utils.tasks import repeat_every
 
 from models import LogConfig
 from services import RESTService, MQTTService
+from services.sharepoint_service import SharepointService
 from utils.environment_validator import EnvironmentValidator
+
 
 # globals
 # queue for event processing
@@ -38,6 +41,7 @@ mqtt_service = MQTTService(mqtt=mqtt)
 rest_service = RESTService(
     url=settings.SERVER_URL, timeout=settings.SERVER_TIMEOUT_SEC, mqtt_service=mqtt_service)
 
+sharepoint_service= SharepointService()
 
 # callback for internal MQTT connect
 @mqtt.on_connect()
@@ -209,3 +213,38 @@ def notify_disable_custom_method() -> None:
         mqtt_service.send_custom_method(default_alarming=1)
     except Exception as err:
         logger.error(f"notify_disable_custom_method {err}, {type(err)}")
+
+
+
+
+#ONVIF MQTT MESSAGES
+@mqtt.subscribe(settings.TOPIC_CAMERA_IMAGE_RESP)
+async def message_topic_camera_image(client, topic, payload, qos, properties):
+    logger.info(f"Starting upload image")
+    try:
+        json_item = json.loads(payload.decode())
+        image = json_item['data']["image"] 
+        if image:
+            uuid_name= uuid.uuid4()
+            filename= f"{uuid_name}.png"
+            sharepoint_service.upload_file(data=image,file= filename)
+
+    except Exception as ex:
+        logger.error(f"Error executing upload image task: {ex}")
+
+    
+
+@mqtt.subscribe(settings.TOPIC_CAMERA_IMAGE_BUFFER_RESP)
+async def message_topic_camera_buffer(client, topic, payload, qos, properties):
+    logger.info(f"Starting upload buffer")
+    try:
+        json_item = json.loads(payload.decode())
+        image_list = json_item['data']["image_buffer"] 
+        if image_list:
+            for image in image_list:
+                uuid_name= uuid.uuid4()
+                filename= f"{uuid_name}.png"
+                sharepoint_service.upload_file(data=image,file= filename)
+
+    except Exception as ex:
+        logger.error(f"Error executing upload buffer task: {ex}")
