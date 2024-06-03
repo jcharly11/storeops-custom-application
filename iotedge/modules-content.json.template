@@ -3,7 +3,7 @@
     "$edgeAgent": {
       "properties.desired": {
         "modules": {
-          "<APPLICATION_ID>": {
+          "storeops-custom-application": {
             "env": {
               "SERVER_URL": {
                 "value": "<SERVER_URL>"
@@ -35,9 +35,9 @@
             },
             "restartPolicy": "always",
             "settings": {
-              "image": "docker.io/checkpt/<APPLICATION_ID>:<VERSION>",
+              "image": "docker.io/checkpt/storeops-custom-application:<VERSION>",
 
-              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/var/log/<APPLICATION_ID>:/app/logs\",\"/usr/share/cockpit/<APPLICATION_ID>:/app/cockpit\",\"/var/environment/<APPLICATION_ID>:/app/environment\",\"/var/scripts/<APPLICATION_ID>:/app/shell-scripts\],\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/var/log/storeops-custom-application:/app/logs\",\"/usr/share/cockpit/storeops-custom-application:/app/cockpit\",\"/var/environment/storeops-custom-application:/app/environment\",\"/var/scripts/storeops-custom-application:/app/shell-scripts\],\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
 
             },
             "status": "running",

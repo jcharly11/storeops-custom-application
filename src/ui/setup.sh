@@ -1,1 +1,1 @@
-cp -rf *  /usr/share/cockpit/<APPLICATION_ID>
+cp -rf *  /usr/share/cockpit/storeops-custom-application

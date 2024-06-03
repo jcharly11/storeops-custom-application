@@ -110,7 +110,7 @@ function copyFile(){
 }
 function restartCustomApplication(){
   
-  cockpit.spawn(["sh","/var/scripts/<APPLICATION_ID>/restart_custom_app.sh", true]).then((data) => { 
+  cockpit.spawn(["sh","/var/scripts/storeops-custom-application/restart_custom_app.sh", true]).then((data) => { 
     console.log(data);
     window.alert("Upgrade complete")
   }).catch((error) => {

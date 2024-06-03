@@ -2,7 +2,7 @@
 
 VERSION="v0.0.1"
 HUB_NAME="ckp-prod-europe"
-DEPLOYMENT_NAME_PREFIX="<APPLICATION_ID>"
+DEPLOYMENT_NAME_PREFIX="storeops-custom-application"
 MODULE_CONTENT="modules-content.json"
 PRIORITY=$(az iot edge deployment list --hub-name ${HUB_NAME} --query "reverse(sort_by([?starts_with(id, '${DEPLOYMENT_NAME_PREFIX}')].{priority:priority}, &priority))[0]" | jq .priority)
 [ -z "${PRIORITY}" ] && PRIORITY=0

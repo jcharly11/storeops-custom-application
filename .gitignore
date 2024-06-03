@@ -130,5 +130,5 @@ dmypy.json
 
 src/logs/*.log
 src/logs/*.gz
-pkg/<APPLICATION_ID>/root
+pkg/storeops-custom-application/root
 iotedge/modules-content.json

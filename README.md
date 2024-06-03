@@ -1,5 +1,5 @@
-# <APPLICATION_ID>
-<APPLICATION_NAME>
+# storeops-custom-application
+StoreOps Custom Application
 
 ## docker
 - Contains scripts for docker build and deployment.

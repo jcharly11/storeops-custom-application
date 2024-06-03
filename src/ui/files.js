@@ -2,8 +2,8 @@
 let baseItems = []
 var localItems = []
 
-const file = "/var/environment/<APPLICATION_ID>/local-environment-vars.txt"
-const ui_file = "/var/environment/<APPLICATION_ID>/ui-local-environment-vars.txt" 
+const file = "/var/environment/storeops-custom-application/local-environment-vars.txt"
+const ui_file = "/var/environment/storeops-custom-application/ui-local-environment-vars.txt" 
 const tempFile = "/tmp/local-environment-vars.txt"
 
 let getEnvironmentVariablesFromBaseFilePromise = function getVariablesData(){

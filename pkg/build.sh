@@ -11,7 +11,7 @@ DEFAULT='\033[0;39m'
 CYAN='\033[0;36m'
 
 VERSION=$(echo $1 | sed 's/v//g')
-BASEDIR="<APPLICATION_ID>"
+BASEDIR="storeops-custom-application"
 DIST=$(awk -F "=" '/VERSION_CODENAME/ {print $2}' /etc/os-release)
 ARCH=$(dpkg --print-architecture)
 INSTALLDIR="/root/${BASEDIR}"
