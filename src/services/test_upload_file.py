@@ -5,8 +5,8 @@ from office365.runtime.client_request import ClientRequest
 from office365.runtime.http.request_options import RequestOptions
 
 
-site_url = 'https://checkptsystems.sharepoint.com'
-username = "StoreOperations@checkptsystems.onmicrosoft.com/sites/"
+site_url = 'https://checkptsystems.sharepoint.com/sites'
+username = "StoreOperations@checkptsystems.onmicrosoft.com"
 password = "5F6c5tL!W2"
 localpath = "/test.txt"
 remotepath = "/sites/iovideos/"+"test.txt"
