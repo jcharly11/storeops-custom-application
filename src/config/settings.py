@@ -87,4 +87,12 @@ TOPIC_CAMERA_IMAGE_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_RESP", default="comm
 TOPIC_CAMERA_IMAGE_BUFFER_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER_RESP", default="command_resp/onvif/image/get_buffer"))
 
 
+#FILESHARE SETTINGS
+CLIENT_ID = '474f7a33-805f-492f-a390-f88e355c1cf2'
+CLIENT_SECRET = 'mdr8Q~rWmQSxij2MXTDoi6jhSQ-k5zR-CisYkaSo'
+TENANT_ID = '1b7f891b-ffd5-438b-afd7-e35a90c2bf8d'
 
+SITE_ID = 'e8a31de1-fce7-46f2-91e5-4a6a8fed9551'
+LIBRARY_NAME = 'Documents'
+DRIVE_ID = 'b!4R2j6Of88kaR5Upqj-2VUacVEhofnqxEt475XUzCXmVl86v_nzYUQJUBUE63Ixc_'
+FOLDER_NAME= "Video"
