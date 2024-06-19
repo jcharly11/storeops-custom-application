@@ -248,3 +248,18 @@ async def message_topic_camera_buffer(client, topic, payload, qos, properties):
 
     except Exception as ex:
         logger.error(f"Error executing upload buffer task: {ex}")
+
+
+@mqtt.subscribe(settings.TOPIC_CAMERA_VIDEO_RESP)
+async def message_topic_camera_video(client, topic, payload, qos, properties):
+    logger.info(f"Starting upload video")
+    try:
+        json_item = json.loads(payload.decode())
+        path = json_item['data']["destination_path"] 
+        file_name = json_item['data']["file_name"] 
+        uuid = json_item['header']["uuid"] 
+        sharepoint_service.upload_video(uuid=uuid, path=path)
+
+    except Exception as ex:
+        logger.error(f"Error executing upload video task: {ex}")
+

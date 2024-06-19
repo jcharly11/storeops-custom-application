@@ -85,7 +85,7 @@ AZURE_KEY = "GXGZdHYe1HNGvpAdQIi956al6+F/ss533CBSIRoACq8WOycTz+QAbfGtHGTJhvbSoJN
 #ONVIF TOPICS
 TOPIC_CAMERA_IMAGE_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_RESP", default="command_resp/onvif/image/snapshot"))
 TOPIC_CAMERA_IMAGE_BUFFER_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER_RESP", default="command_resp/onvif/image/get_buffer"))
-
+TOPIC_CAMERA_VIDEO_RESP = str(os.getenv("TOPIC_CAMERA_VIDEO_RESP", default="command_resp/onvif/video/get-video"))
 
 #FILESHARE SETTINGS
 CLIENT_ID = '474f7a33-805f-492f-a390-f88e355c1cf2'
@@ -96,3 +96,5 @@ SITE_ID = 'e8a31de1-fce7-46f2-91e5-4a6a8fed9551'
 LIBRARY_NAME = 'Documents'
 DRIVE_ID = 'b!4R2j6Of88kaR5Upqj-2VUacVEhofnqxEt475XUzCXmVl86v_nzYUQJUBUE63Ixc_'
 FOLDER_NAME= "Video"
+BASE_URL="https://graph.microsoft.com/v1.0"
+BASE_URL_LOGIN= "https://login.microsoftonline.com"
