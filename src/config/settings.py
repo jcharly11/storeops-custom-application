@@ -103,6 +103,7 @@ BASE_URL_LOGIN= "https://login.microsoftonline.com"
 STANDARD_PAYLOAD = "type: {type}, \
                     uuid: {uuid}, \
                     message_id: {message_id}, \
+                    uuid_request: {uuid_request}, \
                     timestamp:{timestamp}, \
                     version: {version} \
                     data: {data}"
