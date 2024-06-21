@@ -1,6 +1,4 @@
 import os
-import uuid
-from datetime import datetime
 
 # TODO: Update default values
 
@@ -102,17 +100,10 @@ BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
 
 
-requester_id= None
-message_id = None
-type = None
-uuid=  uuid.uuid4.__str__()
-version = None
-timeStamp= datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-
-STANDARD_PAYLOAD = "{ type: {}, \
-                    uuid: {}, \
-                    message_id: {}, \
-                    timestamp:{}, \
-                    version: {} \
-                    data: [] \
-                    }".format(type, uuid, message_id, timeStamp, version)
+STANDARD_PAYLOAD = "type: {type}, \
+                    uuid: {uuid}, \
+                    message_id: {message_id}, \
+                    timestamp:{timestamp}, \
+                    version: {version} \
+                    data: {data}"
+                    
