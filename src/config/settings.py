@@ -108,7 +108,8 @@ uuid=  uuid.uuid4()
 version = None
 timeStamp= datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
-STANDARD_PAYLOAD = "{uuid: {}, \
+STANDARD_PAYLOAD = "{ type: None, \
+                    uuid: {}, \
                     message_id: {}, \
                     timestamp:{}, \
                     version: {} \
