@@ -263,3 +263,18 @@ async def message_topic_camera_video(client, topic, payload, qos, properties):
     except Exception as ex:
         logger.error(f"Error executing upload video task: {ex}")
 
+
+# @app.on_event("startup")
+# @repeat_every(seconds=20, wait_first=False)
+# def test() -> None:
+#     logger.debug(f"uupload")
+#     print("upload*************")
+#     try:
+    
+#         path = ""
+#         uuid = "0000-6666-0000-0000"
+        
+#         sharepoint_service.upload_video(uuid=uuid, path=path)
+
+#     except Exception as err:
+#         logger.error(f"notify_custom_method {err}, {type(err)}")

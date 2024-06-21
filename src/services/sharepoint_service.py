@@ -4,6 +4,7 @@ import logging
 import os
 import config.settings as settings
 import requests
+from database.database import DataBase
 
 class SharepointService():
     def __init__(self):   
@@ -11,6 +12,7 @@ class SharepointService():
         
     def upload_file(self,data, origin_file, file_name):
         self.logger.info("Starting to upload file to azure storage")
+        response= None
         try:
             access_token= self.getAuthToken()
             folder_name="Video"
@@ -24,14 +26,22 @@ class SharepointService():
             with open(origin_file, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
                 self.logger.info(f"file upload: {response.json()}")
+            
+            if(response.status_code==201 or response.status_code==200):
+                DataBase.saveMessage(self,response.json(),True)
+            else:
+                DataBase.saveMessage(self,response.json(),False)
 
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
+            DataBase.saveMessage(self,response.json(),False)
+
 
 
 
     def upload_video(self,uuid, path):
         self.logger.info("Starting to upload video to sharepoint")
+        print("Starting to upload video to sharepoint")
         try:
             access_token= self.getAuthToken()
             folder_name="Video"
@@ -42,13 +52,22 @@ class SharepointService():
                 'Content-Type': 'application/octet-stream'
             }
 
-            origin_file=f"./tmp/onvif-camera/files/{uuid}.mp4"
-            
+            #origin_file=f"./tmp/onvif-camera/files/{uuid}.mp4"
+            origin_file=f"/home/cbernal/Github/storeops/storeops-custom-application/src/services/video/{uuid}.mp4"
+            print(f"-------------------- {origin_file}")
             #origin_file=f"{uuid}.mp4"
             with open(origin_file, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
                 self.logger.info(f"file upload: {response.json()}")
 
+            
+            if(response.status_code==201 or response.status_code==200):
+                print(f"upload video successfully")
+                self.logger.info(f"upload video successfully")
+            else:
+                print(f"upload video fail")
+                self.logger.info(f"upload video fail")
+                
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
 
