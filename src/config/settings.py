@@ -104,14 +104,15 @@ BASE_URL_LOGIN= "https://login.microsoftonline.com"
 
 requester_id= None
 message_id = None
-uuid=  uuid.uuid4()
+type = None
+uuid=  uuid.uuid4.__str__()
 version = None
 timeStamp= datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
-STANDARD_PAYLOAD = "{ type: None, \
+STANDARD_PAYLOAD = "{ type: {}, \
                     uuid: {}, \
                     message_id: {}, \
                     timestamp:{}, \
                     version: {} \
                     data: [] \
-                    }".format(uuid, message_id, timeStamp, version)
+                    }".format(type, uuid, message_id, timeStamp, version)
