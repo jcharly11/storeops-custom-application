@@ -1,4 +1,6 @@
 import os
+import uuid
+from datetime import datetime
 
 # TODO: Update default values
 
@@ -98,3 +100,17 @@ DRIVE_ID = 'b!4R2j6Of88kaR5Upqj-2VUacVEhofnqxEt475XUzCXmVl86v_nzYUQJUBUE63Ixc_'
 FOLDER_NAME= "Video"
 BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
+
+
+requester_id= None
+message_id = None
+uuid=  uuid.uuid4()
+version = None
+timeStamp= datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
+STANDARD_PAYLOAD = "{uuid: {}, \
+                    message_id: {}, \
+                    timestamp:{}, \
+                    version: {} \
+                    data: [] \
+                    }".format(uuid, message_id, timeStamp, version)
