@@ -98,3 +98,6 @@ DRIVE_ID = 'b!4R2j6Of88kaR5Upqj-2VUacVEhofnqxEt475XUzCXmVl86v_nzYUQJUBUE63Ixc_'
 FOLDER_NAME= "Video"
 BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
+
+TOPIC_SHAREPOINT_UPLOAD = os.getenv("TOPIC_SHAREPOINT_UPLOAD", default="sharepoint")
+
