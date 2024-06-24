@@ -99,5 +99,12 @@ FOLDER_NAME= "Video"
 BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
 
-TOPIC_SHAREPOINT_UPLOAD = os.getenv("TOPIC_SHAREPOINT_UPLOAD", default="sharepoint")
 
+STANDARD_PAYLOAD = "type: {type}, \
+                    uuid: {uuid}, \
+                    message_id: {message_id}, \
+                    uuid_request: {uuid_request}, \
+                    timestamp:{timestamp}, \
+                    version: {version} \
+                    data: {data}"
+                    
