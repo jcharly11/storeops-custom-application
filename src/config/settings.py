@@ -86,6 +86,7 @@ AZURE_KEY = "GXGZdHYe1HNGvpAdQIi956al6+F/ss533CBSIRoACq8WOycTz+QAbfGtHGTJhvbSoJN
 TOPIC_CAMERA_IMAGE_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_RESP", default="command_resp/onvif/image/snapshot"))
 TOPIC_CAMERA_IMAGE_BUFFER_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER_RESP", default="command_resp/onvif/image/get_buffer"))
 TOPIC_CAMERA_VIDEO_RESP = str(os.getenv("TOPIC_CAMERA_VIDEO_RESP", default="command_resp/onvif/video/get-video"))
+TOPIC_CAMERA_VIDEO_MEDIALINK_EAS = str(os.getenv("TOPIC_CAMERA_VIDEO_MEDIALINK_EAS", default="command_resp/storeops/media"))
 
 #FILESHARE SETTINGS
 CLIENT_ID = '474f7a33-805f-492f-a390-f88e355c1cf2'

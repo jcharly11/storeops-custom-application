@@ -4,33 +4,26 @@ import logging
 
 class SharePointService(Client):
 
-    def __init__(self) -> None:
-        
-        try:
+    def __init__(self): 
             self.idService = type(self).__name__
-            self.logger   = logging.getLogger(type(self).__name__)
-            self.logger.info("Starting service")
-            self.client = Client()  
-            self.client.on_subscribe = self.onSubscribe
-            self.client.subscribe(settings.TOPIC_SHAREPOINT_UPLOAD) 
-           
-            
-        except Exception as ex:
-            self.logger.error(f"SharePointService:{ex}")
+            self.logger = logging.getLogger("main") 
+            self.logger.info(f"Starting service ")
+            self.client = Client().instance() 
+            self.client.on_message = self.onMessage
+            self.client.on_subscribe = self.onSubscribe 
+            self.client.subscribe("input/video")  
 
-    def onSubscribe(self):
-        self.logger.info(f"topic:{ settings.TOPIC_SHAREPOINT_UPLOAD }")    
-        self.logger.info(f"status: OK")    
+    def onSubscribe(self,client, userdata, mid, qos, properties=None):
+            self.logger.info(f"MQTT onSubscribed {client},{userdata}")    
 
-    def onPublish(self, client, data, mid):
-        self.logger.info(f"mid:{ mid }")
-        self.logger.info(f"userdata:{ data }")
+    def onMessage(self, client, userdata, message, properties=None): 
+          self.logger.info(f"onMessage =  message:{message}")     
 
-
+       
     def pub(self,  payload):
          self.logger.info("Publish message")
          try:
-             self.client.publish(topic=settings.TOPIC_SHAREPOINT_UPLOAD, payload=payload)
+             self.client.publish(topic="output/video", payload=payload)
           
          except Exception as ex:
              self.logger.error(f"Publish {self.idService} exception:{ex}")
