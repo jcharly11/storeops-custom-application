@@ -100,11 +100,11 @@ BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
 
 
-STANDARD_PAYLOAD = "type: {type}, \
+STANDARD_PAYLOAD = "{{type: {type}, \
                     uuid: {uuid}, \
                     message_id: {message_id}, \
                     uuid_request: {uuid_request}, \
                     timestamp:{timestamp}, \
                     version: {version} \
-                    data: {data}"
+                    data: {data}}}"
                     
