@@ -16,7 +16,6 @@ class SharePointService(Client):
             self.client = Client().instance() 
             self.client.on_message = self.onMessage
             self.client.on_subscribe = self.onSubscribe 
-            self.client.subscribe("input/video")  
 
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
             self.logger.info(f"MQTT onSubscribed {client},{userdata}")    
@@ -25,43 +24,25 @@ class SharePointService(Client):
     def onMessage(self, client, userdata, message, properties=None): 
           self.logger.info(f"onMessage =  message:{message.payload.decode()}")
           payload =  message.payload.decode()
-          id = payload["requester_id"]
-          uuid = payload["uuid"]
-          messageId = payload["message_id"]
-          timestamp = payload["timestamp"]
-          data = payload["data"]
-          for path in data:
-               
-               result = self.sharepoint.upload_video(uuid=uuid, path=path)
-
-               if result:
-                    
-                    self.pub(payload=payload, id=id, uuid=uuid,messageId=messageId,timestamp=timestamp,data=data)
-               else:
-                    self.database.saveMessage(message=payload, status="FAIL")
+          self.queue.put(payload)
+          
 
        
     def pub(self,  payload,id , uuid, messageId, timestamp, data):
-         self.logger.info("Publish message")
-         try:
-             topic = "output/video"
-             payload={ 
-                   "requester_id": id,
-                   "uuid": uuid,
-                   "message_id": messageId, 
-                   "timestamp": timestamp,
-                   "data": data
-                   }
-             
-             result = self.client.publish(topic=topic, payload=payload)
-             status = result[0]
-             if status == 0:
-                  print(f"Send `{messageId}` to topic `{topic}`")
-                  
-             else:
-                  print(f"Failed to send message to topic {topic}")
-          
-         except Exception as ex:
+          self.logger.info("Publish message")
+          try:
+               payload={ 
+                    "header":{
+                         "uuid_request": uuid
+                             },
+                    "snapshot": "true"
+                    }
+               
+               result = self.client.publish(topic=settings.TOPIC_CAMERA_IMAGE, payload=payload)
+               status = result[0]
+               
+               
+          except Exception as ex:
              self.logger.error(f"Publish {self.idService} exception:{ex}")
          
  
