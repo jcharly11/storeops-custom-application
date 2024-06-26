@@ -18,6 +18,7 @@ TOPIC_STORE_INFO = os.getenv("TOPIC_STORE_INFO", default="store/info")
 TOPIC_CUSTOM_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="alarm")
 TOPIC_CUSTOM_METHOD = os.getenv("TOPIC_CUSTOM_METHOD", default="/settings/alarm")
 TOPIC_RESTART_APPLICATION = os.getenv("TOPIC_RESTART_APPLICATION", default="command/request/custom/refresh-environment")
+TOPIC_STORE_INFO = os.getenv("TOPIC_STORE_INFO", default="store/info")
 
 # Server Settings
 SERVER_URL = os.getenv("SERVER_URL", default="http://sfero-test-server")
@@ -115,3 +116,9 @@ STANDARD_PAYLOAD = "{{type: {type}, \
                     version: {version} \
                     data: {data}}}"
                     
+DEVICE_ID = 'EMPTY'
+LOCATION_ID = 'EMPTY'
+ACCOUNT_NUMBER = 'EMPTY'
+STORE_NAME = 'EMPTY'
+DOOR_NAME='EMPTY'
+DOOR_NUMBER='EMPTY'

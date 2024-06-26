@@ -13,19 +13,19 @@ from fastapi import FastAPI
 
 from models import LogConfig  
 from utils.environment_validator import EnvironmentValidator
-from mqtt.services.storeops_service import StoreOpsService
-import queue
-
-
-queueAlarm = queue.Queue()
-
+from mqtt.services.storeops_service2 import StoreOpsService
+import queue 
+queueAlarm = queue.Queue() 
+queueInfo = queue.Queue() 
 # application logging
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("main")
 
 app = FastAPI()
-logger.info("Creating instance o storeops service")
-storeOpService = StoreOpsService()
-storeOpService.setQueue(queue=queueAlarm)
+logger.info("Creating instance o storeops service") 
 
+storeOpService = StoreOpsService()
+storeOpService.run(queueAlarm=queueAlarm,queueInfo=queueInfo)
+
+ 
  

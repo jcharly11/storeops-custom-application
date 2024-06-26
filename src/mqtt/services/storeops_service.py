@@ -2,6 +2,8 @@ from mqtt.client import Client
 import logging
 from database.database import DataBase
 from config import settings as settings
+from utils.setting_info_tool import InfoTool
+
 import threading
 import queue
 import json
@@ -13,9 +15,11 @@ class StoreOpsService(Client):
         self.database = DataBase() 
         self.logger.info(f"Starting service ")
         self.client = Client().instance() 
+        self.infoService = InfoTool()
         self.client.on_message = self.onMessage
         self.client.on_subscribe = self.onSubscribe
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
+        self.client.subscribe(settings.TOPIC_STORE_INFO) 
         self.mutex = queue.Queue().mutex
         self.queue = None
 
@@ -34,11 +38,10 @@ class StoreOpsService(Client):
                  if not queue.empty():
                        
                       alarm = json.loads(queue.get())
-                      self.pub(uuid=alarm['uuid'])
+                      self.publicOnvifEvent(uuid=alarm['uuid'])
 
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
             self.logger.info(f"MQTT onSubscribed {client},{userdata}")    
-
 
     def onMessage(self, client, userdata, message, properties=None):
           
@@ -46,11 +49,14 @@ class StoreOpsService(Client):
           topic = message.topic
           self.logger.info(f"Recivening message from topic :{topic}")
 
-          if topic == "alarm":
-                    self.queue.put(payload)
+          if topic == settings.TOPIC_CUSTOM_ALARM:
+               self.queue.put(payload)
 
+          if topic == settings.TOPIC_STORE_INFO:
+               payload =  message.payload.decode()
+               self.infoService.getInfo(payload)
 
-    def pub(self,  uuid):
+    def publicOnvifEvent(self,  uuid):
          self.logger.info("Publish message")
          try:
              payload={ 
