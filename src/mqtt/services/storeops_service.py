@@ -38,7 +38,7 @@ class StoreOpsService(Service):
         if event_type == 'Info':
             self.queueInfo.put(message)
 
-        if event_type == 'MessageSnapshot':
+        if event_type == 'MessageSnapshot':#Request snapshot to onvif 
             self.logger.info(f"Trying to send snapshot message")
             timestamp = message['timestamp']
             uuid_request = message['uuid']
@@ -46,7 +46,8 @@ class StoreOpsService(Service):
                     "header":f"{{timestamp:{timestamp}, uuid_request:{uuid_request}, version:{settings.MESSAGE_VERSION}}}",
                     "data": f"{{take_snapshot: True}}"
                     }                
-            self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_IMAGE, payload=json.dumps(payload))
+            result = self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_IMAGE, payload=json.dumps(payload))
+
 
     def processAlarm(self,  queue): 
         self.logger.info(f"Starting validatio of alarm queue")
