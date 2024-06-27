@@ -13,6 +13,7 @@ class Service(Client):
         self.client.on_message = self.onMessage
         self.client.on_subscribe = self.onSubscribe
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
+        self.client.subscribe(settings.TOPIC_CAMERA_IMAGE_RESP)
         self.client.subscribe(settings.TOPIC_STORE_INFO) 
         
   
@@ -31,4 +32,10 @@ class Service(Client):
 
           if topic == settings.TOPIC_STORE_INFO:
                EventBus.publish('Info', {'payload': payload})
+
+          if topic  == settings.TOPIC_CAMERA_IMAGE_RESP:
+               print("********************")
+               EventBus.publish('Snapshot', {'payload': payload})
  
+    def pub(self, topic , payload):
+         self.client.publish(topic=topic, payload = payload)

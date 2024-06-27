@@ -15,6 +15,8 @@ from models import LogConfig
 from utils.environment_validator import EnvironmentValidator
 from mqtt.services.storeops_service import StoreOpsService
 from mqtt.services.services_info import ServiceInfo
+from mqtt.services.sharepoint_service import SharePointService
+from utils.alarm_process import AlarmProcess
 
 import queue 
 queueAlarm = queue.Queue() 
@@ -27,8 +29,9 @@ app = FastAPI()
 logger.info("Creating instance o storeops service") 
 
 serviceInfo = ServiceInfo()
+alarmProcess = AlarmProcess()
 storeOpService = StoreOpsService()
+sharePointService = SharePointService()
 storeOpService.run(queueAlarm=queueAlarm,queueInfo=queueInfo)
 
- 
- 
+

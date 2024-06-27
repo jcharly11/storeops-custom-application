@@ -1,29 +1,41 @@
-
+import datetime
+import io
 import json
 import logging 
 import os
 import config.settings as settings
 import requests
+from PIL import Image
 
 class SharepointUtils():
     def __init__(self):   
         self.logger = logging.getLogger(__name__)
         
-    def upload_file(self,data, origin_file, file_name):
+    def upload_file(self,data, file_name):
         self.logger.info("Starting to upload file to azure storage")
         try:
             access_token= self.getAuthToken()
             folder_name="Video"
+            url= f"h{settings.BASE_URL}/drives/{settings.DRIVE_ID}/items/root/children/Video"
             upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
 
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
+            name =  f"./tmp/onvif_files/{file_name}"
+            image = Image.open(io.BytesIO(data))
+            image.save(name)
 
-            with open(origin_file, 'rb') as file:
+            with open(name, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
                 self.logger.info(f"file upload: {response.json()}")
+
+            
+            response_folder = requests.get(url, headers=headers)
+            response_json= response.json()
+            id_folder= response_json["id"]
+            return id_folder
 
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
@@ -48,11 +60,9 @@ class SharepointUtils():
             with open(origin_file, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
                 self.logger.info(f"file upload: {response.json()}")
-            return True
 
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
-            return False
 
 
     def generateLink(self, id_folder):
@@ -64,11 +74,11 @@ class SharepointUtils():
                 "Content-Type": "application/json"
             }
 
-            expiration_date= "2024-06-13T09:18:00Z"
+            date_now = datetime.datetime.strptime(datetime.datetime.now(), "%Y/%m/%dT%H:%M:%SZ")
+            expiration_date = date_now + datetime.timedelta(days=60)
             data = {
                 "expirationDateTime": f"{expiration_date}",
                 "type": "view",
-                "password": "TestCkp",
                 "scope": "anonymous",
                 "retainInheritedPermissions": "false"
             }
@@ -98,6 +108,3 @@ class SharepointUtils():
         except Exception as err:
             self.logger.error(f"error get token: {err}, {type(err)}")
             return None
-
-
-   

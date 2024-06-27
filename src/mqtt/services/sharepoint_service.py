@@ -1,48 +1,39 @@
-from mqtt.client import Client
 import config.settings as settings
-import logging
-import queue
-from database.database import DataBase
+import logging 
+from events.event_bus import EventBus
 from utils.sharepoint_utils import SharepointUtils
-class SharePointService(Client):
+import json
+class SharePointService:
 
     def __init__(self): 
             self.idService = type(self).__name__
-            self.logger = logging.getLogger("main") 
-            self.queue = queue.Queue()
-            self.database = DataBase()
-            self.sharepoint = SharepointUtils()
-            self.logger.info(f"Starting service ")
-            self.client = Client().instance() 
-            self.client.on_message = self.onMessage
-            self.client.on_subscribe = self.onSubscribe 
-
-    def onSubscribe(self,client, userdata, mid, qos, properties=None):
-            self.logger.info(f"MQTT onSubscribed {client},{userdata}")    
+            self.logger = logging.getLogger("main")
+            self.sharePointUtils = SharepointUtils()
+            EventBus.subscribe('Snapshot',self)
 
 
-    def onMessage(self, client, userdata, message, properties=None): 
-          self.logger.info(f"onMessage =  message:{message.payload.decode()}")
-          payload =  message.payload.decode()
-          self.queue.put(payload)
-          
-
-       
-    def pub(self,  payload,id , uuid, messageId, timestamp, data):
-          self.logger.info("Publish message")
+    def handleMessage(self, event_type, data=None):
+          self.logger.info(f"Processing snapshot")
           try:
-               payload={ 
-                    "header":{
-                         "uuid_request": uuid
-                             },
-                    "snapshot": "true"
-                    }
-               
-               result = self.client.publish(topic=settings.TOPIC_CAMERA_IMAGE, payload=payload)
-               status = result[0]
-               
-               
+           if event_type == 'Snapshot':
+                 payload = json.loads(data['payload'])
+                 
+                 header = payload['header']
+                 uuid = header['uuid_request']
+                 timestamp = header['timestamp']
+                 body = payload['data']
+                 status = body['status']
+                 img = body['image']
+                 folder =self.sharePointUtils.upload_file(data=img,file_name= f"{uuid}.png")
+                 link = self.sharePointUtils.generateLink(id_folder=folder)
+                 print(link)
+                 #SUBIMOS IMG
+
+
+                    
+
           except Exception as ex:
-             self.logger.error(f"Publish {self.idService} exception:{ex}")
-         
+                    self.logger.error(f"Error requesting snapshot: {ex}")  
+
+
  
