@@ -28,14 +28,14 @@ class DataBase():
           except Exception as ex:
                self.logger.info(f"Error get messages: ",ex.args)
 
-    def saveMessage(self, message, status):
+    def saveMessage(self, message):
         try:
                date= datetime.datetime.now()
                self.cursor = self.connection.cursor()
-               self.cursor.execute('INSERT or REPLACE INTO messages VALUES (?,?,?)',(message,status,date))
+               self.cursor.execute('INSERT or REPLACE INTO messages VALUES (?,?,?,?,?)',(message.request_uuid, message.message, message.status, message.type, message.datetime_inserted))
                self.connection.commit()
                return True
-           
+                  
         except Exception as ex:
                self.logger.info(f"Error executing query insert message: ",ex.args)
 

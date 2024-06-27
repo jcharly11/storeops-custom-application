@@ -15,6 +15,7 @@ class StoreOpsService(Service):
         self.logger.info(f"Starting service ")
         self.service =Service() 
         self.mutex = queue.Queue().mutex
+        self.baseTopic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/ "
      
     def run(self, queueAlarm, queueInfo):
          self.queueAlarm = queueAlarm
@@ -45,7 +46,7 @@ class StoreOpsService(Service):
                     "header":f"{{timestamp:{timestamp}, uuid_request:{uuid_request}, version:{settings.MESSAGE_VERSION}}}",
                     "data": f"{{take_snapshot: True}}"
                     }                
-            self.service.pub(topic=settings.TOPIC_CAMERA_IMAGE, payload=json.dumps(payload))
+            self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_IMAGE, payload=json.dumps(payload))
 
     def processAlarm(self,  queue): 
         self.logger.info(f"Starting validatio of alarm queue")

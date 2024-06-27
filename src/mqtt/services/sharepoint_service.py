@@ -27,6 +27,7 @@ class SharePointService:
                  folder =self.sharePointUtils.upload_file(data=img,file_name= f"{uuid}.png")
                  link = self.sharePointUtils.generateLink(id_folder=folder)
                  print(link)
+                 EventBus.publish('MessageSnapshotLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                  #SUBIMOS IMG
 
 

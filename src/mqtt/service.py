@@ -12,9 +12,12 @@ class Service(Client):
         self.client = Client().instance()
         self.client.on_message = self.onMessage
         self.client.on_subscribe = self.onSubscribe
+        self.baseTopic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
-        self.client.subscribe(settings.TOPIC_CAMERA_IMAGE_RESP)
-        self.client.subscribe(settings.TOPIC_STORE_INFO) 
+        print(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
+        self.client.subscribe(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
+        self.client.subscribe(settings.TOPIC_STORE_INFO)
+ 
         
   
  
@@ -33,7 +36,8 @@ class Service(Client):
           if topic == settings.TOPIC_STORE_INFO:
                EventBus.publish('Info', {'payload': payload})
 
-          if topic  == settings.TOPIC_CAMERA_IMAGE_RESP:
+          if topic  == self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP:
+               print("***************")
                EventBus.publish('Snapshot', {'payload': payload})
  
     def pub(self, topic , payload):
