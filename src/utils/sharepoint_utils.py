@@ -1,3 +1,4 @@
+import base64
 import datetime
 import io
 import json
@@ -26,9 +27,9 @@ class SharepointUtils():
                 'Content-Type': 'application/octet-stream'
             }
             name =  f"./tmp/{file_name}"
-            bdata = self.encoder.encodeBytes(data)
-            image = Image.open(io.BytesIO(bdata))
-            image.save(name)
+
+            with open(name, "wb") as img_result:
+                img_result.write(base64.decodebytes(data))
 
             with open(name, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
@@ -77,8 +78,11 @@ class SharepointUtils():
                 "Content-Type": "application/json"
             }
 
-            date_now = datetime.datetime.strptime(datetime.datetime.now(), "%Y/%m/%dT%H:%M:%SZ")
-            expiration_date = date_now + datetime.timedelta(days=60)
+
+            date_now = datetime.datetime.now()
+            modified_date = date_now + datetime.timedelta(days=60)
+            expiration_date = modified_date.strftime("%Y/%m/%dT%H:%M:%SZ") 
+            
             data = {
                 "expirationDateTime": f"{expiration_date}",
                 "type": "view",
