@@ -3,7 +3,6 @@ import logging
 from database.database import DataBase
 from config import settings as settings
 from events.event_bus import EventBus
-
 import threading
 import queue
 import json
@@ -21,7 +20,6 @@ class StoreOpsService(Service):
          self.queueAlarm = queueAlarm
          self.queueInfo = queueInfo
          EventBus.subscribe('Alarm',self)
-         EventBus.subscribe('Info',self)
          EventBus.subscribe('Info',self)
          EventBus.subscribe('MessageSnapshot',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
@@ -41,9 +39,8 @@ class StoreOpsService(Service):
 
         if event_type == 'MessageSnapshot':
             self.logger.info(f"Trying to send snapshot message")
-            alarm = data['payload']
-            timestamp = alarm['timestamp']
-            uuid_request = alarm['uuid']
+            timestamp = message['timestamp']
+            uuid_request = message['uuid']
             payload = {
                     "header":f"{{timestamp:{timestamp}, uuid_request:{uuid_request}, version:{settings.MESSAGE_VERSION}}}",
                     "data": f"{{take_snapshot: True}}"

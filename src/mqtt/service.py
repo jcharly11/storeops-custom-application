@@ -34,7 +34,6 @@ class Service(Client):
                EventBus.publish('Info', {'payload': payload})
 
           if topic  == settings.TOPIC_CAMERA_IMAGE_RESP:
-               print("********************")
                EventBus.publish('Snapshot', {'payload': payload})
  
     def pub(self, topic , payload):
