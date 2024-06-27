@@ -19,7 +19,7 @@ class SharepointUtils():
         try:
             access_token= self.getAuthToken()
             folder_name="Video"
-            url= f"h{settings.BASE_URL}/drives/{settings.DRIVE_ID}/items/root/children/Video"
+            url= f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/items/root/children/Video"
             upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
 
             headers = {
@@ -27,9 +27,8 @@ class SharepointUtils():
                 'Content-Type': 'application/octet-stream'
             }
             name =  f"./tmp/{file_name}"
-
             with open(name, "wb") as img_result:
-                img_result.write(base64.decodebytes(data))
+                img_result.write(base64.b64decode(data.encode()))
 
             with open(name, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
@@ -81,7 +80,7 @@ class SharepointUtils():
 
             date_now = datetime.datetime.now()
             modified_date = date_now + datetime.timedelta(days=60)
-            expiration_date = modified_date.strftime("%Y/%m/%dT%H:%M:%SZ") 
+            expiration_date = modified_date.strftime("%Y-%m-%dT%H:%M:%SZ") 
             
             data = {
                 "expirationDateTime": f"{expiration_date}",
@@ -93,6 +92,7 @@ class SharepointUtils():
             
             resLink = requests.post(url, headers=headers, data=body)
             resJs= resLink.json()
+            print(resJs)
             folderLink= resJs["link"]["webUrl"]
             return folderLink
 

@@ -28,9 +28,10 @@ logger = logging.getLogger("main")
 app = FastAPI()
 logger.info("Creating instance o storeops service") 
 
+serviceInfo = ServiceInfo()
 alarmProcess = AlarmProcess()
 storeOpService = StoreOpsService()
 sharePointService = SharePointService()
-ServiceInfo().run(queueAlarm=queueAlarm,queueInfo=queueInfo)
+storeOpService.run(queueAlarm=queueAlarm,queueInfo=queueInfo)
 
 
