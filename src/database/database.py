@@ -18,10 +18,11 @@ class DataBase():
           except sqlite3.Error as err:
                self.logger.error(f"Database creation exception:", err.args)
 
-    def getMessages(self):
+    def getMessages(self, message):
           try:
                 self.cursor = self.connection.cursor()
-                self.cursor.execute("SELECT * FROM messages WHERE datetime_inserted <= datetime('now', '-168 hours')")
+                request_uuid = message.request_uuid
+                self.cursor.execute(f"SELECT * FROM messages WHERE request_uuid = {request_uuid}")
                 events = self.cursor.fetchall()
                 return events
           
