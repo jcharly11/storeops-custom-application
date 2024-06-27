@@ -6,10 +6,12 @@ import os
 import config.settings as settings
 import requests
 from PIL import Image
+from utils.images_tools import ImageEncoder
 
 class SharepointUtils():
     def __init__(self):   
         self.logger = logging.getLogger(__name__)
+        self.encoder = ImageEncoder()
         
     def upload_file(self,data, file_name):
         self.logger.info("Starting to upload file to azure storage")
@@ -23,8 +25,9 @@ class SharepointUtils():
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
-            name =  f"./tmp/onvif_files/{file_name}"
-            image = Image.open(io.BytesIO(data))
+            name =  f"./tmp/{file_name}"
+            bdata = self.encoder.encodeBytes(data)
+            image = Image.open(io.BytesIO(bdata))
             image.save(name)
 
             with open(name, 'rb') as file:
