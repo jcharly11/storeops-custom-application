@@ -1,0 +1,17 @@
+[Unit]
+Description=StoreOps custom application
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/storeops-custom-application
+ExecStart=/usr/bin/bash -c "cd /root/storeops-custom-application && source ./venv/bin/activate && uvicorn main:app --host localhost --port 8001"
+SyslogIdentifier=storeops-custom-application
+RemainAfterExit=yes
+Restart=always
+RestartSec=60s
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
