@@ -28,6 +28,7 @@ logger = logging.getLogger("main")
 app = FastAPI()
 logger.info("Creating instance o storeops service") 
 
+environmentValidator =  EnvironmentValidator()
 messageProcceso = MessageProcessor()
 serviceInfo = ServiceInfo()
 alarmProcess = AlarmProcess()
