@@ -14,7 +14,6 @@ class Service(Client):
         self.client.on_subscribe = self.onSubscribe
         self.baseTopic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
-        print(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
         self.client.subscribe(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
  
