@@ -28,10 +28,12 @@ class Service(Client):
           payload =  message.payload.decode()
           topic = message.topic
           
+          
           self.logger.info(f"Recivening message from topic :{topic}")
 
           if topic == settings.TOPIC_CUSTOM_ALARM:
-               EventBus.publish('Alarm', {'payload': payload})
+                  
+               EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
                EventBus.publish('Info', {'payload': payload})

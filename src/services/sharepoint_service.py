@@ -52,7 +52,7 @@ class SharepointService():
                 'Content-Type': 'application/octet-stream'
             }
 
-            #origin_file=f"./tmp/onvif-camera/files/{uuid}.mp4"
+            #origin_file=f"./tmp/onvif-camera/snapshots/onvif-camera/files/{uuid}.mp4"
             origin_file=f"/home/cbernal/Github/storeops/storeops-custom-application/src/services/video/{uuid}.mp4"
             print(f"-------------------- {origin_file}")
             #origin_file=f"{uuid}.mp4"

@@ -21,13 +21,13 @@ class DataBase():
     def getMessages(self, message):
           try:
                 self.cursor = self.connection.cursor()
-                request_uuid = message.request_uuid
-                self.cursor.execute(f"SELECT * FROM messages WHERE request_uuid = {request_uuid}")
+                request_uuid = message['uuid']
+                self.cursor.execute("SELECT * FROM messages WHERE request_uuid =?", (request_uuid,))
                 events = self.cursor.fetchall()
                 return events
           
           except Exception as ex:
-               self.logger.info(f"Error get messages: ",ex.args)
+               self.logger.info(f"Error get messages: ",ex)
 
     def saveMessage(self, message):
         try:

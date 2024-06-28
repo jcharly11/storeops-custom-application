@@ -2,11 +2,14 @@ from events.event_bus import EventBus
 import logging
 from database.database import DataBase
 from database.model.message_alarm import MessageAlarm
+import uuid
+import datetime
 class AlarmProcess:
     def __init__(self) -> None:
         self.logger = logging.getLogger("main")
         self.database = DataBase()
         self.epcsList = []  
+
 
         EventBus.subscribe('AlarmProcess', self)
 
@@ -21,7 +24,7 @@ class AlarmProcess:
                 for item in alarms:
                     alarmGlobal = item['extraPayload']['audible_alarm']
                     if alarmGlobal == True:
-                        uuid = item['uuid']
+                        request_uuid = item['uuid']
                         timestamp = item['extraPayload']['timestamp']
                         break
 
@@ -29,18 +32,19 @@ class AlarmProcess:
                     for item in alarms: 
                         epc = item['epc']
                         self.epcsList.append(epc)  
-                    print(self.epcsList)
-
+ 
                     alarm_event = { "message": MessageAlarm(
-                                        request_uuid= uuid,
+                                        request_uuid= request_uuid,
                                         message= str(self.epcsList),
-                                        status="",
+                                        status=alarmGlobal,
                                         type=1,
                                         datetime_inserted=timestamp
                                     ) }
+                   
+                    
                     self.database.saveMessage(message=alarm_event["message"])
                       
-                    EventBus.publish('MessageSnapshot',{'payload': {'uuid':uuid,'timestamp':timestamp}}   )
+                    EventBus.publish('MessageSnapshot',{'payload': {'uuid':request_uuid,'timestamp':timestamp}}   )#Send internal message to MessageProcessor
                 
                   
 

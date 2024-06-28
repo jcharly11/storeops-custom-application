@@ -9,6 +9,16 @@ import json
 import time
 class StoreOpsService(Service):
     
+    """Receives from other services message to upload files to sharepoint. 
+
+        Files tree structure is created by this service. 
+
+        Retries uploading if fails. 
+
+        Generates an internal message of the custom app with the sharepoint link to the files. 
+
+        Only keep database of files until they are uploaded. 
+"""
     def __init__(self):
         self.logger = logging.getLogger("main")  
         self.database = DataBase() 
@@ -23,6 +33,7 @@ class StoreOpsService(Service):
          EventBus.subscribe('Alarm',self)
          EventBus.subscribe('Info',self)
          EventBus.subscribe('MessageSnapshot',self)
+         EventBus.subscribe('PublishMessageItemOptix',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
          infoThread = threading.Thread(target=self.processInfo,args=(self.queueInfo,))
@@ -47,6 +58,10 @@ class StoreOpsService(Service):
                     "data": f"{{take_snapshot: True}}"
                     }                
             result = self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_IMAGE, payload=json.dumps(payload))
+        
+        if event_type == 'PublishMessageItemOptix': 
+            self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS, payload=json.dumps(message['body']))
+
 
 
     def processAlarm(self,  queue): 
@@ -63,7 +78,7 @@ class StoreOpsService(Service):
                            alarms.append(alarm)
                            if queue.empty():
                                self.logger.info(f"Sending list of alarm messages")
-                               EventBus.publish('AlarmProcess' , {'alarms': alarms})
+                               EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
 
     def processInfo(self, queue):
         while True:
