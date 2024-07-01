@@ -30,5 +30,4 @@ class ServiceInfo():
          payload = data['payload']
          json_item = json.loads(payload)
          self.getInfo(json_item)
-         self.logger.info(f" account,number{settings.ACCOUNT_NUMBER },{settings.LOCATION_ID}")
-        
+         

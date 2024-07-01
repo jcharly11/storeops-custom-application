@@ -48,9 +48,15 @@ class StoreOpsService(Service):
         if event_type == 'MessageSnapshot':#Request snapshot to onvif 
             timestamp = message['timestamp']
             uuid_request = message['uuid']
+            
             payload = {
-                    "header":f"{{timestamp:{timestamp}, uuid_request:{uuid_request}, version:{settings.MESSAGE_VERSION}}}",
-                    "data": f"{{take_snapshot: True}}"
+                    "header":{
+                        "timestamp":timestamp,
+                        "uuid_request":uuid_request,
+                        "version":settings.MESSAGE_VERSION},
+                    "data": {
+                        "take_snapshot": True
+                        }
                     }
             topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE                
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
