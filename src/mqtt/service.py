@@ -12,9 +12,7 @@ class Service(Client):
         self.client = Client().instance()
         self.client.on_message = self.onMessage
         self.client.on_subscribe = self.onSubscribe
-        self.baseTopic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
-        self.client.subscribe(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
         
@@ -27,6 +25,7 @@ class Service(Client):
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
           topic = message.topic
+          topicResp = topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
      
           
           self.logger.info(f"Recivening message from topic :{topic}")
@@ -40,17 +39,15 @@ class Service(Client):
                EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
-                self.logger.info(f"Recivening message from topic :{topic}")
+               try:
+                    EventBus.publish('MessageInfo', {'payload': payload})
+               
 
-                if topic == settings.TOPIC_STORE_INFO:
-                    try:
-                         EventBus.publish('MessageInfo', {'payload': payload})
- 
-                    except Exception as err:
-                         self.logger.error(f"Unexpected {err}, {type(err)}")
-               #
-          if topic  == self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP:
-               print("***************")
+               except Exception as err:
+                    self.logger.error(f"Unexpected {err}, {type(err)}")
+               
+          if topic  == topicResp+settings.TOPIC_CAMERA_IMAGE_RESP:
+               self.logger.info(f"Getting base 64 form onvi")
                EventBus.publish('Snapshot', {'payload': payload})
  
     def pub(self, topic , payload):
@@ -66,3 +63,9 @@ class Service(Client):
           self.client.publish(topic = settings.TOPIC_STORE_INFO, payload =  json.dumps(param))
          except Exception as err:
           self.logger.error(f"send_store_info_get {err}, {type(err)}")
+   
+    def subscribeSnapshotResp(self, accoutNumber, storeId):
+         
+        topic = f"checkpoint/{accoutNumber}/{storeId}/service/"+settings.TOPIC_CAMERA_IMAGE_RESP
+        self.client.subscribe(topic)
+        self.logger.info(f"Subcriber to response of onvif: {topic}")

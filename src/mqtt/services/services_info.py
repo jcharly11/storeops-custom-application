@@ -21,7 +21,10 @@ class ServiceInfo():
             if "doorName" in payload:
                 settings.DOOR_NAME = payload["doorName"]
             if "doorNumber" in payload:
-                settings.DOOR_NUMBER = payload["doorNumber"] 
+                settings.DOOR_NUMBER = payload["doorNumber"]
+
+
+            EventBus.publish('SubscriberInfo', {'accountNumber': settings.ACCOUNT_NUMBER,'storeId':settings.LOCATION_ID}) 
     
     def handleMessage(self, event_type, data=None):
          payload = data['payload']

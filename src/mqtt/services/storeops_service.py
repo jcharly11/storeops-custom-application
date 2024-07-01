@@ -25,7 +25,7 @@ class StoreOpsService(Service):
         self.logger.info(f"Starting service ")
         self.service =Service() 
         self.mutex = queue.Queue().mutex
-        self.baseTopic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/ "
+        
      
     def run(self, queueAlarm, queueInfo):
          self.queueAlarm = queueAlarm
@@ -52,11 +52,17 @@ class StoreOpsService(Service):
             payload = {
                     "header":f"{{timestamp:{timestamp}, uuid_request:{uuid_request}, version:{settings.MESSAGE_VERSION}}}",
                     "data": f"{{take_snapshot: True}}"
-                    }                
-            result = self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_IMAGE, payload=json.dumps(payload))
+                    }
+            topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE                
+            result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
-        if event_type == 'PublishMessageItemOptix': 
-            self.service.pub(topic=self.baseTopic+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS, payload=json.dumps(message['body']))
+        if event_type == 'SubscriberInfo':
+            self.service.subscribeSnapshotResp(accoutNumber= message['accountNumber'], storeId= message['storeId'])
+
+        if event_type == 'PublishMessageItemOptix':
+            topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
+
+            self.service.pub(topic=topic, payload=json.dumps(message['body']))
 
 
 

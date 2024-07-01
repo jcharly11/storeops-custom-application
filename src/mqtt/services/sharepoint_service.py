@@ -28,10 +28,7 @@ class SharePointService:
                  folder, uploaded = self.upload(img=img, uuid=uuid)
                  if uploaded is not True:
                      folder, uploaded = self.upload(img=img, uuid=uuid)
-                      
-                  
-                 
-                 
+                     
                  link = self.sharePointUtils.generateLink(id_folder=folder)
                  EventBus.publish('MessageSnapshotLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                  #SUBIMOS IMG
