@@ -36,8 +36,15 @@ class Service(Client):
                EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
-               EventBus.publish('Info', {'payload': payload})
+                self.logger.info(f"Recivening message from topic :{topic}")
 
+                if topic == settings.TOPIC_STORE_INFO:
+                    try:
+                         EventBus.publish('MessageInfo', {'payload': payload})
+ 
+                    except Exception as err:
+                         self.logger.error(f"Unexpected {err}, {type(err)}")
+               #
           if topic  == self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP:
                print("***************")
                EventBus.publish('Snapshot', {'payload': payload})

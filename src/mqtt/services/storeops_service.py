@@ -31,13 +31,11 @@ class StoreOpsService(Service):
          self.queueAlarm = queueAlarm
          self.queueInfo = queueInfo
          EventBus.subscribe('Alarm',self)
-         EventBus.subscribe('Info',self)
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('PublishMessageItemOptix',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
-         infoThread = threading.Thread(target=self.processInfo,args=(self.queueInfo,))
-         infoThread.start()          
+             
  
     def handleMessage(self, event_type, data=None):
         message =data['payload']
@@ -46,8 +44,6 @@ class StoreOpsService(Service):
 
             self.queueAlarm.put(message)
 
-        if event_type == 'Info':
-            self.queueInfo.put(message)
 
         if event_type == 'MessageSnapshot':#Request snapshot to onvif 
             self.logger.info(f"Trying to send snapshot message")
@@ -80,10 +76,4 @@ class StoreOpsService(Service):
                                self.logger.info(f"Sending list of alarm messages")
                                EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
 
-    def processInfo(self, queue):
-        while True:
-            with self.mutex:
-                 if not queue.empty():
-                       
-                      info = json.loads(queue.get()) 
-                      EventBus.publish('MessageInfo',info)
+ 
