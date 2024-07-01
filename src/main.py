@@ -16,6 +16,7 @@ from utils.environment_validator import EnvironmentValidator
 from mqtt.services.storeops_service import StoreOpsService
 from mqtt.services.services_info import ServiceInfo
 from mqtt.services.sharepoint_service import SharePointService
+from mqtt.services.services_restart import ServiceRestart
 from utils.alarm_process import AlarmProcess
 from utils.message_processor import MessageProcessor
 import queue 
@@ -34,6 +35,7 @@ serviceInfo = ServiceInfo()
 alarmProcess = AlarmProcess()
 storeOpService = StoreOpsService()
 sharePointService = SharePointService()
+serviceRestart = ServiceRestart()
 storeOpService.run(queueAlarm=queueAlarm,queueInfo=queueInfo)
 
 

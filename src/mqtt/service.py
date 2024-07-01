@@ -16,6 +16,7 @@ class Service(Client):
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
+        self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
  
         
   
@@ -48,6 +49,9 @@ class Service(Client):
           if topic  == self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP:
                print("***************")
                EventBus.publish('Snapshot', {'payload': payload})
+          
+          if topic == settings.TOPIC_RESTART_APPLICATION:
+               EventBus.publish('MessageRestart', {'payload': payload})
  
     def pub(self, topic , payload):
          self.client.publish(topic=topic, payload = payload)
