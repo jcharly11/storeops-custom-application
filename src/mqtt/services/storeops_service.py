@@ -46,7 +46,6 @@ class StoreOpsService(Service):
 
 
         if event_type == 'MessageSnapshot':#Request snapshot to onvif 
-            self.logger.info(f"Trying to send snapshot message {self.baseTopic}")
             timestamp = message['timestamp']
             uuid_request = message['uuid']
             payload = {
