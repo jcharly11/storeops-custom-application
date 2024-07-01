@@ -16,7 +16,7 @@ class Service(Client):
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(self.baseTopic+settings.TOPIC_CAMERA_IMAGE_RESP)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
- 
+        self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
         
   
  
@@ -27,9 +27,13 @@ class Service(Client):
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
           topic = message.topic
-          
+     
           
           self.logger.info(f"Recivening message from topic :{topic}")
+
+          if topic == settings.TOPIC_RESTART_APPLICATION:
+               
+               EventBus.publish('Restart', {'payload': payload})#Send internal message to restart service
 
           if topic == settings.TOPIC_CUSTOM_ALARM:
                   
