@@ -39,6 +39,7 @@ class Service(Client):
 
           if topic == settings.TOPIC_STORE_INFO:
                try:
+                    self.logger.info(f"Sending internal mesage to subscribe info")
                     EventBus.publish('MessageInfo', {'payload': payload})
                
 
