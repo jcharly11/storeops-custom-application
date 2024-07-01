@@ -15,8 +15,7 @@ class Service(Client):
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
-        
-  
+
  
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
             self.logger.info(f"MQTT onSubscribed {client},{userdata}")
@@ -32,7 +31,7 @@ class Service(Client):
 
           if topic == settings.TOPIC_RESTART_APPLICATION:
                
-               EventBus.publish('Restart', {'payload': payload})#Send internal message to restart service
+               EventBus.publish('MessageRestart', {'payload': payload})#Send internal message to restart service
 
           if topic == settings.TOPIC_CUSTOM_ALARM:
                   
@@ -49,6 +48,9 @@ class Service(Client):
           if topic  == topicResp+settings.TOPIC_CAMERA_IMAGE_RESP:
                self.logger.info(f"Getting base 64 form onvi")
                EventBus.publish('Snapshot', {'payload': payload})
+          
+          if topic == settings.TOPIC_RESTART_APPLICATION:
+               EventBus.publish('MessageRestart', {'payload': payload})
  
     def pub(self, topic , payload):
          self.client.publish(topic=topic, payload = payload)
