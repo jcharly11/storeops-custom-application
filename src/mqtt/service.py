@@ -24,7 +24,7 @@ class Service(Client):
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
           topic = message.topic
-          topicResp = topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
+          topicResp =  f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
      
           
           self.logger.info(f"Recivening message from topic :{topic}")
