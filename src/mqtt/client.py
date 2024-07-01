@@ -15,7 +15,7 @@ class Client(object):
                                   uuid.uuid4().__str__())
                                   
         try:
-            self.client.connect(host="192.168.127.3", port=settings.MQTT_PORT)
+            self.client.connect(host=settings.MQTT_SERVER, port=settings.MQTT_PORT)
             self.client.on_connect = self.onConnect
             self.client.on_disconnect = self.onDisConnect
             self.client.on_publish = self.onPublish 
