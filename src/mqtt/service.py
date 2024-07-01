@@ -3,7 +3,7 @@ from events.event_bus import EventBus
 
 import config.settings as settings
 import logging
-
+import json
 
 class Service(Client):
 
@@ -21,7 +21,8 @@ class Service(Client):
   
  
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
-            self.logger.info(f"MQTT onSubscribed {client},{userdata}")    
+            self.logger.info(f"MQTT onSubscribed {client},{userdata}")
+            self.getInfo()    
     
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
@@ -43,3 +44,14 @@ class Service(Client):
  
     def pub(self, topic , payload):
          self.client.publish(topic=topic, payload = payload)
+   
+    def getInfo(self):
+         try:
+          
+          param = {
+                "type": "get"
+                }
+          self.logger.info(f"Requesting info store")
+          self.client.publish(topic = settings.TOPIC_STORE_INFO, payload =  json.dumps(param))
+         except Exception as err:
+          self.logger.error(f"send_store_info_get {err}, {type(err)}")
