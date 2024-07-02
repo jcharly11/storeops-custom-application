@@ -28,6 +28,7 @@ class Service(Client):
      
           
           self.logger.info(f"Recivening message from topic :{topic}")
+          self.logger.info(f"Recivening message from topic :{topicResp}")
 
           if topic == settings.TOPIC_RESTART_APPLICATION:
                
@@ -70,5 +71,6 @@ class Service(Client):
     def subscribeSnapshotResp(self, accoutNumber, storeId):
          
         topic = f"checkpoint/{accoutNumber}/{storeId}/service/"+settings.TOPIC_CAMERA_IMAGE_RESP
+        self.logger.info(f"subscribeSnapshotResp: {topic}")
         self.client.subscribe(topic)
         self.logger.info(f"Subcriber to response of onvif: {topic}")

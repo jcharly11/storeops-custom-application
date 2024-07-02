@@ -23,7 +23,7 @@ class ServiceInfo():
             if "doorNumber" in payload:
                 settings.DOOR_NUMBER = payload["doorNumber"]
 
-
+            self.logger.info("calling SubscriberInfo")
             EventBus.publish('SubscriberInfo', {'accountNumber': settings.ACCOUNT_NUMBER,'storeId':settings.LOCATION_ID}) 
     
     def handleMessage(self, event_type, data=None):
