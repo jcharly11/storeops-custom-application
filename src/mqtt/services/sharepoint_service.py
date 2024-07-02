@@ -23,7 +23,7 @@ class SharePointService:
             uuid = header['uuid_request']
             timestamp = header['timestamp']
             body = payload['data'] 
-            status = payload['status'] 
+            status = body['status'] 
             img = body['image']
             
             if status == "OK":
