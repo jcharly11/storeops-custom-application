@@ -19,7 +19,8 @@ class Service(Client):
  
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
             self.logger.info(f"MQTT onSubscribed {client},{userdata}")
-            self.getInfo()    
+            if settings.ACCOUNT_NUMBER =='EMPTY' and settings.LOCATION_ID == 'EMPTY':
+                self.getInfo()    
     
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
