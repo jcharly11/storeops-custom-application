@@ -11,27 +11,25 @@ class SharePointService:
             self.logger = logging.getLogger("main")
             self.sharePointUtils = SharepointUtils()
             EventBus.subscribe('Snapshot',self)
+            
 
 
     def handleMessage(self, event_type, data=None):
           self.logger.info(f"Processing snapshot")
           try:
-           if event_type == 'Snapshot':#Getting smapshot from onvi,  upload to sharepoint, downloadlink generation
-                 payload = json.loads(data['payload'])
-                 
-                 header = payload['header']
-                 uuid = header['uuid_request']
-                 timestamp = header['timestamp']
-                 body = payload['data']
-                 status = body['status']
-                 img = body['image']
+            payload = data['payload']
+            header = payload['header']
+            uuid = header['uuid_request']
+            timestamp = header['timestamp']
+            body = payload['data'] 
+            img = body['image']
+            folder, uploaded = self.upload(img=img, uuid=uuid)
+            if uploaded is not True:
                  folder, uploaded = self.upload(img=img, uuid=uuid)
-                 if uploaded is not True:
-                     folder, uploaded = self.upload(img=img, uuid=uuid)
                      
-                 link = self.sharePointUtils.generateLink(id_folder=folder)
-                 EventBus.publish('MessageSnapshotLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
-                 #SUBIMOS IMG
+            link = self.sharePointUtils.generateLink(id_folder=folder)
+            EventBus.publish('MessageSnapshotLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+              #SUBIMOS IMG
 
 
                     
