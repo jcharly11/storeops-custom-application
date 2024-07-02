@@ -32,6 +32,7 @@ class StoreOpsService(Service):
          self.queueInfo = queueInfo
          EventBus.subscribe('Alarm',self)
          EventBus.subscribe('MessageSnapshot',self)
+         EventBus.subscribe('SubscriberInfo',self)
          EventBus.subscribe('PublishMessageItemOptix',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
