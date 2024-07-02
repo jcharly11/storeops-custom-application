@@ -24,7 +24,7 @@ class ServiceInfo():
                 settings.DOOR_NUMBER = payload["doorNumber"]
 
             self.logger.info("calling SubscriberInfo")
-            EventBus.publish('SubscriberInfo', {'accountNumber': settings.ACCOUNT_NUMBER,'storeId':settings.LOCATION_ID}) 
+            EventBus.publish('SubscriberInfo',{'payload': {'accountNumber': settings.ACCOUNT_NUMBER,'storeId':settings.LOCATION_ID}}) 
     
     def handleMessage(self, event_type, data=None):
          payload = data['payload']
