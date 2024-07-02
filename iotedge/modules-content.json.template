@@ -37,7 +37,7 @@
             "settings": {
               "image": "docker.io/checkpt/storeops-custom-application:<VERSION>",
 
-              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/var/log/storeops-custom-application:/app/logs\",\"/usr/share/cockpit/storeops-custom-application:/app/cockpit\",\"/var/environment/storeops-custom-application:/app/environment\",\"/var/scripts/storeops-custom-application:/app/shell-scripts\"],\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/var/log/storeops-custom-application:/app/logs\",\"/usr/share/cockpit/storeops-custom-application:/app/cockpit\",\"/var/environment/storeops-custom-application:/app/environment\",\"/var/scripts/storeops-custom-application:/app/shell-scripts\",\"/tmp/onvif-camera/snapshots:/app/snapshots\",\"/tmp/onvif-camera/videos:/app/videos\"],\"LogConfig\":{\"Type\": \"json-file\",\"Config\": {\"max-size\": \"10m\",\"max-file\": \"5\"}}}}"
 
             },
             "status": "running",
