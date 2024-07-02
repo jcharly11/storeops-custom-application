@@ -51,8 +51,8 @@ class StoreOpsService(Service):
             
             payload = {
                     "header":{
-                        "timestamp":timestamp,
-                        "uuid_request":uuid_request,
+                        "timestamp": timestamp,
+                        "uuid_request": uuid_request,
                         "version":settings.MESSAGE_VERSION},
                     "data": {
                         "take_snapshot": True
@@ -76,9 +76,8 @@ class StoreOpsService(Service):
         while True:
             with self.mutex:
                  if not queue.empty():
-                      time.sleep(settings.ALARM_AGGREGATION_WINDOW_SEC)
-                      self.logger.info("Stop waiting")
-                      self.logger.info(f"imtesn in queue: {queue.qsize()}")
+                      time.sleep(settings.ALARM_AGGREGATION_WINDOW_SEC) 
+                      self.logger.info(f"Items in queue: {queue.qsize()}")
                       while not queue.empty():
                            alarm = json.loads(queue.get())  
                            alarms.append(alarm)
