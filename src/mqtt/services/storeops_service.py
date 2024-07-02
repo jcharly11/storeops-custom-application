@@ -41,10 +41,9 @@ class StoreOpsService(Service):
     def handleMessage(self, event_type, data=None):
         message =data['payload']
 
-        if event_type == 'Alarm':
+        if event_type == 'Alarm':#Put alarm event to queue
 
             self.queueAlarm.put(message)
-
 
         if event_type == 'MessageSnapshot':#Request snapshot to onvif 
             timestamp = message['timestamp']
@@ -62,12 +61,11 @@ class StoreOpsService(Service):
             topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE                
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
-        if event_type == 'SubscriberInfo':
+        if event_type == 'SubscriberInfo': #Subscribe info topic 
             self.service.subscribeSnapshotResp(accoutNumber= message['accountNumber'], storeId= message['storeId'])
 
-        if event_type == 'PublishMessageItemOptix':
+        if event_type == 'PublishMessageItemOptix':#Publish mesage for itemoptix
             topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
-
             self.service.pub(topic=topic, payload=json.dumps(message['body']))
 
 
@@ -87,5 +85,6 @@ class StoreOpsService(Service):
                            if queue.empty():
                                self.logger.info(f"Sending list of alarm messages")
                                EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
+                               alarms.clear()
 
  

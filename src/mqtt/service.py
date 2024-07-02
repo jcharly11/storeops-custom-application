@@ -41,15 +41,15 @@ class Service(Client):
 
           if topic == settings.TOPIC_STORE_INFO:
                try:
-                    self.logger.info(f"Sending internal mesage to subscribe info")
-                    EventBus.publish('MessageInfo', {'payload': payload})
+                   
+                    EventBus.publish('MessageInfo', {'payload': payload})#Send internal message to storeopservice
                
 
                except Exception as err:
                     self.logger.error(f"Unexpected {err}, {type(err)}")
                
           if topic  == topicResp+settings.TOPIC_CAMERA_IMAGE_RESP:
-               self.logger.info(f"Getting base 64 form onvi")
+               
                EventBus.publish('Snapshot', {'payload': payload})
           
           if topic == settings.TOPIC_RESTART_APPLICATION:
