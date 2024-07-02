@@ -26,7 +26,7 @@ class SharepointUtils():
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
-            name =  f"./tmp/onvif-camera/snapshots/{file_name}"
+            name =  f"./snapshots/{file_name}"
             with open(name, "wb") as img_result:
                 img_result.write(base64.b64decode(data.encode()))
 
@@ -58,7 +58,7 @@ class SharepointUtils():
                 'Content-Type': 'application/octet-stream'
             }
 
-            origin_file=f"./tmp/onvif-camera/snapshots/onvif-camera/files/{uuid}.mp4"
+            origin_file=f"./snapshots/{uuid}.mp4"
             
             #origin_file=f"{uuid}.mp4"
             with open(origin_file, 'rb') as file:

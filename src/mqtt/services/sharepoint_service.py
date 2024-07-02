@@ -42,7 +42,7 @@ class SharePointService:
     def upload(self, img, uuid):
       folder =self.sharePointUtils.upload_file(data=img,file_name= f"{uuid}.png")
       if folder != None:
-            os.remove(f"./tmp/onvif-camera/snapshots/{uuid}.png")
+            os.remove(f"./snapshots/{uuid}.png")
             return (folder, True)
       else:
            return (None,False)            
