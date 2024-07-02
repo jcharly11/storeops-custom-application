@@ -10,17 +10,12 @@ class Service(Client):
     def __init__(self) -> None:
         self.logger = logging.getLogger("main") 
         self.client = Client().instance()
-        self.client.on_message = self.onMessage
-        self.client.on_subscribe = self.onSubscribe
+        self.client.on_message = self.onMessage 
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
+        self.getInfo()
 
- 
-    def onSubscribe(self,client, userdata, mid, qos, properties=None):
-            self.logger.info(f"MQTT onSubscribed {client},{userdata}")
-            if settings.ACCOUNT_NUMBER =='EMPTY' and settings.LOCATION_ID == 'EMPTY':
-                self.getInfo()    
     
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
@@ -40,16 +35,10 @@ class Service(Client):
                EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
-               try:
-                   
-                    EventBus.publish('MessageInfo', {'payload': payload})#Send internal message to storeopservice
+  
+              EventBus.publish('MessageInfo', {'payload': payload})#Send internal message to storeopservice
                
-
-               except Exception as err:
-                    self.logger.error(f"Unexpected {err}, {type(err)}")
-               
-          if topic  == topicResp+settings.TOPIC_CAMERA_IMAGE_RESP:
-               
+          if topic  == topicResp + settings.TOPIC_CAMERA_IMAGE_RESP:
                EventBus.publish('Snapshot', {'payload': payload})
           
           if topic == settings.TOPIC_RESTART_APPLICATION:

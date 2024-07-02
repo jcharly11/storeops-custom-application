@@ -6,11 +6,11 @@ class ServiceInfo():
     
     def __init__(self):
          self.logger = logging.getLogger("main")
-         EventBus.subscribe('MessageInfo',self)
+         EventBus.subscribe('MessageInfo',self)#subsiption to internal message
 
 
   
-    def getInfo(self, payload):
+    def setVariables(self, payload):
           
             if "accountNumber" in payload:
                 settings.ACCOUNT_NUMBER = payload["accountNumber"]   
@@ -28,5 +28,5 @@ class ServiceInfo():
     def handleMessage(self, event_type, data=None):
          payload = data['payload']
          json_item = json.loads(payload)
-         self.getInfo(json_item)
+         self.setVariables(json_item)
          
