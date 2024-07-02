@@ -7,8 +7,6 @@ class ServiceInfo():
     def __init__(self):
          self.logger = logging.getLogger("main")
          EventBus.subscribe('MessageInfo',self)#subsiption to internal message
-
-
   
     def setVariables(self, payload):
           
@@ -25,7 +23,7 @@ class ServiceInfo():
 
             EventBus.publish('SubscriberInfo',{'payload': {'accountNumber': settings.ACCOUNT_NUMBER,'storeId':settings.LOCATION_ID}}) 
     
-    def handleMessage(self, event_type, data=None):
+    def handleMessage(self, _, data=None):
          payload = data['payload']
          json_item = json.loads(payload)
          self.setVariables(json_item)

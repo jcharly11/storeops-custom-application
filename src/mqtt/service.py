@@ -14,17 +14,13 @@ class Service(Client):
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
-        self.getInfo()
+        self.getInfo()#request info to broker
 
     
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
           topic = message.topic
           topicResp =  f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
-     
-          
-          self.logger.info(f"Recivening message from topic :{topic}")
-          self.logger.info(f"Recivening message from topic :{topicResp}")
 
           if topic == settings.TOPIC_RESTART_APPLICATION:
                
@@ -35,10 +31,12 @@ class Service(Client):
                EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
-  
-              EventBus.publish('MessageInfo', {'payload': payload})#Send internal message to storeopservice
+              if settings.ACCOUNT_NUMBER == 'EMPTY' and settings.LOCATION_ID == 'EMPTY':
+                  self.logger.info("Incoming info store from mqtt broker")
+                  EventBus.publish('MessageInfo', {'payload': payload})  #Send internal message to storeopservice
                
           if topic  == topicResp + settings.TOPIC_CAMERA_IMAGE_RESP:
+               self.logger.info(f"Incoming message from onvif module")
                EventBus.publish('Snapshot', {'payload': payload})
           
           if topic == settings.TOPIC_RESTART_APPLICATION:
