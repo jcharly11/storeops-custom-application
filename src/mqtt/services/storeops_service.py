@@ -63,7 +63,6 @@ class StoreOpsService(Service):
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
         if event_type == 'SubscriberInfo':
-            self.logger.info("storesop service SubscriberInfo ")
             self.service.subscribeSnapshotResp(accoutNumber= message['accountNumber'], storeId= message['storeId'])
 
         if event_type == 'PublishMessageItemOptix':

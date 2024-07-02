@@ -17,12 +17,13 @@ class SharePointService:
     def handleMessage(self, event_type, data=None):
           self.logger.info(f"Processing snapshot")
           try:
-            payload = data['payload']
+            payload = json.loads(data['payload'])
             header = payload['header']
             uuid = header['uuid_request']
             timestamp = header['timestamp']
             body = payload['data'] 
             img = body['image']
+            
             folder, uploaded = self.upload(img=img, uuid=uuid)
             if uploaded is not True:
                  folder, uploaded = self.upload(img=img, uuid=uuid)
