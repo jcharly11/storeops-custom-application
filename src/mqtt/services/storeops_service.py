@@ -66,7 +66,7 @@ class StoreOpsService(Service):
 
         if event_type == 'PublishMessageItemOptix':#Publish mesage for itemoptix
             topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
-            self.service.pub(topic=topic, payload=json.dumps(message['body']))
+            self.service.pub(topic=topic, payload=json.dumps(message))
 
 
 
