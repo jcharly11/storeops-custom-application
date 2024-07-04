@@ -35,7 +35,6 @@ class MessageProcessor:
                         "type": 1,
                         "uuid": message['uuid'] ,
                         "message_id": uuid.uuid4().__str__() ,
-                        "uuid_request": None, 
                         "timestamp": datetime.datetime.now().__str__(),
                         "version": 1,
                         "data": data
