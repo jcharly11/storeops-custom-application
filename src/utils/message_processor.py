@@ -12,8 +12,8 @@ class MessageProcessor:
 
     
     
-    def handleMessage(self, event_type, data=None):#Proccessing message for item optix
-          self.logger.info(f"Processing message for itemoptix")
+    def handleMessage(self, event_type, data=None):#Proccessing message for alarm
+          self.logger.info(f"Processing message for alarm")
           try:
            if event_type == 'MessageSnapshotLink':
                  message = data['payload']
@@ -39,15 +39,15 @@ class MessageProcessor:
                         "version": 1,
                         "data": data
                  }  
-                 EventBus.publish('PublishMessageItemOptix',{'payload': {'body':body}})
+                 EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
 
                  
                  
 
                  #update database
                  #read database
-                 #send message itx
+                 #send message alarm
                  #delete message or save
                  
           except Exception as ex:
-              self.logger.error(f"Error processing message fot ITX: {ex}")        
+              self.logger.error(f"Error processing message for alarm: {ex}")        

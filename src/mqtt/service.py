@@ -20,7 +20,7 @@ class Service(Client):
     def onMessage(self, client, userdata, message, properties=None):
           payload =  message.payload.decode()
           topic = message.topic
-          topicResp =  f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
+          #topicResp =  f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
 
           if topic == settings.TOPIC_RESTART_APPLICATION:
                
@@ -35,7 +35,7 @@ class Service(Client):
                   self.logger.info("Incoming info store from mqtt broker")
                   EventBus.publish('MessageInfo', {'payload': payload})  #Send internal message to storeopservice
                
-          if topic  == topicResp + settings.TOPIC_CAMERA_IMAGE_RESP:
+          if topic  == settings.TOPIC_CAMERA_IMAGE_RESP:
                self.logger.info(f"Incoming message from onvif module")
                EventBus.publish('Snapshot', {'payload': payload})
           
@@ -58,7 +58,8 @@ class Service(Client):
    
     def subscribeSnapshotResp(self, accoutNumber, storeId):
          
-        topic = f"checkpoint/{accoutNumber}/{storeId}/service/"+settings.TOPIC_CAMERA_IMAGE_RESP
+        #topic = f"checkpoint/{accoutNumber}/{storeId}/service/"+settings.TOPIC_CAMERA_IMAGE_RESP
+        topic = settings.TOPIC_CAMERA_IMAGE_RESP
         self.logger.info(f"subscribeSnapshotResp: {topic}")
         self.client.subscribe(topic)
         self.logger.info(f"Subcriber to response of onvif: {topic}")

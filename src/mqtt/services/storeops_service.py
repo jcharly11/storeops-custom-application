@@ -33,7 +33,7 @@ class StoreOpsService(Service):
          EventBus.subscribe('Alarm',self)
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('SubscriberInfo',self)
-         EventBus.subscribe('PublishMessageItemOptix',self)
+         EventBus.subscribe('PublishMessageAlarm',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
              
@@ -58,14 +58,16 @@ class StoreOpsService(Service):
                         "take_snapshot": True
                         }
                     }
-            topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE                
+            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE
+            topic = settings.TOPIC_CAMERA_IMAGE               
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
         if event_type == 'SubscriberInfo': #Subscribe info topic 
             self.service.subscribeSnapshotResp(accoutNumber= message['accountNumber'], storeId= message['storeId'])
 
-        if event_type == 'PublishMessageItemOptix':#Publish mesage for itemoptix
-            topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
+        if event_type == 'PublishMessageAlarm':#Publish mesage for alarm
+            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
+            topic = settings.TOPIC_RFID_ALARM
             self.service.pub(topic=topic, payload=json.dumps(message))
 
 
