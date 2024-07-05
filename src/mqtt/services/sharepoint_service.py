@@ -25,11 +25,12 @@ class SharePointService:
                 body = payload['data'] 
                 status = body['status'] 
                 img = body['image']
-            
+                type_message= "snapshot"
+
                 if status == "OK":
-                    folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid, type="snapshot")
+                    folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid, type_message= type_message)
                     if uploaded is not True:
-                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid, type="snapshot")
+                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid, type_message=type_message)
                         
                     link = self.sharePointUtils.generateLink(id_folder=folder)
                     EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
@@ -50,17 +51,19 @@ class SharePointService:
                 body = payload['data'] 
                 status = body['status'] 
                 img_buffer = body['image_buffer']
+                type_message="buffer"
 
                 cont=1
                 if status == "OK":
                     for img in img_buffer:
                         name= str(cont)
 
-                        folder, uploaded = self.upload(img=img, uuid=uuid, file_name=name, type="buffer")
+                        folder, uploaded = self.upload(img=img, uuid=uuid, file_name=name, type_message=type_message)
+
                         if uploaded:
                             cont+=1
                         elif uploaded is not True:
-                            folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name, type="buffer")
+                            folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name, type_message=type_message)
                         
                     link = self.sharePointUtils.generateLink(id_folder=folder)
                     EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
@@ -72,10 +75,11 @@ class SharePointService:
                 self.logger.error(f"Error requesting buffer: {ex}")  
 
 
-    def upload(self, img, uuid,file_name, type):
+    def upload(self, img, uuid,file_name, type_message):
         try:
-            self.logger("begin upload file")
-            folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= f"{file_name}.png",type=type)
+            self.logger.info("begin upload file")
+            file= f"{file_name}.png"
+            folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= file,type_message=type_message)
             if folder != None:
                 os.remove(f"./snapshots/{file_name}.png")
                 return (folder, True)
