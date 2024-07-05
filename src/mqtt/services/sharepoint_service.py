@@ -15,33 +15,62 @@ class SharePointService:
 
 
     def handleMessage(self, event_type, data=None):
-          self.logger.info(f"Processing snapshot")
-          try:
-            payload = json.loads(data['payload'])
-            header = payload['header']
-            uuid = header['uuid_request']
-            timestamp = header['timestamp']
-            body = payload['data'] 
-            status = body['status'] 
-            img = body['image']
+        if(event_type=="Snapshot"):
+            self.logger.info(f"Processing snapshot")
+            try:
+                payload = json.loads(data['payload'])
+                header = payload['header']
+                uuid = header['uuid_request']
+                timestamp = header['timestamp']
+                body = payload['data'] 
+                status = body['status'] 
+                img = body['image']
             
-            if status == "OK":
-                folder, uploaded = self.upload(img=img, uuid=uuid)
-                if uploaded is not True:
-                    folder, uploaded = self.upload(img=img, uuid=uuid)
+                if status == "OK":
+                    folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid, type="snapshot")
+                    if uploaded is not True:
+                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid, type="snapshot")
                         
-                link = self.sharePointUtils.generateLink(id_folder=folder)
-                EventBus.publish('MessageSnapshotLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
-            else:
-                EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
+                    link = self.sharePointUtils.generateLink(id_folder=folder)
+                    EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                else:
+                    EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 
 
-          except Exception as ex:
-                    self.logger.error(f"Error requesting snapshot: {ex}")  
+            except Exception as ex:
+                self.logger.error(f"Error requesting snapshot: {ex}")  
+        
+        if(event_type=="Buffer"):
+            self.logger.info(f"Processing buffer")
+            try:
+                payload = json.loads(data['payload'])
+                header = payload['header']
+                uuid = header['uuid_request']
+                timestamp = header['timestamp']
+                body = payload['data'] 
+                status = body['status'] 
+                img_buffer = body['image_buffer']
+
+                cont=1
+                if status == "OK":
+                    for img in img_buffer:
+                        folder, uploaded = self.upload(img=img, uuid=uuid, file_name=str(cont), type="buffer")
+                        cont+=1
+                        if uploaded is not True:
+                            folder, uploaded = self.upload(img=img, uuid=uuid,file_name=str(cont), type="buffer")
+                        
+                    link = self.sharePointUtils.generateLink(id_folder=folder)
+                    EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                else:
+                    EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 
 
-    def upload(self, img, uuid):
-      folder =self.sharePointUtils.upload_file(data=img,file_name= f"{uuid}.png")
+            except Exception as ex:
+                self.logger.error(f"Error requesting snapshot: {ex}")  
+
+
+    def upload(self, img, uuid,file_name, type):
+      folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= f"{file_name}.png",type=type)
       if folder != None:
             os.remove(f"./snapshots/{uuid}.png")
             return (folder, True)

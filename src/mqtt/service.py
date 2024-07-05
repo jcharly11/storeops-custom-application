@@ -41,7 +41,11 @@ class Service(Client):
           
           if topic == settings.TOPIC_RESTART_APPLICATION:
                EventBus.publish('MessageRestart', {'payload': payload})
- 
+
+          if topic  == settings.TOPIC_CAMERA_IMAGE_BUFFER_RESP:
+               self.logger.info(f"Incoming message from BUFFER onvif module")
+               EventBus.publish('Buffer', {'payload': payload})
+
     def pub(self, topic , payload):
          self.client.publish(topic=topic, payload = payload)
    

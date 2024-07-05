@@ -8,14 +8,14 @@ class MessageProcessor:
     def __init__(self) -> None:
         self.logger = logging.getLogger("main")
         self.database = DataBase()
-        EventBus.subscribe("MessageSnapshotLink", self)
+        EventBus.subscribe("MessageLink", self)
 
     
     
     def handleMessage(self, event_type, data=None):#Proccessing message for alarm
           self.logger.info(f"Processing message for alarm")
           try:
-           if event_type == 'MessageSnapshotLink':
+           if event_type == 'MessageLink':
                  message = data['payload']
                  result = self.database.getMessages(message=message)
 

@@ -34,6 +34,7 @@ class StoreOpsService(Service):
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('SubscriberInfo',self)
          EventBus.subscribe('PublishMessageAlarm',self)
+         EventBus.subscribe('MessageBuffer',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
              
@@ -69,6 +70,25 @@ class StoreOpsService(Service):
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
             topic = settings.TOPIC_RFID_ALARM
             self.service.pub(topic=topic, payload=json.dumps(message))
+        
+
+        if event_type == 'MessageBuffer':#Request buffer to onvif 
+            timestamp = message['timestamp']
+            uuid_request = message['uuid']
+            
+            payload = {
+                    "header":{
+                        "timestamp": timestamp,
+                        "uuid_request": uuid_request,
+                        "version":settings.MESSAGE_VERSION},
+                    "data": {
+                        "get_buffer": True
+                        }
+                    }
+            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
+            topic = settings.TOPIC_CAMERA_IMAGE_BUFFER              
+            result = self.service.pub(topic=topic, payload=json.dumps(payload))
+        
 
 
 

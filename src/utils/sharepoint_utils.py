@@ -14,12 +14,20 @@ class SharepointUtils():
         self.logger = logging.getLogger(__name__)
         self.encoder = ImageEncoder()
         
-    def upload_file(self,data, file_name):
+    def upload_file(self,data,uuid, file_name, type):
         self.logger.info("Starting to upload file to azure storage")
         try:
             access_token= self.getAuthToken()
-            folder_name="Video"
-            url= f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/items/root/children/Video"
+            folder_name=""
+            folder_base=""
+            if(type=="snapshot"):
+                folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
+            else:
+                folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
+
+            folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
+            
+            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
             upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
 
             headers = {
@@ -35,9 +43,18 @@ class SharepointUtils():
                 self.logger.info(f"file upload: {response.json()}")
 
             
-            response_folder = requests.get(url, headers=headers)
-            response_json= response.json()
-            id_folder= response_json["id"]
+            id_folder=""
+
+            if(type=="snapshot"):
+                response_json= response.json()
+                id_folder=response_json["id"]
+            else:
+                for folder in response_json["value"]:
+                    name=folder["name"]
+                    if(name==uuid):
+                        id_folder= folder["id"]
+                        break
+
             return id_folder
 
         except Exception as err:
