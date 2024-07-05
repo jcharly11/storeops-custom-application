@@ -11,7 +11,7 @@ class SharePointService:
             self.logger = logging.getLogger("main")
             self.sharePointUtils = SharepointUtils()
             EventBus.subscribe('Snapshot',self)
-            
+            EventBus.subscribe('Buffer',self)
 
 
     def handleMessage(self, event_type, data=None):
@@ -54,10 +54,13 @@ class SharePointService:
                 cont=1
                 if status == "OK":
                     for img in img_buffer:
-                        folder, uploaded = self.upload(img=img, uuid=uuid, file_name=str(cont), type="buffer")
-                        cont+=1
-                        if uploaded is not True:
-                            folder, uploaded = self.upload(img=img, uuid=uuid,file_name=str(cont), type="buffer")
+                        name= str(cont)
+
+                        folder, uploaded = self.upload(img=img, uuid=uuid, file_name=name, type="buffer")
+                        if uploaded:
+                            cont+=1
+                        elif uploaded is not True:
+                            folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name, type="buffer")
                         
                     link = self.sharePointUtils.generateLink(id_folder=folder)
                     EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
@@ -66,13 +69,13 @@ class SharePointService:
 
 
             except Exception as ex:
-                self.logger.error(f"Error requesting snapshot: {ex}")  
+                self.logger.error(f"Error requesting buffer: {ex}")  
 
 
     def upload(self, img, uuid,file_name, type):
       folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= f"{file_name}.png",type=type)
       if folder != None:
-            os.remove(f"./snapshots/{uuid}.png")
+            os.remove(f"./snapshots/{file_name}.png")
             return (folder, True)
       else:
            return (None,False)            

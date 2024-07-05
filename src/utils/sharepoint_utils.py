@@ -14,7 +14,7 @@ class SharepointUtils():
         self.logger = logging.getLogger(__name__)
         self.encoder = ImageEncoder()
         
-    def upload_file(self,data,uuid, file_name, type):
+    def upload_file(self,data, uuid, file_name, type):
         self.logger.info("Starting to upload file to azure storage")
         try:
             access_token= self.getAuthToken()
