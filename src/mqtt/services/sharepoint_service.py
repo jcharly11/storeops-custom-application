@@ -73,10 +73,14 @@ class SharePointService:
 
 
     def upload(self, img, uuid,file_name, type):
-      folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= f"{file_name}.png",type=type)
-      if folder != None:
-            os.remove(f"./snapshots/{file_name}.png")
-            return (folder, True)
-      else:
-           return (None,False)            
+        try:
+            self.logger("begin upload file")
+            folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= f"{file_name}.png",type=type)
+            if folder != None:
+                os.remove(f"./snapshots/{file_name}.png")
+                return (folder, True)
+            else:
+                return (None,False)       
+        except Exception as ex:
+                self.logger.error(f"Error begin upload files: {ex}")       
                  
