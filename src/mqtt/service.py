@@ -63,13 +63,13 @@ class Service(Client):
     def subscribeSnapshotResp(self, accoutNumber, storeId):
          
         #topic = f"checkpoint/{accoutNumber}/{storeId}/service/"+settings.TOPIC_CAMERA_IMAGE_RESP
-        topic = settings.TOPIC_CAMERA_IMAGE
+        topic = settings.TOPIC_CAMERA_IMAGE_RESP
         
         self.logger.info(f"subscribeSnapshotResp: {topic}")
         self.client.subscribe(topic)
         self.logger.info(f"Subcriber to response of onvif: {topic}")
 
     def subscribeBufferResp(self):
-        topic = settings.TOPIC_CAMERA_IMAGE_BUFFER
+        topic = settings.TOPIC_CAMERA_IMAGE_BUFFER_RESP
         self.logger.info(f"subscribeBufferResp: {topic}")
         self.client.subscribe(topic)

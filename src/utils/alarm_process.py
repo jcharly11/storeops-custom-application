@@ -2,6 +2,7 @@ from events.event_bus import EventBus
 import logging
 from database.database import DataBase
 from database.model.message_alarm import MessageAlarm
+import config.settings as settings
 
 class AlarmProcess:
     def __init__(self) -> None:
@@ -44,10 +45,10 @@ class AlarmProcess:
                     self.database.saveMessage(message=alarm_event["message"])
                     
                     #snapshot
-                    #EventBus.publish('MessageSnapshot',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})#Send internal message to MessageProcessor
+                    EventBus.publish('MessageSnapshot',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})#Send internal message to MessageProcessor
                     
                     #buffer
-                    EventBus.publish('MessageBuffer',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
+                    #EventBus.publish('MessageBuffer',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
                     self.epcsList.clear()
                   
 
