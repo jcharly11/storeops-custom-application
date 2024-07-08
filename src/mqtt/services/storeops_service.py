@@ -65,6 +65,7 @@ class StoreOpsService(Service):
         
         if event_type == 'SubscriberInfo': #Subscribe info topic 
             self.service.subscribeSnapshotResp(accoutNumber= message['accountNumber'], storeId= message['storeId'])
+            self.service.subscribeBufferResp()
 
         if event_type == 'PublishMessageAlarm':#Publish mesage for alarm
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                

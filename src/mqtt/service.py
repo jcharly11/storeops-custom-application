@@ -68,3 +68,8 @@ class Service(Client):
         self.logger.info(f"subscribeSnapshotResp: {topic}")
         self.client.subscribe(topic)
         self.logger.info(f"Subcriber to response of onvif: {topic}")
+
+    def subscribeBufferResp(self):
+        topic = settings.TOPIC_CAMERA_IMAGE_BUFFER
+        self.logger.info(f"subscribeBufferResp: {topic}")
+        self.client.subscribe(topic)
