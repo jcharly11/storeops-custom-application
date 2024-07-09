@@ -4,6 +4,7 @@ import json
 from database.database import DataBase
 import uuid
 import datetime
+import config.settings as settings
 class MessageProcessor:
     def __init__(self) -> None:
         self.logger = logging.getLogger("main")
@@ -30,13 +31,21 @@ class MessageProcessor:
                               "value":message['link']
                          } 
                  ]
-                 body={ 
+                #  body={ 
 
-                        "type": 1,
-                        "uuid": message['uuid'] ,
-                        "message_id": uuid.uuid4().__str__() ,
+                #         "type": 1,
+                #         "uuid": message['uuid'] ,
+                #         "message_id": uuid.uuid4().__str__() ,
+                #         "timestamp": datetime.datetime.now().__str__(),
+                #         "version": 1,
+                #         "data": data
+                #  } 
+                 body={ 
+                        "uuid": message['uuid'],
                         "timestamp": datetime.datetime.now().__str__(),
-                        "version": 1,
+                        "device_model": "SFERO",
+                        "device_id": settings.DEVICE_ID,
+                        "version": "1.0.0",
                         "data": data
                  }  
                  EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})

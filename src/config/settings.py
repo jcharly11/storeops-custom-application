@@ -91,7 +91,7 @@ TOPIC_CAMERA_VIDEO = str(os.getenv("TOPIC_CAMERA_VIDEO", default="command/onvif/
 TOPIC_CAMERA_VIDEO_RESP = str(os.getenv("TOPIC_CAMERA_VIDEO_RESP", default="command_resp/onvif/video/get-video"))
 #EVENT TOPIC EAS RFID
 TOPIC_CAMERA_VIDEO_MEDIALINK_EAS = str(os.getenv("TOPIC_CAMERA_VIDEO_MEDIALINK_EAS", default="command_resp/storeops/media"))
-TOPIC_RFID_ALARM = str(os.getenv("TOPIC_RFID_ALARM", default="event/storeops/eas/rfid_alarm"))
+TOPIC_RFID_ALARM = str(os.getenv("TOPIC_RFID_ALARM", default="event/storeops/rfid_alarm"))
 
 #FILESHARE SETTINGS
 CLIENT_ID = '474f7a33-805f-492f-a390-f88e355c1cf2'
