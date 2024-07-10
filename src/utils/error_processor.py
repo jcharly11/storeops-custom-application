@@ -21,7 +21,7 @@ class ErrorProcess:
                 data=[
                         {
                             "key": "silence",
-                            "value": [0][2] 
+                            "value": result[0][2] 
                         },
                         {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").split(",") } ,
                           { 

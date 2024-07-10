@@ -18,6 +18,7 @@ from mqtt.services.services_info import ServiceInfo
 from mqtt.services.sharepoint_service import SharePointService
 from mqtt.services.services_restart import ServiceRestart
 from utils.alarm_process import AlarmProcess
+from utils.error_processor import ErrorProcess
 from utils.message_processor import MessageProcessor
 import queue 
 queueAlarm = queue.Queue() 
@@ -33,6 +34,7 @@ environmentValidator =  EnvironmentValidator()
 messageProcceso = MessageProcessor()
 serviceInfo = ServiceInfo()
 alarmProcess = AlarmProcess()
+errorProcess= ErrorProcess()
 storeOpService = StoreOpsService()
 sharePointService = SharePointService()
 serviceRestart = ServiceRestart()
