@@ -25,7 +25,7 @@ class MessageProcessor:
                          "key": "silence",
                           "value": result[0][2] 
                           } ,
-                          {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").split(",") } ,
+                          {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").replace(" ","").split(",")} ,
                           { 
                               "key": "media",
                               "value":message['link']
