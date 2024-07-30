@@ -13,11 +13,11 @@ MQTT_KEEP_ALIVE = int(os.getenv("MQTT_KEEP_ALIVE", default=60))
 # MQTT Topics
 TOPIC_WIRAMA_EPC_ALL = os.getenv(
     "TOPIC_WIRAMA_EPC_ALL", default="Wirama/EPC/All")
-TOPIC_SERVER_STATS = os.getenv("TOPIC_LPP_STATS", default="server/stats")
-TOPIC_STORE_INFO = os.getenv("TOPIC_STORE_INFO", default="store/info")
-TOPIC_CUSTOM_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="/custom/alarm")
+TOPIC_SERVER_STATS = os.getenv("TOPIC_LPP_STATS", default="server/stats") 
+TOPIC_CUSTOM_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="alarm")
 TOPIC_CUSTOM_METHOD = os.getenv("TOPIC_CUSTOM_METHOD", default="/settings/alarm")
 TOPIC_RESTART_APPLICATION = os.getenv("TOPIC_RESTART_APPLICATION", default="command/request/custom/refresh-environment")
+TOPIC_STORE_INFO = os.getenv("TOPIC_STORE_INFO", default="store/info")
 
 # Server Settings
 SERVER_URL = os.getenv("SERVER_URL", default="http://sfero-test-server")
@@ -75,17 +75,23 @@ STOREOPS_DEVICE_MODEL = os.getenv("STOREOPS_DEVICE_MODEL", default="SFERO")
 STOREOPS_TECHNOLOGY = os.getenv("STOREOPS_TECHNOLOGY", default="rfid")
 STOREOPS_TIMEZONE = os.getenv("STOREOPS_TIMEZONE", default="")
 STOREOPS_SHAREPOINT_ENABLE = os.getenv("STOREOPS_SHAREPOINT_ENABLE", default=0)
-STOREOPS_SHAREPOINT = os.getenv("STOREOPS_SHAREPOINT", default="storage01checkpt")
+STOREOPS_SHAREPOINT_XXX = os.getenv("STOREOPS_SHAREPOINT_XXX", default='')
 STOREOPS_SHAREPOINT_BASE_DIRECTORY = os.getenv("STOREOPS_SHAREPOINT_BASE_DIRECTORY", default="onviffiles")
 STOREOPS_SHAREPOINT_RETENTION_DAYS = os.getenv("STOREOPS_SHAREPOINT_RETENTION_DAYS", default=3)
-STOREOPS_SHAREPOINT_KEY = os.getenv("STOREOPS_SHAREPOINT_RETENTION_DAYS", default=3)
-AZURE_KEY = "GXGZdHYe1HNGvpAdQIi956al6+F/ss533CBSIRoACq8WOycTz+QAbfGtHGTJhvbSoJNARjwIMwLz+AStLekTew=="
 
 
 #ONVIF TOPICS
+TOPIC_CAMERA_IMAGE = str(os.getenv("TOPIC_CAMERA_IMAGE", default="command/onvif/image/snapshot"))
 TOPIC_CAMERA_IMAGE_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_RESP", default="command_resp/onvif/image/snapshot"))
+
+TOPIC_CAMERA_IMAGE_BUFFER = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER", default="command/onvif/image/get_buffer"))
 TOPIC_CAMERA_IMAGE_BUFFER_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER_RESP", default="command_resp/onvif/image/get_buffer"))
+
+TOPIC_CAMERA_VIDEO = str(os.getenv("TOPIC_CAMERA_VIDEO", default="command/onvif/video/get_video"))
 TOPIC_CAMERA_VIDEO_RESP = str(os.getenv("TOPIC_CAMERA_VIDEO_RESP", default="command_resp/onvif/video/get-video"))
+#EVENT TOPIC EAS RFID
+TOPIC_CAMERA_VIDEO_MEDIALINK_EAS = str(os.getenv("TOPIC_CAMERA_VIDEO_MEDIALINK_EAS", default="command_resp/storeops/media"))
+TOPIC_RFID_ALARM = str(os.getenv("TOPIC_RFID_ALARM", default="event/storeops/rfid_alarm"))
 
 #FILESHARE SETTINGS
 CLIENT_ID = '474f7a33-805f-492f-a390-f88e355c1cf2'
@@ -98,3 +104,24 @@ DRIVE_ID = 'b!4R2j6Of88kaR5Upqj-2VUacVEhofnqxEt475XUzCXmVl86v_nzYUQJUBUE63Ixc_'
 FOLDER_NAME= "Video"
 BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
+
+
+STANDARD_PAYLOAD = "{{type: {type}, \
+                    uuid: {uuid}, \
+                    message_id: {message_id}, \
+                    uuid_request: {uuid_request}, \
+                    timestamp:{timestamp}, \
+                    version: {version} \
+                    data: {data}}}"
+                    
+DEVICE_ID = 'EMPTY'
+LOCATION_ID = 'EMPTY'
+ACCOUNT_NUMBER = 'EMPTY'
+STORE_NAME = 'EMPTY'
+DOOR_NAME='EMPTY'
+DOOR_NUMBER='EMPTY'
+STORE_NUMBER = 'EMPTY'
+ALARM_AGGREGATION_WINDOW_SEC = float(
+    os.getenv("ALARM_AGGREGATION_WINDOW_SEC", default=1.0))
+
+MESSAGE_VERSION = "1.0"

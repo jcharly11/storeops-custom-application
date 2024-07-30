@@ -1,47 +1,65 @@
-
+import base64
+import datetime
+import io
 import json
 import logging 
 import os
 import config.settings as settings
 import requests
-from database.database import DataBase
+from PIL import Image
+from utils.images_tools import ImageEncoder
 
-class SharepointService():
+class SharepointUtils():
     def __init__(self):   
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("main")
+        self.encoder = ImageEncoder()
         
-    def upload_file(self,data, origin_file, file_name):
-        self.logger.info("Starting to upload file to azure storage")
-        response= None
+    def upload_file(self,data, uuid, file_name):
+        self.logger.info(f"Starting to upload file to azure storage: {file_name}")
         try:
             access_token= self.getAuthToken()
-            folder_name="Video"
+            folder_name=""
+            response_json= None
+            
+            folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
+            folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
+            
+            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
             upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
 
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
-
-            with open(origin_file, 'rb') as file:
-                response = requests.put(upload_url, headers=headers, data=file)
-                self.logger.info(f"file upload: {response.json()}")
+            name =  f"./snapshots/{file_name}"
+            with open(name, "wb") as img_result:
+                img_result.write(base64.b64decode(data.encode()))
             
-            if(response.status_code==201 or response.status_code==200):
-                DataBase.saveMessage(self,response.json(),True)
-            else:
-                DataBase.saveMessage(self,response.json(),False)
+            
+            with open(name, 'rb') as file:
+                response = requests.put(upload_url, headers=headers, data=file)
+                response_json= response.json()
+            
+            id_folder=""
+
+            response_folder = requests.get(url, headers=headers)
+            response_json= response_folder.json()
+            for folder in response_json["value"]:
+                name=folder["name"]
+                if(name==uuid):
+                    id_folder= folder["id"]
+                    break
+
+            return id_folder
 
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
-            DataBase.saveMessage(self,response.json(),False)
-
+            return None
 
 
 
     def upload_video(self,uuid, path):
         self.logger.info("Starting to upload video to sharepoint")
-        print("Starting to upload video to sharepoint")
         try:
             access_token= self.getAuthToken()
             folder_name="Video"
@@ -52,22 +70,13 @@ class SharepointService():
                 'Content-Type': 'application/octet-stream'
             }
 
-            #origin_file=f"./tmp/onvif-camera/snapshots/onvif-camera/files/{uuid}.mp4"
-            origin_file=f"/home/cbernal/Github/storeops/storeops-custom-application/src/services/video/{uuid}.mp4"
-            print(f"-------------------- {origin_file}")
+            origin_file=f"./snapshots/{uuid}.mp4"
+            
             #origin_file=f"{uuid}.mp4"
             with open(origin_file, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
                 self.logger.info(f"file upload: {response.json()}")
 
-            
-            if(response.status_code==201 or response.status_code==200):
-                print(f"upload video successfully")
-                self.logger.info(f"upload video successfully")
-            else:
-                print(f"upload video fail")
-                self.logger.info(f"upload video fail")
-                
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
 
@@ -81,11 +90,14 @@ class SharepointService():
                 "Content-Type": "application/json"
             }
 
-            expiration_date= "2024-06-13T09:18:00Z"
+
+            date_now = datetime.datetime.now()
+            modified_date = date_now + datetime.timedelta(days=60)
+            expiration_date = modified_date.strftime("%Y-%m-%dT%H:%M:%SZ") 
+            
             data = {
                 "expirationDateTime": f"{expiration_date}",
                 "type": "view",
-                "password": "TestCkp",
                 "scope": "anonymous",
                 "retainInheritedPermissions": "false"
             }
@@ -93,6 +105,7 @@ class SharepointService():
             
             resLink = requests.post(url, headers=headers, data=body)
             resJs= resLink.json()
+            print(resJs)
             folderLink= resJs["link"]["webUrl"]
             return folderLink
 
@@ -115,6 +128,3 @@ class SharepointService():
         except Exception as err:
             self.logger.error(f"error get token: {err}, {type(err)}")
             return None
-
-
-   
