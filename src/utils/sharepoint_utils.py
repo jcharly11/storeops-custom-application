@@ -58,7 +58,7 @@ class SharepointUtils():
 
 
 
-    def upload_video(self,uuid,path,file_name):
+    def upload_video(self,uuid, path, file_name):
         self.logger.info("Starting to upload video to sharepoint")
         try:
             access_token= self.getAuthToken()

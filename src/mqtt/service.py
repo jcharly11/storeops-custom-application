@@ -77,3 +77,8 @@ class Service(Client):
         topic = settings.TOPIC_CAMERA_IMAGE_BUFFER_RESP
         self.logger.info(f"subscribeBufferResp: {topic}")
         self.client.subscribe(topic)
+
+    def subscribeVideoResp(self):
+        topic = settings.TOPIC_CAMERA_VIDEO_RESP
+        self.logger.info(f"subscribeVideorResp: {topic}")
+        self.client.subscribe(topic)

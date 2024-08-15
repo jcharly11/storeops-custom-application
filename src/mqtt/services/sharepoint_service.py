@@ -83,10 +83,10 @@ class SharePointService:
                 body = payload['data'] 
                 status = body['status'] 
                 fileName = body['file_name']
-                destination_path  = body['file_name']
+                path  = body['destination_path']
 
                 if status == "OK":
-                    folder, uploaded = self.uploadVideo(uuid=uuid,file_name=fileName)
+                    folder, uploaded = self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
                     
 
             except Exception as ex:
@@ -104,10 +104,10 @@ class SharePointService:
         except Exception as ex:
                 self.logger.error(f"Error begin upload files: {ex}")       
                  
-    def uploadVideo(self, uuid,file_name):
+    def uploadVideo(self, uuid, path ,file_name):
         try:
             self.logger.info("begin upload video") 
-            self.sharePointUtils.upload_video(uuid=uuid) 
+            self.sharePointUtils.upload_video(uuid=uuid, path=path, file_name=file_name) 
         except Exception as ex:
                 self.logger.error(f"Error begin upload files: {ex}")       
                                   

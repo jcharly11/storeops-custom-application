@@ -35,6 +35,8 @@ class StoreOpsService(Service):
          EventBus.subscribe('SubscriberInfo',self)
          EventBus.subscribe('PublishMessageAlarm',self)
          EventBus.subscribe('MessageBuffer',self)
+         
+         EventBus.subscribe('MessageVideo',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
              
@@ -66,6 +68,7 @@ class StoreOpsService(Service):
         if event_type == 'SubscriberInfo': #Subscribe info topic 
             self.service.subscribeSnapshotResp(accoutNumber= message['accountNumber'], storeId= message['storeId'])
             self.service.subscribeBufferResp()
+            self.service.subscribeVideoResp()
 
         if event_type == 'PublishMessageAlarm':#Publish mesage for alarm
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
