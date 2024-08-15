@@ -12,6 +12,7 @@ class SharePointService:
             self.sharePointUtils = SharepointUtils()
             EventBus.subscribe('Snapshot',self)
             EventBus.subscribe('Buffer',self)
+            EventBus.subscribe('Video',self)
 
 
     def handleMessage(self, event_type, data=None):
@@ -86,11 +87,12 @@ class SharePointService:
                 path  = body['destination_path']
 
                 if status == "OK":
-                    folder, uploaded = self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
+                    self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
                     
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
+
     def upload(self, img, uuid,file_name):
         try:
             self.logger.info("begin upload file")
