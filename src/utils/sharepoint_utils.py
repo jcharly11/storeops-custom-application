@@ -58,25 +58,27 @@ class SharepointUtils():
 
 
 
-    def upload_video(self,uuid):
+    def upload_video(self,uuid,path,file_name):
         self.logger.info("Starting to upload video to sharepoint")
         try:
             access_token= self.getAuthToken()
-            folder_name="Video"
-            upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{uuid}.mp4:/content'
-
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
-
-            origin_file=f"./video/{uuid}.mp4"
-            
-            #origin_file=f"{uuid}.mp4"
-            with open(origin_file, 'rb') as file:
+            #Path should be defined 
+            folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
+            folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}" 
+            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
+            upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
+            file_full_path = path + file_name
+            with open(file_full_path, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
-                self.logger.info(f"file upload: {response.json()}")
-
+                if response:
+                    os.remove(file_full_path)
+                    self.logger.info("Deleting video after upload")
+                self.logger.info("UPLOADING VIDEO COMPLETE")
+                 
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
 

@@ -106,13 +106,8 @@ class SharePointService:
                  
     def uploadVideo(self, uuid,file_name):
         try:
-            self.logger.info("begin upload file") 
-            folder =self.sharePointUtils.upload_video(uuid=uuid)
-            if folder != None:
-                os.remove(f"./snapshots/{file_name}.png")
-                return (folder, True)
-            else:
-                return (None,False)       
+            self.logger.info("begin upload video") 
+            self.sharePointUtils.upload_video(uuid=uuid) 
         except Exception as ex:
                 self.logger.error(f"Error begin upload files: {ex}")       
                                   
