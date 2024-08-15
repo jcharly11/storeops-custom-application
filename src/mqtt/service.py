@@ -46,6 +46,10 @@ class Service(Client):
                self.logger.info(f"Incoming message from BUFFER onvif module")
                EventBus.publish('Buffer', {'payload': payload})
 
+          if topic  == settings.TOPIC_CAMERA_VIDEO_RESP:
+               self.logger.info(f"Incoming message from VIDEO onvif module")
+               EventBus.publish('Video', {'payload': payload})
+
     def pub(self, topic , payload):
          self.client.publish(topic=topic, payload = payload)
    

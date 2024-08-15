@@ -62,7 +62,8 @@ class SharePointService:
                             cont+=1
                         elif uploaded is not True:
                             folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name)
-                        
+
+
                     link = self.sharePointUtils.generateLink(id_folder=folder)
                     EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                 else:
@@ -72,7 +73,24 @@ class SharePointService:
             except Exception as ex:
                 self.logger.error(f"Error requesting buffer: {ex}")  
 
+        if(event_type=="Video"):
+            self.logger.info(f"Processing video")
+            try:
+                payload = json.loads(data['payload'])
+                header = payload['header']
+                uuid = header['uuid_request']
+                timestamp = header['timestamp']
+                body = payload['data'] 
+                status = body['status'] 
+                fileName = body['file_name']
+                destination_path  = body['file_name']
 
+                if status == "OK":
+                    folder, uploaded = self.uploadVideo(uuid=uuid,file_name=fileName)
+                    
+
+            except Exception as ex:
+                self.logger.error(f"Error requesting snapshot: {ex}")  
     def upload(self, img, uuid,file_name):
         try:
             self.logger.info("begin upload file")
@@ -86,3 +104,15 @@ class SharePointService:
         except Exception as ex:
                 self.logger.error(f"Error begin upload files: {ex}")       
                  
+    def uploadVideo(self, uuid,file_name):
+        try:
+            self.logger.info("begin upload file") 
+            folder =self.sharePointUtils.upload_video(uuid=uuid)
+            if folder != None:
+                os.remove(f"./snapshots/{file_name}.png")
+                return (folder, True)
+            else:
+                return (None,False)       
+        except Exception as ex:
+                self.logger.error(f"Error begin upload files: {ex}")       
+                                  

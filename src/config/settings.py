@@ -89,7 +89,7 @@ TOPIC_CAMERA_IMAGE_BUFFER = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER", default="
 TOPIC_CAMERA_IMAGE_BUFFER_RESP = str(os.getenv("TOPIC_CAMERA_IMAGE_BUFFER_RESP", default="command_resp/onvif/image/get_buffer"))
 
 TOPIC_CAMERA_VIDEO = str(os.getenv("TOPIC_CAMERA_VIDEO", default="command/onvif/video/get_video"))
-TOPIC_CAMERA_VIDEO_RESP = str(os.getenv("TOPIC_CAMERA_VIDEO_RESP", default="command_resp/onvif/video/get-video"))
+TOPIC_CAMERA_VIDEO_RESP = str(os.getenv("TOPIC_CAMERA_VIDEO_RESP", default="command_resp/onvif/video/get_video"))
 #EVENT TOPIC EAS RFID
 TOPIC_CAMERA_VIDEO_MEDIALINK_EAS = str(os.getenv("TOPIC_CAMERA_VIDEO_MEDIALINK_EAS", default="command_resp/storeops/media"))
 TOPIC_RFID_ALARM = str(os.getenv("TOPIC_RFID_ALARM", default="event/storeops/rfid_alarm"))

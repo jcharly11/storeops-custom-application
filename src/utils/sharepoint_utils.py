@@ -58,7 +58,7 @@ class SharepointUtils():
 
 
 
-    def upload_video(self,uuid, path):
+    def upload_video(self,uuid):
         self.logger.info("Starting to upload video to sharepoint")
         try:
             access_token= self.getAuthToken()
@@ -70,7 +70,7 @@ class SharepointUtils():
                 'Content-Type': 'application/octet-stream'
             }
 
-            origin_file=f"./snapshots/{uuid}.mp4"
+            origin_file=f"./video/{uuid}.mp4"
             
             #origin_file=f"{uuid}.mp4"
             with open(origin_file, 'rb') as file:
