@@ -11,6 +11,7 @@ class Service(Client):
         self.logger = logging.getLogger("main") 
         self.client = Client().instance()
         self.client.on_message = self.onMessage 
+        self.client.subscribe(settings.TOPIC_CUSTOM_ALARM_EAS)
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
@@ -25,6 +26,10 @@ class Service(Client):
           if topic == settings.TOPIC_RESTART_APPLICATION:
                
                EventBus.publish('MessageRestart', {'payload': payload})#Send internal message to restart service
+
+          if topic == settings.TOPIC_CUSTOM_ALARM_EAS:
+                  
+               EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_CUSTOM_ALARM:
                   
