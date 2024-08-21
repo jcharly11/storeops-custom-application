@@ -31,15 +31,6 @@ class MessageProcessor:
                               "value":message['link']
                          } 
                  ]
-                #  body={ 
-
-                #         "type": 1,
-                #         "uuid": message['uuid'] ,
-                #         "message_id": uuid.uuid4().__str__() ,
-                #         "timestamp": datetime.datetime.now().__str__(),
-                #         "version": 1,
-                #         "data": data
-                #  } 
                  body={ 
                         "uuid": message['uuid'],
                         "timestamp": datetime.datetime.now().__str__(),
