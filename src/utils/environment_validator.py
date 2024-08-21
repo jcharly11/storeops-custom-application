@@ -27,11 +27,11 @@ class EnvironmentValidator():
                 file.write(f"export STOREOPS_TECHNOLOGY={os.getenv('STOREOPS_TECHNOLOGY', default='rfid') }"+ "\n")
                 file.write(f"export STOREOPS_TIMEZONE={os.getenv('STOREOPS_TIMEZONE', default='') }"+ "\n")
                 file.write(f"export STOREOPS_SHAREPOINT_ENABLE={os.getenv('STOREOPS_SHAREPOINT_ENABLE', default=0) }"+ "\n")
-                file.write(f"export STOREOPS_SHAREPOINT_BASE_DIRECTORY={os.getenv('STOREOPS_SHAREPOINT_BASE_DIRECTORY', default='') }"+ "\n")
                 file.write(f"export STOREOPS_SHAREPOINT_XXX={os.getenv('STOREOPS_SHAREPOINT_XXX', default='') }"+ "\n")
                 file.write(f"export STOREOPS_SHAREPOINT_BASE_DIRECTORY={os.getenv('STOREOPS_SHAREPOINT_BASE_DIRECTORY', default='storeops') }"+ "\n")
                 file.write(f"export STOREOPS_SHAREPOINT_RETENTION_DAYS={os.getenv('STOREOPS_SHAREPOINT_RETENTION_DAYS', default=3)}"+ "\n")
-                
+                file.write(f"export ALARM_AGGREGATION_WINDOW_SEC={os.getenv('ALARM_AGGREGATION_WINDOW_SEC', default=3.0)}"+ "\n")
+
             if os.path.exists(self.fileName_ui) == False:      
                 with open(self.fileName_ui, mode="w") as file_ui:
                     file_ui.write("")
