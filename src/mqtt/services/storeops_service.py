@@ -113,5 +113,5 @@ class StoreOpsService(Service):
                         self.logger.info(f"Sending list of alarm messages {len(alarms)}")
                         EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
                         alarms.clear()
-
+             time.sleep(0.5)
  
