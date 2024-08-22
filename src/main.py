@@ -1,5 +1,6 @@
 import json
 import logging
+import multiprocessing.queues
 import queue
 import time
 import datetime
@@ -20,8 +21,8 @@ from mqtt.services.services_restart import ServiceRestart
 from utils.alarm_process import AlarmProcess
 from utils.error_processor import ErrorProcess
 from utils.message_processor import MessageProcessor
-import queue 
-queueAlarm = queue.Queue() 
+import multiprocessing
+queueAlarm = multiprocessing.Queue() #queue.Queue() 
 queueInfo = queue.Queue() 
 # application logging
 dictConfig(LogConfig().dict())

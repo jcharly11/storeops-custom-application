@@ -4,7 +4,7 @@ from database.database import DataBase
 from config import settings as settings
 from events.event_bus import EventBus
 import threading
-import queue
+import multiprocessing
 import json
 import time
 class StoreOpsService(Service):
@@ -24,10 +24,10 @@ class StoreOpsService(Service):
         self.database = DataBase() 
         self.logger.info(f"Starting service ")
         self.service =Service() 
-        self.mutex = queue.Queue().mutex
+        #self.mutex = queue.Queue().mutex
         
      
-    def run(self, queueAlarm, queueInfo):
+    def run(self, queueAlarm: multiprocessing.Queue, queueInfo):
          self.queueAlarm = queueAlarm
          self.queueInfo = queueInfo
          EventBus.subscribe('Alarm',self)
@@ -46,7 +46,7 @@ class StoreOpsService(Service):
 
         if event_type == 'Alarm':#Put alarm event to queue
 
-            self.queueAlarm.put(message)
+            self.queueAlarm.put_nowait(message)
 
         if event_type == 'MessageSnapshot':#Request snapshot to onvif 
             timestamp = message['timestamp']
@@ -99,16 +99,15 @@ class StoreOpsService(Service):
         self.logger.info(f"Starting validatio of alarm queue")
         alarms =[]
         while True:
-            with self.mutex:
-                 if not queue.empty():
-                      time.sleep(settings.ALARM_AGGREGATION_WINDOW_SEC) 
-                      self.logger.info(f"Items in queue: {queue.qsize()}")
-                      while not queue.empty():
-                           alarm = json.loads(queue.get())  
-                           alarms.append(alarm)
-                           if queue.empty():
-                               self.logger.info(f"Sending list of alarm messages")
-                               EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
-                               alarms.clear()
+             if not queue.empty():
+                time.sleep(settings.ALARM_AGGREGATION_WINDOW_SEC)
+                self.logger.info(f"Items in queue: {queue.qsize()}")
+                while not queue.empty():
+                    alarm = json.loads(queue.get(block = False))
+                    alarms.append(alarm)
+                    if queue.empty():
+                        self.logger.info(f"Sending list of alarm messages")
+                        EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
+                        alarms.clear()
 
  
