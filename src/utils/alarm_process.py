@@ -43,12 +43,10 @@ class AlarmProcess:
                    
                     
                     self.database.saveMessage(message=alarm_event["message"])
-                    
-                    #snapshot
-                    #EventBus.publish('MessageSnapshot',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})#Send internal message to MessageProcessor
-                    
-                    #buffer
                     EventBus.publish('MessageBuffer',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
+                    self.logger.info(f"*******************************")
+                    self.logger.info(f"Epcs in list fo messagee{self.epcsList}")
+                    self.logger.info(f"*******************************")
                     self.epcsList.clear()
                   
 

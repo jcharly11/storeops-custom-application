@@ -7,6 +7,7 @@ import threading
 import multiprocessing
 import json
 import time
+import datetime
 class StoreOpsService(Service):
     
     """Receives from other services message to upload files to sharepoint. 
@@ -45,6 +46,10 @@ class StoreOpsService(Service):
         message =data['payload']
 
         if event_type == 'Alarm':#Put alarm event to queue
+            self.logger.info("***************************")
+            self.logger.info(message)
+            self.logger.info(datetime.datetime.now())
+            self.logger.info("***************************")
 
             self.queueAlarm.put_nowait(message)
 
@@ -96,7 +101,6 @@ class StoreOpsService(Service):
 
 
     def processAlarm(self,  queue): 
-        self.logger.info(f"Starting validatio of alarm queue")
         alarms =[]
         while True:
              if not queue.empty():
@@ -106,7 +110,7 @@ class StoreOpsService(Service):
                     alarm = json.loads(queue.get(block = False))
                     alarms.append(alarm)
                     if queue.empty():
-                        self.logger.info(f"Sending list of alarm messages")
+                        self.logger.info(f"Sending list of alarm messages {len(alarms)}")
                         EventBus.publish('AlarmProcess' , {'alarms': alarms})#Send internal message to AlarmProcess
                         alarms.clear()
 
