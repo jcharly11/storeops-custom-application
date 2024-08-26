@@ -15,7 +15,7 @@ TOPIC_WIRAMA_EPC_ALL = os.getenv(
     "TOPIC_WIRAMA_EPC_ALL", default="Wirama/EPC/All")
 TOPIC_SERVER_STATS = os.getenv("TOPIC_LPP_STATS", default="server/stats") 
 TOPIC_CUSTOM_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="alarm")
-TOPIC_CUSTOM_ALARM_EAS = os.getenv("TOPIC_VOICE_ALARM", default="event/custom/alarm")
+TOPIC_CUSTOM_NOTIFICATION_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="event/custom/alarm")
 TOPIC_CUSTOM_METHOD = os.getenv("TOPIC_CUSTOM_METHOD", default="/settings/alarm")
 TOPIC_RESTART_APPLICATION = os.getenv("TOPIC_RESTART_APPLICATION", default="command/request/custom/refresh-environment")
 TOPIC_STORE_INFO = os.getenv("TOPIC_STORE_INFO", default="store/info")
@@ -126,3 +126,4 @@ ALARM_AGGREGATION_WINDOW_SEC = float(
     os.getenv("ALARM_AGGREGATION_WINDOW_SEC", default=3.0))
 
 MESSAGE_VERSION = "1.0"
+CUSTOM_APP_ALARM_DECISION_ENABLED = False

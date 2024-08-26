@@ -11,10 +11,12 @@ class Service(Client):
         self.logger = logging.getLogger("main") 
         self.client = Client().instance()
         self.client.on_message = self.onMessage 
-        self.client.subscribe(settings.TOPIC_CUSTOM_ALARM_EAS)
+        self.client.subscribe(settings.TOPIC_CUSTOM_ALARM_EXTRA)
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
+        self.client.subscribe(settings.TOPIC_CUSTOM_METHOD)
+        
         self.getInfo()#request info to broker
 
     
@@ -22,18 +24,23 @@ class Service(Client):
           payload =  message.payload.decode()
           topic = message.topic
           #topicResp =  f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"
+          
+          if topic == settings.TOPIC_CUSTOM_METHOD:
+               
+               EventBus.publish('CustomMethod', {'payload': payload})#Send internal message to custom method alarm
 
           if topic == settings.TOPIC_RESTART_APPLICATION:
                
                EventBus.publish('MessageRestart', {'payload': payload})#Send internal message to restart service
 
-          if topic == settings.TOPIC_CUSTOM_ALARM_EAS:
-                  
-               EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
+          if topic == settings.TOPIC_CUSTOM_NOTIFICATION_ALARM:
+
+               if not settings.CUSTOM_APP_ALARM_DECISION_ENABLED:
+                   EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_CUSTOM_ALARM:
-                  
-               EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
+                if settings.CUSTOM_APP_ALARM_DECISION_ENABLED:
+                    EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
               if settings.ACCOUNT_NUMBER == 'EMPTY' and settings.LOCATION_ID == 'EMPTY':
