@@ -18,6 +18,7 @@ from mqtt.services.storeops_service import StoreOpsService
 from mqtt.services.services_info import ServiceInfo
 from mqtt.services.sharepoint_service import SharePointService
 from mqtt.services.services_restart import ServiceRestart
+from mqtt.services.service_custom_method import ServiceCustomMethod
 from utils.alarm_process import AlarmProcess
 from utils.error_processor import ErrorProcess
 from utils.message_processor import MessageProcessor
@@ -47,6 +48,7 @@ logger.info(f"STOREOPS_SHAREPOINT_BASE_DIRECTORY: {settings.STOREOPS_SHAREPOINT_
 logger.info(f"STOREOPS_SHAREPOINT_RETENTION_DAYS: {settings.STOREOPS_SHAREPOINT_RETENTION_DAYS}") 
 logger.info(f"ALARM_AGGREGATION_WINDOW_SEC: {settings.ALARM_AGGREGATION_WINDOW_SEC}") 
 
+serviceCustomMethod = ServiceCustomMethod
 messageProcceso = MessageProcessor()
 serviceInfo = ServiceInfo()
 alarmProcess = AlarmProcess()

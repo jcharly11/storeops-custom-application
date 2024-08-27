@@ -11,7 +11,6 @@ class Service(Client):
         self.logger = logging.getLogger("main") 
         self.client = Client().instance()
         self.client.on_message = self.onMessage 
-        self.client.subscribe(settings.TOPIC_CUSTOM_ALARM_EXTRA)
         self.client.subscribe(settings.TOPIC_CUSTOM_ALARM)
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
