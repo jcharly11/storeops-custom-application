@@ -79,6 +79,8 @@ class StoreOpsService(Service):
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
             topic = settings.TOPIC_RFID_ALARM
             self.service.pub(topic=topic, payload=json.dumps(message))
+            self.database.deleteMessage(message=message)
+            #delete from database
 
         if event_type == 'MessageBuffer':#Request buffer to onvif 
             timestamp = message['timestamp']

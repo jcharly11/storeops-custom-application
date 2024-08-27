@@ -42,3 +42,17 @@ class DataBase():
 
         return ex.args
 
+
+    def deleteMessage(self, message):
+        try:
+               request_uuid = message['uuid']
+               date= datetime.datetime.now()
+               self.cursor = self.connection.cursor()
+               self.cursor.execute('DELETE FROM messages   WHERE request_uuid =?', (request_uuid,))
+               self.connection.commit()
+               return True
+                  
+        except Exception as ex:
+               self.logger.info(f"Error executing query insert message: ",ex.args)
+
+        return ex.args

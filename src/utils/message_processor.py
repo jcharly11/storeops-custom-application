@@ -40,6 +40,7 @@ class MessageProcessor:
                         "data": data
                  }  
                  EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
+                  
 
                  
                  
