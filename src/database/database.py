@@ -45,10 +45,9 @@ class DataBase():
 
     def deleteMessage(self, message):
         try:
-               request_uuid = message['uuid']
-               date= datetime.datetime.now()
+               request_uuid = message['body']['uuid']
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM messages   WHERE request_uuid =?', (request_uuid,))
+               self.cursor.execute('DELETE FROM messages WHERE request_uuid =?', (request_uuid,))
                self.connection.commit()
                return True
                   
