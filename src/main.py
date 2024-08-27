@@ -48,7 +48,7 @@ logger.info(f"STOREOPS_SHAREPOINT_BASE_DIRECTORY: {settings.STOREOPS_SHAREPOINT_
 logger.info(f"STOREOPS_SHAREPOINT_RETENTION_DAYS: {settings.STOREOPS_SHAREPOINT_RETENTION_DAYS}") 
 logger.info(f"ALARM_AGGREGATION_WINDOW_SEC: {settings.ALARM_AGGREGATION_WINDOW_SEC}") 
 
-serviceCustomMethod = ServiceCustomMethod
+serviceCustomMethod = ServiceCustomMethod()
 messageProcceso = MessageProcessor()
 serviceInfo = ServiceInfo()
 alarmProcess = AlarmProcess()
