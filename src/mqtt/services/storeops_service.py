@@ -78,8 +78,12 @@ class StoreOpsService(Service):
         if event_type == 'PublishMessageAlarm':#Publish mesage for alarm
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
             topic = settings.TOPIC_RFID_ALARM
-            self.service.pub(topic=topic, payload=json.dumps(message))
-            self.database.deleteMessage(message=message)
+            try:
+                result = self.service.pub(topic=topic, payload=json.dumps(message))
+                self.logger.info(f"Reuslt mqtt message: { result }")
+                self.database.deleteMessage(message=message)
+            except Exception as ex:
+                self.logger.info(f"Error sending mqtt {topic}")
             #delete from database
 
         if event_type == 'MessageBuffer':#Request buffer to onvif 
@@ -96,7 +100,8 @@ class StoreOpsService(Service):
                         }
                     }
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
-            topic = settings.TOPIC_CAMERA_IMAGE_BUFFER              
+            topic = settings.TOPIC_CAMERA_IMAGE_BUFFER            
+
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
 

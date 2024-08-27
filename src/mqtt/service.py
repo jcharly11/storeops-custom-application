@@ -62,7 +62,7 @@ class Service(Client):
                EventBus.publish('Video', {'payload': payload})
 
     def pub(self, topic , payload):
-         self.client.publish(topic=topic, payload = payload)
+        return self.client.publish(topic=topic, payload = payload)
    
     def getInfo(self):
          try:

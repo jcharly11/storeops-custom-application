@@ -3,10 +3,8 @@ from paho.mqtt import client as mqtt
 import uuid
 import logging
 import config.settings as settings
-from mqtt.client_singleton import  singleton
 
-@singleton 
-class Client(object):
+class Client():
 
     def __init__(self) -> None:
         self.logger = logging.getLogger("main")
