@@ -62,6 +62,7 @@ class Service(Client):
                EventBus.publish('Video', {'payload': payload})
 
     def pub(self, topic , payload):
+        self.logger.info(f"log from service to send mqtt message{payload}")
         return self.client.publish(topic=topic, payload = payload)
    
     def getInfo(self):

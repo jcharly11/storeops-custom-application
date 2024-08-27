@@ -79,6 +79,8 @@ class StoreOpsService(Service):
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
             topic = settings.TOPIC_RFID_ALARM
             try:
+                self.logger.info("***************************************")
+                self.logger.info(f"Recived mqtt message: { message }")
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
                 self.database.deleteMessage(message=message)
