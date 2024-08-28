@@ -107,8 +107,7 @@ class StoreOpsService(Service):
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
 
-
-
+   
     def processAlarm(self,  queue): 
         alarms =[]
         while True:

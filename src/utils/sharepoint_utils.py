@@ -78,7 +78,18 @@ class SharepointUtils():
                     os.remove(file_full_path)
                     self.logger.info("Deleting video after upload")
                 self.logger.info("UPLOADING VIDEO COMPLETE")
-                 
+            
+            id_folder=""
+
+            response_folder = requests.get(url, headers=headers)
+            response_json= response_folder.json() 
+            for folder in response_json["value"]:
+                name=folder["name"]
+                if(name==uuid):
+                    id_folder= folder["id"]
+                    break
+
+            return id_folder                
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
 

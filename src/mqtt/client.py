@@ -45,7 +45,7 @@ class Client():
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
          pass
 
-    def onPublish(self,client, data,mid):
+    def onPublish(self,client, data, mid):
          pass        
      
     def onMessage(self, client, userdata, message, properties=None):

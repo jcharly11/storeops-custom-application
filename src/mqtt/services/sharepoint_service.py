@@ -87,8 +87,11 @@ class SharePointService:
                 path  = body['destination_path']
 
                 if status == "OK":
-                    self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
-                    
+                    folder, uploaded = self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
+                    if uploaded:
+                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name)
+                        link = self.sharePointUtils.generateLink(id_folder=folder)
+                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
@@ -109,7 +112,12 @@ class SharePointService:
     def uploadVideo(self, uuid, path ,file_name):
         try:
             self.logger.info("begin upload video") 
-            self.sharePointUtils.upload_video(uuid=uuid, path=path, file_name=file_name) 
+            folder = self.sharePointUtils.upload_video(uuid=uuid, path=path, file_name=file_name)
+            if folder != None:
+                os.remove(f"./video/{file_name}")
+                return (folder, True)
+            else:
+                return (None,False)      
         except Exception as ex:
                 self.logger.error(f"Error begin upload files: {ex}")       
                                   
