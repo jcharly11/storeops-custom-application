@@ -89,7 +89,6 @@ class SharePointService:
                 if status == "OK":
                     folder, uploaded = self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
                     if uploaded:
-                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name)
                         link = self.sharePointUtils.generateLink(id_folder=folder)
                         EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
 
@@ -114,7 +113,6 @@ class SharePointService:
             self.logger.info("begin upload video") 
             folder = self.sharePointUtils.upload_video(uuid=uuid, path=path, file_name=file_name)
             if folder != None:
-                os.remove(f"./video/{file_name}")
                 return (folder, True)
             else:
                 return (None,False)      
