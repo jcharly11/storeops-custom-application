@@ -15,6 +15,7 @@ class Service(Client):
         self.client.subscribe(settings.TOPIC_STORE_INFO)
         self.client.subscribe(settings.TOPIC_RESTART_APPLICATION)
         self.client.subscribe(settings.TOPIC_CUSTOM_METHOD)
+        self.client.subscribe(settings.TOPIC_CUSTOM_NOTIFICATION_ALARM)
         
         self.getInfo()#request info to broker
 
