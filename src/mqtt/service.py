@@ -44,7 +44,7 @@ class Service(Client):
 
           if topic == settings.TOPIC_STORE_INFO:
               if settings.ACCOUNT_NUMBER == 'EMPTY' and settings.LOCATION_ID == 'EMPTY':
-                  self.logger.info("Incoming info store from mqtt broker")
+                  self.logger.info(f"Incoming info store from mqtt broker: {payload}")
                   EventBus.publish('MessageInfo', {'payload': payload})  #Send internal message to storeopservice
                
           if topic  == settings.TOPIC_CAMERA_IMAGE_RESP:

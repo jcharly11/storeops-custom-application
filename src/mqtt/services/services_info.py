@@ -9,7 +9,8 @@ class ServiceInfo():
          EventBus.subscribe('MessageInfo',self)#subsiption to internal message
   
     def setVariables(self, payload):
-          
+            self.logger.info(f"set values from store info: {payload}")
+            
             if "accountNumber" in payload:
                 settings.ACCOUNT_NUMBER = payload["accountNumber"]   
             if "storeNumber" in payload:
