@@ -34,11 +34,11 @@ class Service(Client):
 
           if topic == settings.TOPIC_CUSTOM_NOTIFICATION_ALARM:
 
-               if not settings.CUSTOM_APP_ALARM_DECISION_ENABLED:
+               if  settings.CUSTOM_APP_ALARM_DECISION_ENABLED:
                    EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_CUSTOM_ALARM:
-                if settings.CUSTOM_APP_ALARM_DECISION_ENABLED:
+                if not  settings.CUSTOM_APP_ALARM_DECISION_ENABLED:
                     EventBus.publish('Alarm', {'payload': payload})#Send internal message to storeopservice
 
           if topic == settings.TOPIC_STORE_INFO:
