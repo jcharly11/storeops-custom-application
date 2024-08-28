@@ -36,7 +36,6 @@ class StoreOpsService(Service):
          EventBus.subscribe('SubscriberInfo',self)
          EventBus.subscribe('PublishMessageAlarm',self)
          EventBus.subscribe('MessageBuffer',self)
-         
          EventBus.subscribe('MessageVideo',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
          alarmThread.start() 
@@ -107,6 +106,23 @@ class StoreOpsService(Service):
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
 
+        if event_type == 'MessageVideo':#Request buffer to onvif 
+            timestamp = message['timestamp']
+            uuid_request = message['uuid']
+            
+            payload = {
+                    "header":{
+                        "timestamp": timestamp,
+                        "uuid_request": uuid_request,
+                        "version":settings.MESSAGE_VERSION},
+                    "data": {
+                        "get_video": True
+                        }
+                    }
+            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
+            topic = settings.TOPIC_CAMERA_VIDEO
+
+            result = self.service.pub(topic=topic, payload=json.dumps(payload))
    
     def processAlarm(self,  queue): 
         alarms =[]
