@@ -49,20 +49,20 @@ class SharePointService:
                 uuid = header['uuid_request']
                 timestamp = header['timestamp']
                 body = payload['data'] 
-                status = body['status'] 
-                img_buffer = body['image_buffer']
+                status = body['status']
+                image_number = body['image_number'] 
+                path = body['destination_path']
 
-                cont=1
                 if status == "OK":
-                    for img in img_buffer:
+                    cont = 1
+                    for i in range(image_number):
                         name= str(cont)
-
-                        folder, uploaded = self.upload(img=img, uuid=uuid, file_name=name)
+                        folder, uploaded = self.upload(path=path, uuid=uuid, file_name= name)
 
                         if uploaded:
                             cont+=1
                         elif uploaded is not True:
-                            folder, uploaded = self.upload(img=img, uuid=uuid,file_name=name)
+                            folder, uploaded = self.upload(path=path, uuid=uuid, file_name=name)
 
 
                     link = self.sharePointUtils.generateLink(id_folder=folder)
@@ -95,13 +95,12 @@ class SharePointService:
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
 
-    def upload(self, img, uuid,file_name):
+    def upload(self, path, uuid, file_name):
         try:
             self.logger.info("begin upload file")
             file= f"{file_name}.png"
-            folder =self.sharePointUtils.upload_file(data=img, uuid=uuid, file_name= file)
+            folder =self.sharePointUtils.upload_file(path=path, uuid=uuid, file_name=file)
             if folder != None:
-                os.remove(f"./snapshots/{file_name}.png")
                 return (folder, True)
             else:
                 return (None,False)       

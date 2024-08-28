@@ -14,7 +14,7 @@ class SharepointUtils():
         self.logger = logging.getLogger("main")
         self.encoder = ImageEncoder()
         
-    def upload_file(self,data, uuid, file_name):
+    def upload_file(self,path, uuid, file_name):
         self.logger.info(f"Starting to upload file to azure storage: {file_name}")
         try:
             access_token= self.getAuthToken()
@@ -26,17 +26,13 @@ class SharepointUtils():
             
             url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
             upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
-
+            file_full_path = path + file_name
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
-            name =  f"./snapshots/{file_name}"
-            with open(name, "wb") as img_result:
-                img_result.write(base64.b64decode(data.encode()))
             
-            
-            with open(name, 'rb') as file:
+            with open(file_full_path, 'rb') as file:
                 response = requests.put(upload_url, headers=headers, data=file)
                 response_json= response.json()
             
