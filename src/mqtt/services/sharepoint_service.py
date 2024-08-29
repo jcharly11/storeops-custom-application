@@ -55,7 +55,7 @@ class SharePointService:
 
                 if status == "OK":
                     cont = 1
-                    for i in range(image_number):
+                    for i in range(int(image_number)):
                         name= str(cont)
                         folder, uploaded = self.upload(path=path, uuid=uuid, file_name= name)
 
