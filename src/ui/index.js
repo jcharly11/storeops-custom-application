@@ -36,7 +36,7 @@ $(document).ready(function() {
 
        
      });
-    
+    }
      console.log("***############****")
      console.log(baseItems.length)
      console.log(localItems.length)

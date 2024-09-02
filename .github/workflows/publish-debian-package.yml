@@ -18,8 +18,6 @@ jobs:
             focal-arm64-runner,
             bullseye-amd64-runner,
             bullseye-arm64-runner,
-            buster-amd64-runner,
-            buster-arm64-runner,
           ]
 
     steps:
