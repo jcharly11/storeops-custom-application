@@ -100,9 +100,8 @@ class StoreOpsService(Service):
                         "get_buffer": True
                         }
                     }
-            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
+            
             topic = settings.TOPIC_CAMERA_IMAGE_BUFFER            
-
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
 
@@ -119,9 +118,8 @@ class StoreOpsService(Service):
                         "get_video": True
                         }
                     }
-            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
+            
             topic = settings.TOPIC_CAMERA_VIDEO
-
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
    
     def processAlarm(self,  queue): 

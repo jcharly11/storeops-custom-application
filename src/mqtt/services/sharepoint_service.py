@@ -1,15 +1,21 @@
-import config.settings as settings
 import logging 
 from events.event_bus import EventBus
 from utils.sharepoint_utils import SharepointUtils
 import json
-import os
+import threading
+import datetime
+import config.settings as settings
+from database.database import DataBase
+from mqtt.service import Service
+
 class SharePointService:
 
     def __init__(self): 
             self.idService = type(self).__name__
             self.logger = logging.getLogger("main")
             self.sharePointUtils = SharepointUtils()
+            self.database = DataBase()
+            self.service = Service() 
             EventBus.subscribe('Snapshot',self)
             EventBus.subscribe('Buffer',self)
             EventBus.subscribe('Video',self)
@@ -30,7 +36,7 @@ class SharePointService:
 
                 if status == "OK":
                     files = [uuid]
-                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, file_name= files)
+                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, files = files)
                     if uploaded:
                         EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                 else:
@@ -51,18 +57,18 @@ class SharePointService:
                 status = body['status']
                 image_number = body['image_number'] 
                 path = body['destination_path']
-
+                
                 if status == "OK":
                     cont = 1
                     files = []
-                    for i in range(image_number):
+                    for i in range(int(image_number)):
                         name= str(cont)
                         files.append(f"{name}.jpg")
-                        cont+=1 
+                        cont += 1 
                         
-                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, file_name = files)
-                    if uploaded:
-                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                    upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
+                    upload.start()
+                    
 
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
@@ -84,24 +90,45 @@ class SharePointService:
                 path  = body['destination_path']
 
                 if status == "OK":
-                    folder, uploaded = self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
-                    if uploaded:
-                        link = self.sharePointUtils.generateLink(id_folder=folder)
-                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                    files = [fileName]
+                    upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
+                    upload.start()
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
+ 
 
-   
-                 
-    def uploadVideo(self, uuid, path ,file_name):
-        try:
-            self.logger.info("begin upload video") 
-            folder = self.sharePointUtils.upload_video(uuid=uuid, path=path, file_name=file_name)
-            if folder != None:
-                return (folder, True)
-            else:
-                return (None,False)      
-        except Exception as ex:
-                self.logger.error(f"Error begin upload files: {ex}")       
-                                  
+
+    def upload(self, path, uuid, timestamp, files):
+         uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid,  files = files)
+         if uploaded:
+             result = self.database.getMessages(request_uuid = uuid)
+             if result:
+                    data=[
+                            {
+                            "key": "silence",
+                            "value": result[0][2] 
+                            } ,
+                            {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").replace(" ","").split(",")} ,
+                            { 
+                                "key": "media",
+                                "value":link
+                            } 
+                    ]
+                    body={ 
+                            "uuid":uuid,
+                            "timestamp": datetime.datetime.now().__str__(),
+                            "device_model": "SFERO",
+                            "device_id": settings.DEVICE_ID,
+                            "version": "1.0.0",
+                            "data": data
+                    }               
+            
+             try:                
+                result = self.service.pub(topic=settings.TOPIC_RFID_ALARM, payload=json.dumps(body))
+                self.logger.info(f"Result RFID ALARM message: { result }")
+                self.database.deleteMessage(request_uuid=uuid)
+             except Exception as ex:
+                self.logger.info(f"Error sending mqtt {settings.TOPIC_RFID_ALARM}")
+
+

@@ -102,10 +102,10 @@ class SharepointUtils():
             folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
             folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}" 
             url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
-            self.logger.info("Upload group id:", uuid)
+            self.logger.info(f"Upload group id:{uuid}")
             for file_name in files:
-                file_full_path = path + file_name
-                self.logger.info("Uploading file", file_name)
+                file_full_path = f"{path}/{file_name}"
+                self.logger.info(f"Uploading file {file_full_path}")
                 upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
                 with open(file_full_path, 'rb') as file:
                     response = requests.put(upload_url, headers=headers, data=file)
@@ -132,7 +132,7 @@ class SharepointUtils():
             return True , self.generateLink(id_folder=id_folder)
 
         except Exception as err:
-            self.logger.error(f"error uploading the file: {err}, {type(err)}")
+            self.logger.error(f"error uploading group of files : {err}, {type(err)}")
             return False, None
 
     def generateLink(self, id_folder):

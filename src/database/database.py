@@ -18,10 +18,9 @@ class DataBase():
           except sqlite3.Error as err:
                self.logger.error(f"Database creation exception:", err.args)
 
-    def getMessages(self, message):
+    def getMessages(self, request_uuid):
           try:
                 self.cursor = self.connection.cursor()
-                request_uuid = message['uuid']
                 self.cursor.execute("SELECT * FROM messages WHERE request_uuid =?", (request_uuid,))
                 events = self.cursor.fetchall()
                 return events
@@ -43,9 +42,9 @@ class DataBase():
         return ex.args
 
 
-    def deleteMessage(self, message):
+    def deleteMessage(self, request_uuid):
         try:
-               request_uuid = message['body']['uuid']
+               
                self.cursor = self.connection.cursor()
                self.cursor.execute('DELETE FROM messages WHERE request_uuid =?', (request_uuid,))
                self.connection.commit()
