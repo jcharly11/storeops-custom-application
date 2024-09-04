@@ -61,16 +61,13 @@ class SharePointService:
                 
                 if status == "OK":
                     cont = 1
+
                     files = []
                     for i in range(int(image_number)):
                         name= str(cont)
                         files.append(f"{name}.jpg")
-                        cont += 1 
-                        
-                    #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
-                    #upload.start()
                     self.executor.submit(self.upload, path, uuid, timestamp, files)
-                    
+                                        
 
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
@@ -94,8 +91,6 @@ class SharePointService:
 
                 if status == "OK":
                     files = [fileName]
-                    #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
-                    #upload.start()
                     self.executor.submit(self.upload, path, uuid, timestamp, files)
 
             except Exception as ex:

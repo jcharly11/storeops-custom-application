@@ -39,16 +39,10 @@ class MessageProcessor:
                             "version": "1.0.0",
                             "data": data
                     }  
-                 EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
+                    EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
                   
 
-                 
-                 
-
-                 #update database
-                 #read database
-                 #send message alarm
-                 #delete message or save
+    
                  
           except Exception as ex:
               self.logger.error(f"Error processing message for alarm: {ex}")        
