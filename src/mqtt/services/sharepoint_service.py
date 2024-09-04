@@ -90,6 +90,7 @@ class SharePointService:
                 status = body['status'] 
                 fileName = body['file_name']
                 path  = body['destination_path']
+                path = path[:-1]
 
                 if status == "OK":
                     files = [fileName]
@@ -127,11 +128,11 @@ class SharePointService:
                             "data": data
                     }               
             
-             try:                
-                result = self.service.pub(topic=settings.TOPIC_RFID_ALARM, payload=json.dumps(body))
-                self.logger.info(f"Result RFID ALARM message: { result }")
-                self.database.deleteMessage(request_uuid=uuid)
-             except Exception as ex:
-                self.logger.info(f"Error sending mqtt {settings.TOPIC_RFID_ALARM}")
+                    try:                
+                        result = self.service.pub(topic=settings.TOPIC_RFID_ALARM, payload=json.dumps(body))
+                        self.logger.info(f"Result RFID ALARM message: { result }")
+                        self.database.deleteMessage(request_uuid=uuid)
+                    except Exception as ex:
+                        self.logger.info(f"Error sending mqtt {settings.TOPIC_RFID_ALARM}, ignore if video and buffer are active")
 
 
