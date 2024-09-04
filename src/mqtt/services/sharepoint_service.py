@@ -123,12 +123,5 @@ class SharePointService:
                             "version": "1.0.0",
                             "data": data
                     }               
-            
-                    try:                
-                        result = self.service.pub(topic=settings.TOPIC_RFID_ALARM, payload=json.dumps(body))
-                        self.logger.info(f"Result RFID ALARM message: { result }")
-                        self.database.deleteMessage(request_uuid=uuid)
-                    except Exception as ex:
-                        self.logger.info(f"Error sending mqtt {settings.TOPIC_RFID_ALARM}, ignore if video and buffer are active")
-
-
+                    EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
+ 

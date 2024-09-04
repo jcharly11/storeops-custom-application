@@ -85,7 +85,7 @@ class StoreOpsService(Service):
                 self.database.deleteMessage(request_uuid=message['body']['uuid'])
 
             except Exception as ex:
-                self.logger.info(f"Error sending mqtt {topic}")
+                self.logger.info(f"Error sending mqtt {topic},{ex}")
             #delete from database
 
         if event_type == 'MessageBuffer':#Request buffer to onvif 
