@@ -43,7 +43,7 @@ class AlarmProcess:
                     
 
                     self.database.saveMessage(message=alarm_event["message"])
-                    if settings.STOREOPS_MEDIA_FILES_ENABLE == 1:
+                    if settings.STOREOPS_MEDIA_FILES_ENABLE == '1':
                         EventBus.publish('MessageBuffer',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
                         EventBus.publish('MessageVideo',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
                     else: 

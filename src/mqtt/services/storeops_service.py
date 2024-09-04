@@ -82,7 +82,7 @@ class StoreOpsService(Service):
                 self.logger.info(f"Recived mqtt message: { message }")
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
-                self.database.deleteMessage(uuid_request=message['body']['uuid'])
+                self.database.deleteMessage(request_uuid=message['body']['uuid'])
 
             except Exception as ex:
                 self.logger.info(f"Error sending mqtt {topic}")
