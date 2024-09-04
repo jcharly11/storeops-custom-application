@@ -20,6 +20,7 @@ class SharePointService:
             self.logger.info(f"Processing snapshot")
             try:
                 payload = json.loads(data['payload'])
+                
                 header = payload['header']
                 uuid = header['uuid_request']
                 timestamp = header['timestamp']
@@ -55,18 +56,16 @@ class SharePointService:
 
                 if status == "OK":
                     cont = 1
+                    files = []
                     for i in range(image_number):
                         name= str(cont)
-                        folder, uploaded = self.upload(path=path, uuid=uuid, file_name= name)
-
-                        if uploaded:
-                            cont+=1
-                        elif uploaded is not True:
-                            folder, uploaded = self.upload(path=path, uuid=uuid, file_name=name)
-
-
-                    link = self.sharePointUtils.generateLink(id_folder=folder)
-                    EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                        files.append(f"{name}.jpg")
+                        cont+=1 
+                        
+                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, file_name= name)
+                    if uploaded:
+                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                        
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 
@@ -95,17 +94,7 @@ class SharePointService:
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
 
-    def upload(self, path, uuid, file_name):
-        try:
-            self.logger.info("begin upload file")
-            file= f"{file_name}.png"
-            folder =self.sharePointUtils.upload_file(path=path, uuid=uuid, file_name=file)
-            if folder != None:
-                return (folder, True)
-            else:
-                return (None,False)       
-        except Exception as ex:
-                self.logger.error(f"Error begin upload files: {ex}")       
+   
                  
     def uploadVideo(self, uuid, path ,file_name):
         try:

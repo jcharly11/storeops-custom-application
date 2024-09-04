@@ -89,6 +89,51 @@ class SharepointUtils():
         except Exception as err:
             self.logger.error(f"error uploading the file: {err}, {type(err)}")
 
+    def upload_group(self, path, uuid, files):
+        self.logger.info(f"Starting to upload files : {len(files)} items")
+
+        try:
+            access_token= self.getAuthToken()
+            success = False
+            headers = {
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/octet-stream'
+            }
+            folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
+            folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}" 
+            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
+            self.logger.info("Upload group id:", uuid)
+            for file_name in files:
+                file_full_path = path + file_name
+                self.logger.info("Uploading file", file_name)
+                upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
+                with open(file_full_path, 'rb') as file:
+                    response = requests.put(upload_url, headers=headers, data=file)
+                    
+                    if response:
+
+                        success=True
+                    else:
+                        success = False
+                        break
+
+
+            if success:
+                folder_name=""
+                id_folder=""
+                response_folder = requests.get(url, headers=headers)
+                response_folder_json= response_folder.json()
+                for folder in response_folder_json["value"]:
+                    name=folder["name"]
+                    if(name==uuid):
+                        id_folder= folder["id"]
+                        break
+
+            return True , self.generateLink(id_folder=id_folder)
+
+        except Exception as err:
+            self.logger.error(f"error uploading the file: {err}, {type(err)}")
+            return False, None
 
     def generateLink(self, id_folder):
         try:
