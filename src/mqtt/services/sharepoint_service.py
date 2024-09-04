@@ -6,7 +6,6 @@ import threading
 import datetime
 import config.settings as settings
 from database.database import DataBase
-from mqtt.service import Service
 from concurrent.futures import ThreadPoolExecutor
 class SharePointService:
 
