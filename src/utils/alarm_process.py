@@ -43,8 +43,13 @@ class AlarmProcess:
                    
                     
                     self.database.saveMessage(message=alarm_event["message"])
-                    EventBus.publish('MessageBuffer',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
-                    EventBus.publish('MessageVideo',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
+                    if settings.STOREOPS_MEDIA_FILES_ENABLE==1:
+                        EventBus.publish('MessageBuffer',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
+                        EventBus.publish('MessageVideo',{'payload': {'uuid':request_uuid,'timestamp':timestamp}})
+                    else: 
+                        self.logger.info(f"Media Files Disabled no request buffer or video")
+                        EventBus.publish('MessageLink', {'payload': {"uuid":request_uuid, "timestamp":timestamp, "link":""}})
+
                     self.logger.info(f"*******************************")
                     self.logger.info(f"Epcs in list fo messagee{self.epcsList}")
                     self.logger.info(f"*******************************")
