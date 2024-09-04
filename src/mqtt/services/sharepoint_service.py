@@ -7,7 +7,7 @@ import datetime
 import config.settings as settings
 from database.database import DataBase
 from mqtt.service import Service
-
+from concurrent.futures import ThreadPoolExecutor
 class SharePointService:
 
     def __init__(self): 
@@ -16,6 +16,7 @@ class SharePointService:
             self.sharePointUtils = SharepointUtils()
             self.database = DataBase()
             self.service = Service() 
+            self.executor = ThreadPoolExecutor(max_workers=2)
             EventBus.subscribe('Snapshot',self)
             EventBus.subscribe('Buffer',self)
             EventBus.subscribe('Video',self)
@@ -66,8 +67,9 @@ class SharePointService:
                         files.append(f"{name}.jpg")
                         cont += 1 
                         
-                    upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
-                    upload.start()
+                    #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
+                    #upload.start()
+                    self.executor.submit(self.upload, path, uuid, timestamp, files)
                     
 
                 else:
@@ -91,8 +93,9 @@ class SharePointService:
 
                 if status == "OK":
                     files = [fileName]
-                    upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
-                    upload.start()
+                    #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
+                    #upload.start()
+                    self.executor.submit(self.upload, path, uuid, timestamp, files)
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  

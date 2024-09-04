@@ -105,7 +105,7 @@ class SharepointUtils():
             self.logger.info(f"Upload group id:{uuid}")
             for file_name in files:
                 file_full_path = f"{path}/{file_name}"
-                self.logger.info(f"Uploading file {file_full_path}")
+                self.logger.info(f"Uploading file group: {file_full_path}")
                 upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
                 with open(file_full_path, 'rb') as file:
                     response = requests.put(upload_url, headers=headers, data=file)
