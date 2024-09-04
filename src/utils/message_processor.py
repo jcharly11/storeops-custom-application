@@ -18,7 +18,7 @@ class MessageProcessor:
           try:
            if event_type == 'MessageLink':
                  message = data['payload']
-                 result = self.database.getMessages(message=message)
+                 result = self.database.getMessages(request_uuid=message['uuid'])
                  if result:
                     data=[
                             {
