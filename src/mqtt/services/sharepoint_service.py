@@ -15,7 +15,6 @@ class SharePointService:
             self.logger = logging.getLogger("main")
             self.sharePointUtils = SharepointUtils()
             self.database = DataBase()
-            self.service = Service() 
             self.executor = ThreadPoolExecutor(max_workers=2)
             EventBus.subscribe('Snapshot',self)
             EventBus.subscribe('Buffer',self)
@@ -68,7 +67,8 @@ class SharePointService:
                         files.append(f"{name}.jpg")
                         cont += 1
                     self.executor.submit(self.upload, path, uuid, timestamp, files)
-                                        
+                    #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
+                    #upload.start()                                       
 
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
@@ -93,6 +93,8 @@ class SharePointService:
                 if status == "OK":
                     files = [fileName]
                     self.executor.submit(self.upload, path, uuid, timestamp, files)
+                    #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
+                    #upload.start()
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
