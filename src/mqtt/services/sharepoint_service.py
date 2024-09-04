@@ -29,12 +29,10 @@ class SharePointService:
                 img = body['image']
 
                 if status == "OK":
-                    folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid)
-                    if uploaded is not True:
-                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid)
-                        
-                    link = self.sharePointUtils.generateLink(id_folder=folder)
-                    EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                    files = [uuid]
+                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, file_name= files)
+                    if uploaded:
+                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 
@@ -62,10 +60,10 @@ class SharePointService:
                         files.append(f"{name}.jpg")
                         cont+=1 
                         
-                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, file_name= name)
+                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, file_name = files)
                     if uploaded:
                         EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
-                        
+
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 

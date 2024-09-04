@@ -19,26 +19,26 @@ class MessageProcessor:
            if event_type == 'MessageLink':
                  message = data['payload']
                  result = self.database.getMessages(message=message)
-
-                 data=[
-                         {
-                         "key": "silence",
-                          "value": result[0][2] 
-                          } ,
-                          {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").replace(" ","").split(",")} ,
-                          { 
-                              "key": "media",
-                              "value":message['link']
-                         } 
-                 ]
-                 body={ 
-                        "uuid": message['uuid'],
-                        "timestamp": datetime.datetime.now().__str__(),
-                        "device_model": "SFERO",
-                        "device_id": settings.DEVICE_ID,
-                        "version": "1.0.0",
-                        "data": data
-                 }  
+                 if result:
+                    data=[
+                            {
+                            "key": "silence",
+                            "value": result[0][2] 
+                            } ,
+                            {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").replace(" ","").split(",")} ,
+                            { 
+                                "key": "media",
+                                "value":message['link']
+                            } 
+                    ]
+                    body={ 
+                            "uuid": message['uuid'],
+                            "timestamp": datetime.datetime.now().__str__(),
+                            "device_model": "SFERO",
+                            "device_id": settings.DEVICE_ID,
+                            "version": "1.0.0",
+                            "data": data
+                    }  
                  EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
                   
 
