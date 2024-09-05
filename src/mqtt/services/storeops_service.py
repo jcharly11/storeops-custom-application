@@ -26,6 +26,7 @@ class StoreOpsService(Service):
         self.database = DataBase() 
         self.logger.info(f"Starting service ")
         self.service =Service() 
+        self.file_utils = FileUtils()
         #self.mutex = queue.Queue().mutex
         
      
@@ -84,7 +85,9 @@ class StoreOpsService(Service):
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
                 self.database.deleteMessage(request_uuid=message['body']['uuid'])
-                FileUtils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
+                self.file_utils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
+                self.file_utils.deleteFolderContent(folder=f"./videos/{message['body']['uuid']}")
+
 
             except Exception as ex:
                 self.logger.info(f"Error sending mqtt {topic},{ex}")
