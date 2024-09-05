@@ -2,6 +2,7 @@ from mqtt.service import Service
 import logging
 from database.database import DataBase
 from config import settings as settings
+from utils.file_utils import FileUtils
 from events.event_bus import EventBus
 import threading
 import multiprocessing
@@ -83,6 +84,7 @@ class StoreOpsService(Service):
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
                 self.database.deleteMessage(request_uuid=message['body']['uuid'])
+                FileUtils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
 
             except Exception as ex:
                 self.logger.info(f"Error sending mqtt {topic},{ex}")
