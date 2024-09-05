@@ -2,13 +2,13 @@ from mqtt.service import Service
 import logging
 from database.database import DataBase
 from config import settings as settings
-from utils.file_utils import FileUtils
 from events.event_bus import EventBus
 import threading
 import multiprocessing
 import json
 import time
 import datetime
+import os
 class StoreOpsService(Service):
     
     """Receives from other services message to upload files to sharepoint. 
@@ -25,9 +25,7 @@ class StoreOpsService(Service):
         self.logger = logging.getLogger("main")  
         self.database = DataBase() 
         self.logger.info(f"Starting service ")
-        self.service =Service() 
-        self.file_utils = FileUtils()
-        #self.mutex = queue.Queue().mutex
+        self.service =Service()  
         
      
     def run(self, queueAlarm: multiprocessing.Queue, queueInfo):
@@ -37,7 +35,6 @@ class StoreOpsService(Service):
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('SubscriberInfo',self)
          EventBus.subscribe('PublishMessageAlarm',self)
-         EventBus.subscribe('PublishMessageAlarmVideo',self)
          EventBus.subscribe('MessageBuffer',self)
          EventBus.subscribe('MessageVideo',self)
          alarmThread = threading.Thread(target=self.processAlarm,args=(self.queueAlarm,))
@@ -86,22 +83,11 @@ class StoreOpsService(Service):
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
                 self.database.deleteMessage(request_uuid=message['body']['uuid'])
-                self.file_utils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
+                #self.file_utils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
+                
             except Exception as ex:
                 self.logger.info(f"Error sending mqtt {topic},{ex}")                
 
-
-        if event_type == 'PublishMessageAlarmVideo':#Publish mesage for alarm
-            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
-            topic = settings.TOPIC_RFID_ALARM
-            try:
-                self.logger.info("***************************************")
-                self.logger.info(f"Recived mqtt message: { message }") 
-                self.file_utils.deleteFolderContent(folder=f"./videos/{message['body']['uuid']}")
-
-            except Exception as ex:
-                self.logger.info(f"Error sending mqtt {topic},{ex}")
-            #delete from database
 
         if event_type == 'MessageBuffer':#Request buffer to onvif 
             timestamp = message['timestamp']

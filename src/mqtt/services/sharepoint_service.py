@@ -125,15 +125,6 @@ class SharePointService:
                             "data": data
                     }               
                     EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
-             else:
-                    body={ 
-                            "uuid":uuid,
-                            "timestamp": datetime.datetime.now().__str__(),
-                            "device_model": "SFERO",
-                            "device_id": settings.DEVICE_ID,
-                            "version": "1.0.0",
-                            "data": None
-                    }                      
-                    EventBus.publish('PublishMessageAlarmVideo',{'payload': {'body':body}})
+
                          
  

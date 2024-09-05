@@ -8,11 +8,13 @@ import config.settings as settings
 import requests
 from PIL import Image
 from utils.images_tools import ImageEncoder
+from utils.file_utils import FileUtils
 
 class SharepointUtils():
     def __init__(self):   
         self.logger = logging.getLogger("main")
         self.encoder = ImageEncoder()
+        self.file_utils = FileUtils()
         
     def upload_file(self,path, uuid, file_name):
         self.logger.info(f"Starting to upload file to azure storage: {file_name}")
@@ -113,6 +115,7 @@ class SharepointUtils():
                     if response:
 
                         success=True
+                        os.remove(file_full_path)
                     else:
                         success = False
                         break
@@ -128,7 +131,7 @@ class SharepointUtils():
                     if(name==uuid):
                         id_folder= folder["id"]
                         break
-
+                self.file_utils.deleteFolderContent(folder = path)
             return True , self.generateLink(id_folder=id_folder)
 
         except Exception as err:
