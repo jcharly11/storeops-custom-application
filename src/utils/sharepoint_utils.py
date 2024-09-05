@@ -8,13 +8,12 @@ import config.settings as settings
 import requests
 from PIL import Image
 from utils.images_tools import ImageEncoder
-from utils.file_utils import FileUtils
 
 class SharepointUtils():
     def __init__(self):   
         self.logger = logging.getLogger("main")
         self.encoder = ImageEncoder()
-        self.file_utils = FileUtils()
+        
         
     def upload_file(self,path, uuid, file_name):
         self.logger.info(f"Starting to upload file to azure storage: {file_name}")
@@ -111,14 +110,15 @@ class SharepointUtils():
                 upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
                 with open(file_full_path, 'rb') as file:
                     response = requests.put(upload_url, headers=headers, data=file)
-                    
                     if response:
 
                         success=True
                         os.remove(file_full_path)
                     else:
+
                         success = False
                         break
+
 
 
             if success:
@@ -131,8 +131,8 @@ class SharepointUtils():
                     if(name==uuid):
                         id_folder= folder["id"]
                         break
-                self.file_utils.deleteFolderContent(folder = path)
-            return True , self.generateLink(id_folder=id_folder)
+                
+                return True , self.generateLink(id_folder=id_folder)
 
         except Exception as err:
             self.logger.error(f"error uploading group of files : {err}, {type(err)}")
