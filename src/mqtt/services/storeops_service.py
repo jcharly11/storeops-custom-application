@@ -36,7 +36,7 @@ class StoreOpsService(Service):
          EventBus.subscribe('Alarm',self)
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('SubscriberInfo',self)
-         EventBus.subscribe('PublishMessageAlarmBuffer',self)
+         EventBus.subscribe('PublishMessageAlarm',self)
          EventBus.subscribe('PublishMessageAlarmVideo',self)
          EventBus.subscribe('MessageBuffer',self)
          EventBus.subscribe('MessageVideo',self)
@@ -77,7 +77,7 @@ class StoreOpsService(Service):
             self.service.subscribeBufferResp()
             self.service.subscribeVideoResp()
 
-        if event_type == 'PublishMessageAlarmBuffer':#Publish mesage for alarm
+        if event_type == 'PublishMessageAlarm':#Publish mesage for alarm
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
             topic = settings.TOPIC_RFID_ALARM
             try:
@@ -85,28 +85,24 @@ class StoreOpsService(Service):
                 self.logger.info(f"Recived mqtt message: { message }")
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
-                self.file_utils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
                 self.database.deleteMessage(request_uuid=message['body']['uuid'])
-
-
+                self.file_utils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
             except Exception as ex:
-                self.logger.info(f"Error sending mqtt {topic},{ex}")
-            #delete from database
+                self.logger.info(f"Error sending mqtt {topic},{ex}")                
+
+
         if event_type == 'PublishMessageAlarmVideo':#Publish mesage for alarm
             #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_VIDEO_MEDIALINK_EAS                
             topic = settings.TOPIC_RFID_ALARM
             try:
                 self.logger.info("***************************************")
-                self.logger.info(f"Recived mqtt message: { message }")
-                result = self.service.pub(topic=topic, payload=json.dumps(message))
-                self.logger.info(f"Reuslt mqtt message: { result }")
+                self.logger.info(f"Recived mqtt message: { message }") 
                 self.file_utils.deleteFolderContent(folder=f"./videos/{message['body']['uuid']}")
-                self.database.deleteMessage(request_uuid=message['body']['uuid'])
-                
 
             except Exception as ex:
                 self.logger.info(f"Error sending mqtt {topic},{ex}")
             #delete from database
+
         if event_type == 'MessageBuffer':#Request buffer to onvif 
             timestamp = message['timestamp']
             uuid_request = message['uuid']

@@ -65,7 +65,7 @@ class SharePointService:
                         name= str(cont)
                         files.append(f"{name}.jpg")
                         cont += 1
-                    self.executor.submit(self.upload, path, uuid, timestamp, files,event_type)
+                    self.executor.submit(self.upload, path, uuid, timestamp, files)
                     #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
                     #upload.start()                                       
 
@@ -91,7 +91,7 @@ class SharePointService:
 
                 if status == "OK":
                     files = [fileName]
-                    self.executor.submit(self.upload, path, uuid, timestamp, event_type)
+                    self.executor.submit(self.upload, path, uuid, timestamp, files)
                     #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
                     #upload.start()
 
@@ -100,7 +100,7 @@ class SharePointService:
  
 
 
-    def upload(self, path, uuid, timestamp, files, event_type):
+    def upload(self, path, uuid, timestamp, files):
          uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid,  files = files)
          if uploaded:
              result = self.database.getMessages(request_uuid = uuid)
@@ -124,9 +124,16 @@ class SharePointService:
                             "version": "1.0.0",
                             "data": data
                     }               
-                    if event_type =='Buffer':
-                        EventBus.publish('PublishMessageAlarmBuffer',{'payload': {'body':body}})
-                    elif event_type == 'Video':
-                        EventBus.publish('PublishMessageAlarmVideo',{'payload': {'body':body}})
-
+                    EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
+             else:
+                    body={ 
+                            "uuid":uuid,
+                            "timestamp": datetime.datetime.now().__str__(),
+                            "device_model": "SFERO",
+                            "device_id": settings.DEVICE_ID,
+                            "version": "1.0.0",
+                            "data": None
+                    }                      
+                    EventBus.publish('PublishMessageAlarmVideo',{'payload': {'body':body}})
+                         
  
