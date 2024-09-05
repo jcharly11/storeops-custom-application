@@ -65,7 +65,7 @@ class SharePointService:
                         name= str(cont)
                         files.append(f"{name}.jpg")
                         cont += 1
-                    self.executor.submit(self.upload, path, uuid, timestamp, files)
+                    self.executor.submit(self.upload, path, uuid, timestamp, files,event_type)
                     #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
                     #upload.start()                                       
 
@@ -91,7 +91,7 @@ class SharePointService:
 
                 if status == "OK":
                     files = [fileName]
-                    self.executor.submit(self.upload, path, uuid, timestamp, files)
+                    self.executor.submit(self.upload, path, uuid, timestamp, event_type)
                     #upload = threading.Thread(target=self.upload,args=(path, uuid, timestamp, files,))
                     #upload.start()
 
@@ -100,7 +100,7 @@ class SharePointService:
  
 
 
-    def upload(self, path, uuid, timestamp, files):
+    def upload(self, path, uuid, timestamp, files, event_type):
          uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid,  files = files)
          if uploaded:
              result = self.database.getMessages(request_uuid = uuid)
@@ -124,5 +124,9 @@ class SharePointService:
                             "version": "1.0.0",
                             "data": data
                     }               
-                    EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
+                    if event_type =='Buffer':
+                        EventBus.publish('PublishMessageAlarmBuffer',{'payload': {'body':body}})
+                    elif event_type == 'Video':
+                        EventBus.publish('PublishMessageAlarmVideo',{'payload': {'body':body}})
+
  

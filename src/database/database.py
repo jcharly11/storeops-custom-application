@@ -52,5 +52,4 @@ class DataBase():
                   
         except Exception as ex:
                self.logger.info(f"Error executing query insert message: ",ex.args)
-
-        return ex.args
+               return False
