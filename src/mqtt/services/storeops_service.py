@@ -28,9 +28,8 @@ class StoreOpsService(Service):
         self.service =Service()  
         
      
-    def run(self, queueAlarm: multiprocessing.Queue, queueInfo):
-         self.queueAlarm = queueAlarm
-         self.queueInfo = queueInfo
+    def run(self, queueAlarm: multiprocessing.Queue):
+         self.queueAlarm = queueAlarm 
          EventBus.subscribe('Alarm',self)
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('SubscriberInfo',self)

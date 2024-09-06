@@ -2,12 +2,7 @@ import json
 import logging
 import multiprocessing.queues
 import queue
-import time
-import datetime
-import uuid
 import config.settings as settings
-import os
-import signal
 
 from logging.config import dictConfig
 from fastapi import FastAPI
@@ -23,8 +18,7 @@ from utils.alarm_process import AlarmProcess
 from utils.error_processor import ErrorProcess
 from utils.message_processor import MessageProcessor
 import multiprocessing
-queueAlarm = multiprocessing.Queue() #queue.Queue() 
-queueInfo = queue.Queue() 
+queueAlarm = multiprocessing.Queue()
 # application logging
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("main")
@@ -56,6 +50,6 @@ errorProcess= ErrorProcess()
 storeOpService = StoreOpsService()
 sharePointService = SharePointService()
 serviceRestart = ServiceRestart()
-storeOpService.run(queueAlarm=queueAlarm,queueInfo=queueInfo)
+storeOpService.run(queueAlarm=queueAlarm)
 
 

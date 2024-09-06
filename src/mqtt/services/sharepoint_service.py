@@ -2,12 +2,12 @@ import logging
 from events.event_bus import EventBus
 from utils.sharepoint_utils import SharepointUtils
 import json
-import threading
 import datetime
 import config.settings as settings
 from database.database import DataBase
 from concurrent.futures import ThreadPoolExecutor
 from utils.file_utils import FileUtils
+from utils.upload_utils import UploadUtils
 
 class SharePointService:
 
@@ -17,6 +17,7 @@ class SharePointService:
             self.sharePointUtils = SharepointUtils()
             self.database = DataBase()
             self.file_utils = FileUtils()
+            self.upload_utils = UploadUtils()
             self.executor = ThreadPoolExecutor(max_workers=2)
             EventBus.subscribe('Snapshot',self)
             EventBus.subscribe('Buffer',self)
@@ -37,7 +38,7 @@ class SharePointService:
                 img = body['image']
 
                 if status == "OK":
-                    files = [uuid]
+                    files = [f'{uuid}.jpg']
                     uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, files = files)
                     if uploaded:
                         EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
@@ -68,7 +69,7 @@ class SharePointService:
                         name= str(cont)
                         files.append(f"{name}.jpg")
                         cont += 1
-                    self.executor.submit(self.upload, path, uuid, timestamp, files)
+                    self.executor.submit(self.upload_utils.run, path, uuid, files, None)
 
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
@@ -92,40 +93,8 @@ class SharePointService:
 
                 if status == "OK":
                     files = [fileName]
-                    self.executor.submit(self.upload, path, uuid, timestamp, files)
+                    self.executor.submit(self.upload_utils.run, path, uuid, files, None)
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
- 
-
-
-    def upload(self, path, uuid, timestamp, files):
-         uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid,  files = files)
-         
-         if uploaded and link is not None:
-             self.file_utils.deleteFolderContent(folder = path)
-             result = self.database.getMessages(request_uuid = uuid)
-             if result:
-                    data=[
-                            {
-                            "key": "silence",
-                            "value": result[0][2] 
-                            } ,
-                            {"key": "EPC","value": result[0][1].replace("[","").replace("]","").replace("'","").replace(" ","").split(",")} ,
-                            { 
-                                "key": "media",
-                                "value":link
-                            } 
-                    ]
-                    body={ 
-                            "uuid":uuid,
-                            "timestamp": datetime.datetime.now().__str__(),
-                            "device_model": "SFERO",
-                            "device_id": settings.DEVICE_ID,
-                            "version": "1.0.0",
-                            "data": data
-                    }               
-                    EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
-
-                         
  
