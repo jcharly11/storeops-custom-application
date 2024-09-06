@@ -122,24 +122,18 @@ class SharepointUtils():
 
 
             if success:
-                folder_name=""
-                id_folder=""
-                response_folder = requests.get(url, headers=headers)
-                response_folder_json= response_folder.json()
-                for folder in response_folder_json["value"]:
-                    name=folder["name"]
-                    if(name==uuid):
-                        id_folder= folder["id"]
-                        break
                 self.file_utils.deleteFolderContent(folder = path)
-            return True , self.generateLink(id_folder=id_folder)
-
+            
+                return True
+            
         except Exception as err:
             self.logger.error(f"error uploading group of files : {err}, {type(err)}")
-            return False, None
+            return False
 
-    def generateLink(self, id_folder):
+
+    def generateLink(self, uuid):
         try:
+            id_folder= self.createFolder(uuid)
             url=f"{settings.BASE_URL}/sites/{settings.SITE_ID}/drive/items/{id_folder}/createLink"
             access_token= self.getAuthToken()
             headers = {
@@ -185,3 +179,43 @@ class SharepointUtils():
         except Exception as err:
             self.logger.error(f"error get token: {err}, {type(err)}")
             return None
+        
+
+    def createFolder(self,uuid):
+        try:
+            link=""
+            folder_base= F"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
+            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
+            access_token= self.sharePointUtils.getAuthToken()
+            headers = {
+                "Authorization": f"{access_token}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "name": "{uuid}",
+                "folder": { },
+                "@microsoft.graph.conflictBehavior": "fail"
+                }
+            body= json.dumps(data)
+            response = requests.post(url, headers=headers, data=body)
+            
+            if(response.status_code==200 or response.status_code==201):
+                resJs= response.json()
+                return resJs["id"]
+            
+            #folder already exists
+            elif(response.status_code==409):
+                response_folder = requests.get(url, headers=headers)
+                response_folder_json= response_folder.json()
+                for folder in response_folder_json["value"]:
+                    name=folder["name"]
+                    if(name==uuid):
+                        id_folder= folder["id"]
+                        break
+                return id_folder
+
+
+        except Exception as err:
+            print(f"error create sharepoint folder: {err}, {type(err)}")
+            return ""

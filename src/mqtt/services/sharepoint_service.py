@@ -7,6 +7,8 @@ import datetime
 import config.settings as settings
 from database.database import DataBase
 from concurrent.futures import ThreadPoolExecutor
+import requests
+
 class SharePointService:
 
     def __init__(self): 
@@ -101,7 +103,8 @@ class SharePointService:
 
 
     def upload(self, path, uuid, timestamp, files):
-         uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid,  files = files)
+         link= self.sharePointUtils.generateLink(uuid)
+         uploaded = self.sharePointUtils.upload_group(path=path, uuid=uuid, files = files)
          if uploaded:
              result = self.database.getMessages(request_uuid = uuid)
              if result:
@@ -125,6 +128,3 @@ class SharePointService:
                             "data": data
                     }               
                     EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
-
-                         
- 
