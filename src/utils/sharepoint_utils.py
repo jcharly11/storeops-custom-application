@@ -1,12 +1,8 @@
-import base64
 import datetime
-import io
 import json
 import logging 
-import os
 import config.settings as settings
 import requests
-from PIL import Image
 from utils.images_tools import ImageEncoder
 
 class SharepointUtils():
@@ -36,15 +32,10 @@ class SharepointUtils():
                 with open(file_full_path, 'rb') as file:
                     response = requests.put(upload_url, headers=headers, data=file)
                     if response:
-
                         success=True
                     else:
-
                         success = False
                         break
-
-
-
             if success:
                 return True
             
