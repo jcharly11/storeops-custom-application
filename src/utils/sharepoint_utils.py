@@ -78,7 +78,6 @@ class SharepointUtils():
             
             resLink = requests.post(url, headers=headers, data=body)
             resJs= resLink.json()
-            print(resJs)
             folderLink= resJs["link"]["webUrl"]
             return folderLink
 
@@ -108,14 +107,14 @@ class SharepointUtils():
             link=""
             folder_base= F"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
             url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
-            access_token= self.sharePointUtils.getAuthToken()
+            access_token= self.getAuthToken()
             headers = {
                 "Authorization": f"{access_token}",
                 "Content-Type": "application/json"
             }
             
             data = {
-                "name": "{uuid}",
+                "name": f"{uuid}",
                 "folder": { },
                 "@microsoft.graph.conflictBehavior": "fail"
                 }

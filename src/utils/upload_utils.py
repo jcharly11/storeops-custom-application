@@ -16,8 +16,10 @@ class UploadUtils:
 
     def run(self, path, uuid, files, link):
 
-        if link is  None:
+        if link ==  None:
              link= self.sharePointUtils.generateLink(uuid)
+        else:
+             link = link
 
         uploaded = self.sharePointUtils.upload_group(path=path, uuid=uuid, files = files)
         if uploaded:
