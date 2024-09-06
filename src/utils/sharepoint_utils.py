@@ -113,7 +113,6 @@ class SharepointUtils():
                     if response:
 
                         success=True
-                        os.remove(file_full_path)
                     else:
 
                         success = False
