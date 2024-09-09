@@ -8,7 +8,7 @@ import datetime
 class UploadUtils:
 
     def __init__(self) -> None:
-         self.logger = logging.getLogger("ServiceReintent")
+         self.logger = logging.getLogger("main")
          self.sharePointUtils = SharepointUtils()
          self.database = DataBase()
          self.file_utils = FileUtils()
@@ -47,5 +47,4 @@ class UploadUtils:
                     }               
                     EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
         else:
-
             EventBus.publish('PublishMessageAlarmReintent',{'payload': {'link': link,'uuid': uuid,'files': files,'path': path}})
