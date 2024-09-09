@@ -25,7 +25,7 @@ class ServiceReintent():
         try:
             
             self.queue.put(data)
-            self.logger.info(f"Content in reintent queue{self.queue.qsize()}")
+            self.logger.info(f"Content in reintent queue {self.queue.qsize()}")
 
         except Exception as err:
             self.logger.info(
@@ -35,16 +35,14 @@ class ServiceReintent():
     def upload(self , queue):
         while True:
             if  not queue.empty():
-                
-
-
-                time.sleep(settings.STOREOPS_REINTENT_DELAY_SECONDS)
-                item = queue.get()
+                time.sleep(int(settings.STOREOPS_REINTENT_DELAY_SECONDS))
+                payload = queue.get()
+                item = payload['payload']
                 uuid =  item['uuid']
                 link =  item['link']
                 files = item['files']
                 path =  item['path']
-                self.logger.info(f"Reintento of {uuid}")
+                self.logger.info(f"Reintent of {uuid}, {link}, {files}, {path}")
                 self.upload_utils.run(path=path, uuid=uuid, files=files, link = link)
 
             
