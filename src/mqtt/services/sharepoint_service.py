@@ -66,7 +66,7 @@ class SharePointService:
 
                     files = []
                     for i in range(int(image_number)):
-                        name= str(cont)
+                        name= str(cont).zfill(2)
                         files.append(f"{name}.jpg")
                         cont += 1
                     self.executor.submit(self.upload_utils.run, path, uuid, files, None)
