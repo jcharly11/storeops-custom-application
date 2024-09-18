@@ -16,7 +16,7 @@ class EnvironmentValidator():
             # TODO: Add code logic for environment variables
             self.logger.warning(f"Create base configuration file")
             with open(self.fileName, mode="w") as file:
-
+                file.write(f"export STOREOPS_MEDIA_FILES_ENABLE={os.getenv('STOREOPS_MEDIA_FILES_ENABLE', default=1) }"+ "\n")
                 file.write(f"export STOREOPS_MQTT_ENABLE={os.getenv('STOREOPS_MQTT_ENABLE', default=1) }"+ "\n")
                 file.write(f"export STOREOPS_SERVER={os.getenv('STOREOPS_SERVER', default='') }"+ "\n")
                 file.write(f"export STOREOPS_PORT={os.getenv('STOREOPS_PORT', default=80) }"+ "\n")

@@ -1,97 +1,52 @@
-import base64
 import datetime
-import io
 import json
 import logging 
-import os
 import config.settings as settings
 import requests
-from PIL import Image
 from utils.images_tools import ImageEncoder
 
 class SharepointUtils():
     def __init__(self):   
         self.logger = logging.getLogger("main")
         self.encoder = ImageEncoder()
-        
-    def upload_file(self,path, uuid, file_name):
-        self.logger.info(f"Starting to upload file to azure storage: {file_name}")
+ 
+
+    def upload_group(self, path, uuid, files):
+        self.logger.info(f"Starting to upload files : {len(files)} items")
+
         try:
             access_token= self.getAuthToken()
-            folder_name=""
-            response_json= None
-            
-            folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
-            folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
-            
-            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
-            upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
-            file_full_path = f"{path}/{file_name}"
+            success = False
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/octet-stream'
             }
-            
-            with open(file_full_path, 'rb') as file:
-                response = requests.put(upload_url, headers=headers, data=file)
-                response_json= response.json()
-            
-            id_folder=""
-
-            response_folder = requests.get(url, headers=headers)
-            response_json= response_folder.json()
-            for folder in response_json["value"]:
-                name=folder["name"]
-                if(name==uuid):
-                    id_folder= folder["id"]
-                    break
-
-            return id_folder
-
-        except Exception as err:
-            self.logger.error(f"error uploading the file: {err}, {type(err)}")
-            return None
-
-
-
-    def upload_video(self,uuid, path, file_name):
-        self.logger.info("Starting to upload video to sharepoint")
-        try:
-            access_token= self.getAuthToken()
-            headers = {
-                'Authorization': f'Bearer {access_token}',
-                'Content-Type': 'application/octet-stream'
-            }
-            #Path should be defined 
             folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/{uuid}"
             folder_base=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}" 
             url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
-            upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
-            file_full_path = path + file_name
-            with open(file_full_path, 'rb') as file:
-                response = requests.put(upload_url, headers=headers, data=file)
-                if response:
-                    os.remove(file_full_path)
-                    self.logger.info("Deleting video after upload")
-                self.logger.info("UPLOADING VIDEO COMPLETE")
+            self.logger.info(f"Upload group id:{uuid}")
+            for file_name in files:
+                file_full_path = f"{path}/{file_name}"
+                self.logger.info(f"Uploading file group: {file_full_path}")
+                upload_url = f'{settings.BASE_URL}/sites/{settings.SITE_ID}/drives/{settings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
+                with open(file_full_path, 'rb') as file:
+                    response = requests.put(upload_url, headers=headers, data=file)
+                    if response:
+                        success=True
+                    else:
+                        success = False
+                        break
+            if success:
+                return True
             
-            id_folder=""
-
-            response_folder = requests.get(url, headers=headers)
-            response_json= response_folder.json() 
-            for folder in response_json["value"]:
-                name=folder["name"]
-                if(name==uuid):
-                    id_folder= folder["id"]
-                    break
-
-            return id_folder                
         except Exception as err:
-            self.logger.error(f"error uploading the file: {err}, {type(err)}")
+            self.logger.error(f"error uploading group of files : {err}, {type(err)}")
+            return False
 
 
-    def generateLink(self, id_folder):
+    def generateLink(self, uuid):
         try:
+            id_folder= self.createFolder(uuid)
             url=f"{settings.BASE_URL}/sites/{settings.SITE_ID}/drive/items/{id_folder}/createLink"
             access_token= self.getAuthToken()
             headers = {
@@ -114,7 +69,6 @@ class SharepointUtils():
             
             resLink = requests.post(url, headers=headers, data=body)
             resJs= resLink.json()
-            print(resJs)
             folderLink= resJs["link"]["webUrl"]
             return folderLink
 
@@ -137,3 +91,43 @@ class SharepointUtils():
         except Exception as err:
             self.logger.error(f"error get token: {err}, {type(err)}")
             return None
+        
+
+    def createFolder(self,uuid):
+        try:
+            link=""
+            folder_base= F"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}"
+            url=f"{settings.BASE_URL}/drives/{settings.DRIVE_ID}/root:/{folder_base}:/children"
+            access_token= self.getAuthToken()
+            headers = {
+                "Authorization": f"{access_token}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "name": f"{uuid}",
+                "folder": { },
+                "@microsoft.graph.conflictBehavior": "fail"
+                }
+            body= json.dumps(data)
+            response = requests.post(url, headers=headers, data=body)
+            
+            if(response.status_code==200 or response.status_code==201):
+                resJs= response.json()
+                return resJs["id"]
+            
+            #folder already exists
+            elif(response.status_code==409):
+                response_folder = requests.get(url, headers=headers)
+                response_folder_json= response_folder.json()
+                for folder in response_folder_json["value"]:
+                    name=folder["name"]
+                    if(name==uuid):
+                        id_folder= folder["id"]
+                        break
+                return id_folder
+
+
+        except Exception as err:
+            print(f"error create sharepoint folder: {err}, {type(err)}")
+            return ""

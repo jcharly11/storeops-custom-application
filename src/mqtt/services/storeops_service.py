@@ -8,6 +8,7 @@ import multiprocessing
 import json
 import time
 import datetime
+import os
 class StoreOpsService(Service):
     
     """Receives from other services message to upload files to sharepoint. 
@@ -24,13 +25,11 @@ class StoreOpsService(Service):
         self.logger = logging.getLogger("main")  
         self.database = DataBase() 
         self.logger.info(f"Starting service ")
-        self.service =Service() 
-        #self.mutex = queue.Queue().mutex
+        self.service =Service()  
         
      
-    def run(self, queueAlarm: multiprocessing.Queue, queueInfo):
-         self.queueAlarm = queueAlarm
-         self.queueInfo = queueInfo
+    def run(self, queueAlarm: multiprocessing.Queue):
+         self.queueAlarm = queueAlarm 
          EventBus.subscribe('Alarm',self)
          EventBus.subscribe('MessageSnapshot',self)
          EventBus.subscribe('SubscriberInfo',self)
@@ -82,10 +81,12 @@ class StoreOpsService(Service):
                 self.logger.info(f"Recived mqtt message: { message }")
                 result = self.service.pub(topic=topic, payload=json.dumps(message))
                 self.logger.info(f"Reuslt mqtt message: { result }")
-                self.database.deleteMessage(message=message)
+                self.database.deleteMessage(request_uuid=message['body']['uuid'])
+                #self.file_utils.deleteFolderContent(folder=f"./snapshots/{message['body']['uuid']}")
+                
             except Exception as ex:
-                self.logger.info(f"Error sending mqtt {topic}")
-            #delete from database
+                self.logger.info(f"Error sending mqtt {topic},{ex}")                
+
 
         if event_type == 'MessageBuffer':#Request buffer to onvif 
             timestamp = message['timestamp']
@@ -100,9 +101,8 @@ class StoreOpsService(Service):
                         "get_buffer": True
                         }
                     }
-            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
+            
             topic = settings.TOPIC_CAMERA_IMAGE_BUFFER            
-
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
         
 
@@ -119,9 +119,8 @@ class StoreOpsService(Service):
                         "get_video": True
                         }
                     }
-            #topic = f"checkpoint/{settings.ACCOUNT_NUMBER}/{settings.LOCATION_ID}/service/"+settings.TOPIC_CAMERA_IMAGE_BUFFER
+            
             topic = settings.TOPIC_CAMERA_VIDEO
-
             result = self.service.pub(topic=topic, payload=json.dumps(payload))
    
     def processAlarm(self,  queue): 

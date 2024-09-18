@@ -2,12 +2,7 @@ import json
 import logging
 import multiprocessing.queues
 import queue
-import time
-import datetime
-import uuid
 import config.settings as settings
-import os
-import signal
 
 from logging.config import dictConfig
 from fastapi import FastAPI
@@ -19,12 +14,12 @@ from mqtt.services.services_info import ServiceInfo
 from mqtt.services.sharepoint_service import SharePointService
 from mqtt.services.services_restart import ServiceRestart
 from mqtt.services.service_custom_method import ServiceCustomMethod
+from mqtt.services.service_reintent import ServiceReintent
 from utils.alarm_process import AlarmProcess
 from utils.error_processor import ErrorProcess
 from utils.message_processor import MessageProcessor
 import multiprocessing
-queueAlarm = multiprocessing.Queue() #queue.Queue() 
-queueInfo = queue.Queue() 
+queueAlarm = multiprocessing.Queue()
 # application logging
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("main")
@@ -48,6 +43,7 @@ logger.info(f"STOREOPS_SHAREPOINT_BASE_DIRECTORY: {settings.STOREOPS_SHAREPOINT_
 logger.info(f"STOREOPS_SHAREPOINT_RETENTION_DAYS: {settings.STOREOPS_SHAREPOINT_RETENTION_DAYS}") 
 logger.info(f"ALARM_AGGREGATION_WINDOW_SEC: {settings.ALARM_AGGREGATION_WINDOW_SEC}") 
 
+serviceReintent = ServiceReintent()
 serviceCustomMethod = ServiceCustomMethod()
 messageProcceso = MessageProcessor()
 serviceInfo = ServiceInfo()
@@ -56,6 +52,6 @@ errorProcess= ErrorProcess()
 storeOpService = StoreOpsService()
 sharePointService = SharePointService()
 serviceRestart = ServiceRestart()
-storeOpService.run(queueAlarm=queueAlarm,queueInfo=queueInfo)
+storeOpService.run(queueAlarm=queueAlarm)
 
 

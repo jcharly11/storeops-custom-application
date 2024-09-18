@@ -15,7 +15,7 @@ TOPIC_WIRAMA_EPC_ALL = os.getenv(
     "TOPIC_WIRAMA_EPC_ALL", default="Wirama/EPC/All")
 TOPIC_SERVER_STATS = os.getenv("TOPIC_LPP_STATS", default="server/stats") 
 TOPIC_CUSTOM_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="alarm")
-TOPIC_CUSTOM_NOTIFICATION_ALARM = os.getenv("TOPIC_VOICE_ALARM", default="event/custom/alarm")
+TOPIC_CUSTOM_NOTIFICATION_ALARM = os.getenv("TOPIC_CUSTOM_NOTIFICATION_ALARM", default="event/custom/alarm")
 TOPIC_CUSTOM_METHOD = os.getenv("TOPIC_CUSTOM_METHOD", default="/settings/alarm")
 TOPIC_RESTART_APPLICATION = os.getenv("TOPIC_RESTART_APPLICATION", default="command/request/custom/refresh-environment")
 TOPIC_STORE_INFO = os.getenv("TOPIC_STORE_INFO", default="store/info")
@@ -79,7 +79,8 @@ STOREOPS_SHAREPOINT_ENABLE = os.getenv("STOREOPS_SHAREPOINT_ENABLE", default=0)
 STOREOPS_SHAREPOINT_XXX = os.getenv("STOREOPS_SHAREPOINT_XXX", default='')
 STOREOPS_SHAREPOINT_BASE_DIRECTORY = os.getenv("STOREOPS_SHAREPOINT_BASE_DIRECTORY", default="onviffiles")
 STOREOPS_SHAREPOINT_RETENTION_DAYS = os.getenv("STOREOPS_SHAREPOINT_RETENTION_DAYS", default=3)
-
+STOREOPS_REINTENT_DELAY_SECONDS = os.getenv("STOREOPS_SHAREPOINT_RETENTION_DAYS", default=10)
+STOREOPS_MEDIA_FILES_ENABLE = os.getenv("STOREOPS_MEDIA_FILES_ENABLE", default=1)
 
 #ONVIF TOPICS
 TOPIC_CAMERA_IMAGE = str(os.getenv("TOPIC_CAMERA_IMAGE", default="command/onvif/image/snapshot"))

@@ -18,7 +18,7 @@ class MessageProcessor:
           try:
            if event_type == 'MessageLink':
                  message = data['payload']
-                 result = self.database.getMessages(message=message)
+                 result = self.database.getMessages(request_uuid=message['uuid'])
                  if result:
                     data=[
                             {
@@ -40,11 +40,9 @@ class MessageProcessor:
                             "data": data
                     }  
                     EventBus.publish('PublishMessageAlarm',{'payload': {'body':body}})
-                
-                 #update database
-                 #read database
-                 #send message alarm
-                 #delete message or save
+                  
+
+    
                  
           except Exception as ex:
               self.logger.error(f"Error processing message for alarm: {ex}")        

@@ -1,15 +1,24 @@
-import config.settings as settings
 import logging 
 from events.event_bus import EventBus
 from utils.sharepoint_utils import SharepointUtils
 import json
-import os
+import datetime
+import config.settings as settings
+from database.database import DataBase
+from concurrent.futures import ThreadPoolExecutor
+from utils.file_utils import FileUtils
+from utils.upload_utils import UploadUtils
+
 class SharePointService:
 
     def __init__(self): 
             self.idService = type(self).__name__
             self.logger = logging.getLogger("main")
             self.sharePointUtils = SharepointUtils()
+            self.database = DataBase()
+            self.file_utils = FileUtils()
+            self.upload_utils = UploadUtils()
+            self.executor = ThreadPoolExecutor(max_workers=2)
             EventBus.subscribe('Snapshot',self)
             EventBus.subscribe('Buffer',self)
             EventBus.subscribe('Video',self)
@@ -20,6 +29,7 @@ class SharePointService:
             self.logger.info(f"Processing snapshot")
             try:
                 payload = json.loads(data['payload'])
+                
                 header = payload['header']
                 uuid = header['uuid_request']
                 timestamp = header['timestamp']
@@ -28,12 +38,10 @@ class SharePointService:
                 img = body['image']
 
                 if status == "OK":
-                    folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid)
-                    if uploaded is not True:
-                        folder, uploaded = self.upload(img=img, uuid=uuid,file_name=uuid)
-                        
-                    link = self.sharePointUtils.generateLink(id_folder=folder)
-                    EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                    files = [f'{uuid}.jpg']
+                    uploaded, link = self.sharePointUtils.upload_group(path=path, uuid=uuid, files = files)
+                    if uploaded:
+                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 
@@ -52,21 +60,17 @@ class SharePointService:
                 status = body['status']
                 image_number = body['image_number'] 
                 path = body['destination_path']
-
+                
                 if status == "OK":
                     cont = 1
+
+                    files = []
                     for i in range(int(image_number)):
-                        name= str(cont)
-                        folder, uploaded = self.upload(path=path, uuid=uuid, file_name= name)
+                        name= str(cont).zfill(2)
+                        files.append(f"{name}.jpg")
+                        cont += 1
+                    self.executor.submit(self.upload_utils.run, path, uuid, files, None)
 
-                        if uploaded:
-                            cont+=1
-                        elif uploaded is not True:
-                            folder, uploaded = self.upload(path=path, uuid=uuid, file_name=name)
-
-
-                    link = self.sharePointUtils.generateLink(id_folder=folder)
-                    EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
                 else:
                     EventBus.publish('ErrorService', {'payload': {"uuid":uuid, "timestamp":timestamp, "error":"Error with onvif module"}})
 
@@ -85,36 +89,12 @@ class SharePointService:
                 status = body['status'] 
                 fileName = body['file_name']
                 path  = body['destination_path']
+                path = path[:-1]
 
                 if status == "OK":
-                    folder, uploaded = self.uploadVideo(uuid=uuid,path=path, file_name=fileName)
-                    if uploaded:
-                        link = self.sharePointUtils.generateLink(id_folder=folder)
-                        EventBus.publish('MessageLink', {'payload': {"uuid":uuid, "timestamp":timestamp, "link":link}})
+                    files = [fileName]
+                    self.executor.submit(self.upload_utils.run, path, uuid, files, None)
 
             except Exception as ex:
                 self.logger.error(f"Error requesting snapshot: {ex}")  
-
-    def upload(self, path, uuid, file_name):
-        try:
-            self.logger.info("begin upload file")
-            file= f"{file_name}.png"
-            folder =self.sharePointUtils.upload_file(path=path, uuid=uuid, file_name=file)
-            if folder != None:
-                return (folder, True)
-            else:
-                return (None,False)       
-        except Exception as ex:
-                self.logger.error(f"Error begin upload files: {ex}")       
-                 
-    def uploadVideo(self, uuid, path ,file_name):
-        try:
-            self.logger.info("begin upload video") 
-            folder = self.sharePointUtils.upload_video(uuid=uuid, path=path, file_name=file_name)
-            if folder != None:
-                return (folder, True)
-            else:
-                return (None,False)      
-        except Exception as ex:
-                self.logger.error(f"Error begin upload files: {ex}")       
-                                  
+ 
