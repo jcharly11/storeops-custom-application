@@ -1,0 +1,21 @@
+import os
+
+SHAREPOINT_CREATE_LINK_TIMEOUT_MIN = int(os.getenv("SHAREPOINT_CREATE_LINK_TIMEOUT_MIN", default=5))
+SHAREPOINT_CREATE_LINK_RETRY_SEC = int(os.getenv("SHAREPOINT_CREATE_LINK_RETRY_SEC", default=2))
+
+SHAREPOINT_RETRY_SEND_MIN = os.getenv("SHAREPOINT_RETRY_SEND_MIN", default=5)
+SHAREPOINT_KEEP_MESSAGES_DAYS = os.getenv("SHAREPOINT_KEEP_MESSAGES_DAYS", default=5)
+
+
+#FILESHARE SETTINGS
+CLIENT_ID = '474f7a33-805f-492f-a390-f88e355c1cf2'
+CLIENT_SECRET = 'mdr8Q~rWmQSxij2MXTDoi6jhSQ-k5zR-CisYkaSo'
+TENANT_ID = '1b7f891b-ffd5-438b-afd7-e35a90c2bf8d'
+SITE_ID = 'e8a31de1-fce7-46f2-91e5-4a6a8fed9551'
+LIBRARY_NAME = 'Documents'
+DRIVE_ID = 'b!4R2j6Of88kaR5Upqj-2VUacVEhofnqxEt475XUzCXmVl86v_nzYUQJUBUE63Ixc_'
+FOLDER_NAME= "Video"
+BASE_URL="https://graph.microsoft.com/v1.0"
+BASE_URL_LOGIN= "https://login.microsoftonline.com"
+
+

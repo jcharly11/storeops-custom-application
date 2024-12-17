@@ -2,36 +2,17 @@ import os
 import config.settings as settings
 import logging
 import stat
-#Class to setup environment variables in running container
+import time
+import os
+from utils.restart import Restart
 
 class EnvironmentValidator():
     def __init__(self): 
-       self.logger = logging.getLogger("main")
-       self.fileName = "./environment/local-environment-vars.txt"
-       self.fileName_ui = "./environment/ui-local-environment-vars.txt"
-       self.create()
-
-    def create(self):
+        self.logger = logging.getLogger("main")
+        self.managers = []
+        self.fileName = "./environment/local-environment-vars.txt"
+        self.fileName_ui = "./environment/ui-local-environment-vars.txt"
         try:
-            # TODO: Add code logic for environment variables
-            self.logger.warning(f"Create base configuration file")
-            with open(self.fileName, mode="w") as file:
-                file.write(f"export STOREOPS_MEDIA_FILES_ENABLE={os.getenv('STOREOPS_MEDIA_FILES_ENABLE', default=1) }"+ "\n")
-                file.write(f"export STOREOPS_MQTT_ENABLE={os.getenv('STOREOPS_MQTT_ENABLE', default=1) }"+ "\n")
-                file.write(f"export STOREOPS_SERVER={os.getenv('STOREOPS_SERVER', default='') }"+ "\n")
-                file.write(f"export STOREOPS_PORT={os.getenv('STOREOPS_PORT', default=80) }"+ "\n")
-                file.write(f"export STOREOPS_USERNAME={os.getenv('STOREOPS_USERNAME', default='') }"+ "\n")
-                file.write(f"export STOREOPS_PASSWORD={os.getenv('STOREOPS_PASSWORD', default='') }"+ "\n")
-                file.write(f"export STOREOPS_MESSAGES_RETENTION_DAYS={os.getenv('STOREOPS_MESSAGES_RETENTION_DAYS', default=7) }"+ "\n")
-                file.write(f"export STOREOPS_DEVICE_MODEL={os.getenv('STOREOPS_DEVICE_MODEL', default='SFERO') }"+ "\n")
-                file.write(f"export STOREOPS_TECHNOLOGY={os.getenv('STOREOPS_TECHNOLOGY', default='rfid') }"+ "\n")
-                file.write(f"export STOREOPS_TIMEZONE={os.getenv('STOREOPS_TIMEZONE', default='') }"+ "\n")
-                file.write(f"export STOREOPS_SHAREPOINT_ENABLE={os.getenv('STOREOPS_SHAREPOINT_ENABLE', default=0) }"+ "\n")
-                file.write(f"export STOREOPS_SHAREPOINT_XXX={os.getenv('STOREOPS_SHAREPOINT_XXX', default='') }"+ "\n")
-                file.write(f"export STOREOPS_SHAREPOINT_BASE_DIRECTORY={os.getenv('STOREOPS_SHAREPOINT_BASE_DIRECTORY', default='storeops') }"+ "\n")
-                file.write(f"export STOREOPS_SHAREPOINT_RETENTION_DAYS={os.getenv('STOREOPS_SHAREPOINT_RETENTION_DAYS', default=3)}"+ "\n")
-                file.write(f"export ALARM_AGGREGATION_WINDOW_SEC={os.getenv('ALARM_AGGREGATION_WINDOW_SEC', default=3.0)}"+ "\n")
-
             if os.path.exists(self.fileName_ui) == False:      
                 with open(self.fileName_ui, mode="w") as file_ui:
                     file_ui.write("")
@@ -39,16 +20,19 @@ class EnvironmentValidator():
         except Exception as err:
             self.logger.info(f"Error Env validator: {err}")   
 
-    def create_ui_conf(self):
-        try:
-            # TODO: Add code logic for environment variables
-            self.logger.warning(f"Create local configuration file")
-            with open(self.fileName_ui, mode="w") as file:
-                pass # Remove when logic added
-                # Example code to add environment variables to modify trough UI
-                # file.write(f"export SERVER_URL={settings.SERVER_URL}"+ "\n")
+    def addManager(self, manager):
+        self.managers.append(manager)
+        self.create(self.fileName)
 
-            os.chmod(self.fileName_ui, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  
-        except Exception as err:
-            self.logger.info(f"Error Env validator: {err}")   
+    def create(self, fileName):
+        with open(fileName, mode="w") as file:
+            for manager in self.managers:
+                manager.saveVariables(file)
+        os.chmod(self.fileName, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+
+    def updateLocalVariables(self, restart = False):
+        self.create(self.fileName_ui)
+        if restart:
+            self.logger.info(f"Restarting custom application")
+            Restart.run()
 

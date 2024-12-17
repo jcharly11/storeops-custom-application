@@ -2,17 +2,20 @@
 from paho.mqtt import client as mqtt
 import uuid
 import logging
-import config.settings as settings
+import config.settings as settings 
 
-class Client():
+
+class Client:
 
     def __init__(self) -> None:
         self.logger = logging.getLogger("main")
         self.logger.info("Creating instance of client")
+        self.connected = False
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, 
                                   uuid.uuid4().__str__())
                                   
         try:
+            print("Connecting to: ", settings.MQTT_SERVER)
             self.client.connect(host=settings.MQTT_SERVER, port=settings.MQTT_PORT)
             self.client.on_connect = self.onConnect
             self.client.on_disconnect = self.onDisConnect
@@ -34,19 +37,24 @@ class Client():
          self.client.subscribe(topic=topic)
 
     def publish(self, topic, payload):
-         self.client.publish(topic=topic, payload=payload)
+         return self.client.publish(topic=topic, payload=payload)
              
     def onConnect(self, client, userdata, flags, reason_code, properties=None):
+           self.connected = True
            self.logger.info(f"MQTT Connected {client},{flags},{reason_code}")
 
     def onDisConnect(self, client, userdata,  reason_code):
+            self.connected = False
             self.logger.info(f"MQTT Disconnected {client},{userdata},{reason_code}")    
 
     def onSubscribe(self,client, userdata, mid, qos, properties=None):
          pass
 
-    def onPublish(self,client, data, mid):
+    def onPublish(self,client, data,mid):
          pass        
      
     def onMessage(self, client, userdata, message, properties=None):
          pass
+    
+    def isConnected(self):
+         return self.connected

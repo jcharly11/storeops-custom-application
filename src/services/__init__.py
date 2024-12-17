@@ -1,2 +1,2 @@
-from .rest_service import *
-from .mqtt_service import *
+from .storeops_service import *
+from .sharepoint_service import *

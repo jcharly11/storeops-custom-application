@@ -3,3 +3,4 @@
 systemctl daemon-reload
 systemctl enable storeops-custom-application
 systemctl restart storeops-custom-application
+rm -rf /usr/share/cockpit/storeops-custom-application
