@@ -3,11 +3,13 @@ import logging
 import os
 import json
 import config.storeops_settings as storeopsSettings  
+from utils.file_utils import FileUtils
 
 class CertificateUtils:
 
     def __init__(self, url, user, password) -> None:
         self.logger = logging.getLogger("main")
+        self.utils = FileUtils()
         self.url= url
         self.token = None
         self.IdInitialized = False
@@ -43,6 +45,10 @@ class CertificateUtils:
                     return False
 
     def exists(self, path):
+
+        if self.utils.existFolder(path) is False:
+            self.utils.createFolderFull(path=path)
+
         self.logger.info(f" {self.log_prefix}: Check content of certificates path:{path}")
          
         content =  os.listdir(path)
