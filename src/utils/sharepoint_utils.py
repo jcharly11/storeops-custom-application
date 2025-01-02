@@ -53,8 +53,8 @@ class SharepointUtils():
                     success = False
              
         except Exception as ex:
-                pass
-        
+            self.logger.error(f"Exception uploading images: {ex}")
+            
         return success
                  
         
