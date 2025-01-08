@@ -11,11 +11,12 @@ class SharepointUtils():
     def __init__(self):   
         self.logger = logging.getLogger("main")
         self.encoder = ImageEncoder()
-        self.access_token= self.getAuthToken()
+        self.access_token = None
         self.filesUtils =  FileUtils()
  
 
     def upload_group(self, path, uuid, data): 
+        self.access_token = self.getAuthToken()
        # self.logger.info(f"Starting to upload files : {len(data)} items")
         uploaded =False
         files = []
@@ -23,9 +24,9 @@ class SharepointUtils():
         today = datetime.datetime.today()
     
         year = today.year
-        month = today.month
-        day=today.day
-
+        month =  str(today.month).zfill(2)
+        day = str(today.day).zfill(2)
+ 
         folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
         self.logger.info(f"Upload group id:{uuid}")
         for file_name in data:
@@ -122,8 +123,8 @@ class SharepointUtils():
             today = datetime.datetime.today()
     
             year = today.year
-            month = today.month
-            day=today.day
+            month = str(today.month).zfill(2)
+            day = str(today.day).zfill(2)
 
             folder_base= F"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
             url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}:/children"
