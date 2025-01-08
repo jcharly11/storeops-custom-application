@@ -17,7 +17,9 @@ class SharepointUtils():
 
     def upload_group(self, path, uuid, data): 
         self.access_token = self.getAuthToken()
-       # self.logger.info(f"Starting to upload files : {len(data)} items")
+        self.logger.info(f"Starting to upload files : {len(data)} items")
+        self.logger.info(f"Path: {path}")
+        
         uploaded =False
         files = []
         urls = []
@@ -31,7 +33,7 @@ class SharepointUtils():
         self.logger.info(f"Upload group id:{uuid}")
         for file_name in data:
             file_full_path = f"{path}/{file_name}"
-            #self.logger.info(f"Uploading file: {file_full_path}")
+            self.logger.info(f"Uploading file full path: {file_full_path}")
             upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
             files.append(file_full_path) 
             urls.append(upload_url) 

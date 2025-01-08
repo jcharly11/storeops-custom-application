@@ -11,7 +11,7 @@ Storeops custom application
 
 - STOREOPS_RETRY_SEND_MIN: Minutes to wait before intent to resend a failed message.
 
-- STOREOPS_KEEP_MESSAGES_DAYS: Number of days to keep stored a failed message.
+- STOREOPS_KEEP_MESSAGES_DAYS: Number of days to keep stored all message.
 
 - STOREOPS_CERTIFICATES_REQUEST_USER:  User for SSL certificate creation API Service.
 
