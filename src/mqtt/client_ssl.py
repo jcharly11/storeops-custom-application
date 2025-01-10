@@ -28,6 +28,8 @@ class ClientSSL():
         self.connected = False
         self.certificates = False
         self.fileUtils = FileUtils()
+
+        self.subscribe_topics = []
         
         self.connect() 
               
@@ -94,7 +96,17 @@ class ClientSSL():
   
   
     def subscribe(self, topic):
-         self.client.subscribe(topic=topic)
+         if topic not in self.subscribe_topics:
+            self.subscribe_topics.append(topic)
+            if self.connected:
+              self.client.subscribe(topic=topic)
+
+    def unsubscribe(self, topic):
+          if topic in self.subscribe_topics:
+            self.subscribe_topics.remove(topic)
+            if self.connected:
+              self.client.unsubscribe(topic=topic)     
+
 
     def publish(self, topic, payload):
          if self.connect:
@@ -105,6 +117,8 @@ class ClientSSL():
     def onConnect(self, client, userdata, flags, rc):
            self.logger.info(f"{self.log_prefix}: MQTT ssl Connected:  {client},{flags},{rc}")
            self.connected = True
+           for topic in self.subscribe_topics:
+              self.client.subscribe(topic=topic)
 
     def onDisConnect(self, client, userdata,  reason_code):
             self.logger.info(f"{self.log_prefix}: MQTT ssl Disconnected: {client},reason_code={reason_code}")

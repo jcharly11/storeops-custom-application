@@ -35,7 +35,7 @@ class StoreopsService():
         self.storeopsQueue = mp.Queue()
         self.storeopInternalQueue = mp.Queue() 
         self.clientSSL =  ClientSSL(environment = environment)
-        self.clientSSL.on_message = self.onMessageStoreOps
+        self.clientSSL.instance().on_message = self.onMessageStoreOps
         self.restart = Restart()
 
 
@@ -325,7 +325,7 @@ class StoreopsService():
 
             if isDestinationCorrect:
                 self.logger.info(f"{self.log_prefix}: Command directed to me")
-                expiration_date = datetime.datetime.strptime(payload["expiration_date"])
+                expiration_date = datetime.datetime.fromisoformat(payload["expiration_date"])
                 if expiration_date > datetime.datetime.now():
                     self.publishReceivedCommand(topic, payload, send_storeops=True)
                 else:
