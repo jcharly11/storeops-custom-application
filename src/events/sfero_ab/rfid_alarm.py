@@ -163,7 +163,7 @@ class RFIDAlarmEvent(Event):
                         self.logger.info(f"{self.EVENT_ID}: send {self.EVENT_ID} message: {rfid_alarm_event}")
                         self.publishToStoreops(rfid_alarm_event)
 
-                self.checkEventMessagesTimeout()
+               # self.checkEventMessagesTimeout()
                 self.checkRequestMediaTimeout()
                 self.sendEventConfiguration()
             except Exception as err:
@@ -203,7 +203,7 @@ class RFIDAlarmEvent(Event):
                         self.publishToStoreops(message = event["message"])
                         delete_events.append(event)
                 else:
-                    self.logger.info(f"{self.EVENT_ID}:******************************NOT LINK EVENT MESSAGES")
+                    self.logger.info(f"{self.EVENT_ID}:NOT LINK EVENT MESSAGES")
 
             for event in delete_events:
                 self.event_messages.remove(event)

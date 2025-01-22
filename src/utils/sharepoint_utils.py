@@ -68,7 +68,7 @@ class SharepointUtils():
 
     def generateLink(self, uuid):
         try:
-            id_folder= self.createFolder(uuid)
+            id_folder= self.createFolderAzure(uuid)
             
             url=f"{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drive/items/{id_folder}/createLink"
             headers = {
@@ -118,7 +118,7 @@ class SharepointUtils():
             return None
         
 
-    def createFolder(self,uuid):
+    def createFolderAzure(self,uuid):
         try:
             id_folder = None
             self.access_token=self.getAuthToken()
