@@ -63,7 +63,7 @@ class RFIDAlarmEvent(Event):
         self.images_in_process = []
         self.video_in_process = []
         self.event_messages = []
-        
+        self.event_messages_timeout = []
         self.sharepointService = sharepointService
         self.sharepointService.subscribeResponses(self)
 
@@ -163,7 +163,7 @@ class RFIDAlarmEvent(Event):
                         self.logger.info(f"{self.EVENT_ID}: send {self.EVENT_ID} message: {rfid_alarm_event}")
                         self.publishToStoreops(rfid_alarm_event)
 
-               # self.checkEventMessagesTimeout()
+                self.checkEventMessagesTimeout()
                 self.checkRequestMediaTimeout()
                 self.sendEventConfiguration()
             except Exception as err:
@@ -182,6 +182,8 @@ class RFIDAlarmEvent(Event):
                 self.logger.info(f"{self.EVENT_ID}: send message without link by timeout: {event['message'].data}")
                 
                 self.publishToStoreops(event["message"])
+                
+                self.event_messages_timeout.append(event)
                 delete_events.append(event)
 
         for event in delete_events:
@@ -192,23 +194,33 @@ class RFIDAlarmEvent(Event):
         try:
             
             delete_events = []
-            self.logger.info(f"{self.EVENT_ID}:TOTAL EVENTS {len(self.event_messages)}")
             for event in self.event_messages:
                 self.logger.info(f"{self.EVENT_ID}: Event {event['uuid']}")
                 
                 if event["uuid"] == message['uuid']:
                     if message['link'] is not None:
-                        event["message"].data.append({ "key": "mediaLink","type":'string' ,"value": [message['link']]})
-                        self.logger.info(f"{self.EVENT_ID}: send message: {event['message']}")
-                        self.publishToStoreops(message = event["message"])
-                        delete_events.append(event)
-                else:
-                    self.logger.info(f"{self.EVENT_ID}:NOT LINK EVENT MESSAGES")
+                        self.sendMessageToStoreops(event=event, link=message['link'])   
+                        delete_events.append(event)    
+ 
+            
+            for event in self.event_messages_timeout:
+                self.logger.info(f"{self.EVENT_ID}: Event in timeout {event['uuid']}")
+                if event["uuid"] == message['uuid']:
+                    self.sendMessageToStoreops(event=event, link=message['link'])
+                    delete_events.append(event)                         
+
 
             for event in delete_events:
                 self.event_messages.remove(event)
         except Exception as err:
             self.logger.error(f"{self.EVENT_ID}: processSharepointMessage {err}, {type(err)}")
+
+
+    def sendMessageToStoreops(self, event, link):
+        event["message"].data.append({ "key": "mediaLink","type":'string' ,"value": [link]})
+        self.logger.info(f"{self.EVENT_ID}: send message: {event['message']}")
+        self.publishToStoreops(message = event["message"])
+         
 
 
     def request_media_creation(self, event_uuid):

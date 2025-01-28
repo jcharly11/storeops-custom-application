@@ -42,3 +42,4 @@ REQUEST_MEDIA_VIDEO_TIMEOUT = 1
 #Default host paths
 
 BACKUP_FILES_AZURE_PATH = './backup'
+LOGS_MESSAGE_PATH = './logs'
