@@ -16,7 +16,7 @@ class LogMessagesUtil:
     def create(self):
         try:
             date=self.dateUtils.getTimeStampSimple()
-            self.file= f"{date}.csv"
+            self.file= f"storeops-messages-{date}.csv"
             if self.fileUtils.folderExist(self.path) is False:
                 self.fileUtils.createFolderFull(self.path)
             return True  
