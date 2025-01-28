@@ -28,6 +28,7 @@ class LogMessagesUtil:
 
 
     def save(self, message):
+        row = [message]
         with open(f"{self.path}/{self.file}", mode='w') as file:
                     self.writer = csv.writer(file)
-                    self.writer.writerow(f"{message} \n")
+                    self.writer.writerow(row)
