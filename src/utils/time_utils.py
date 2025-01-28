@@ -13,6 +13,9 @@ class DateUtils():
     def getTimeStamp(self):
         return datetime.now().strftime(settings.DATETIME_STRING_FORMAT)
     
+    def getTimeStampSimple(self):
+        return datetime.now().strftime(settings.DATETIME_STRING_FORMAT_SIMPLE)
+
     def getTime(self):
         return datetime.now()
     

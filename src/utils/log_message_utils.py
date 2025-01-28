@@ -14,10 +14,14 @@ class LogMessagesUtil:
         self.file = None
 
     def create(self):
-        date=self.dateUtils.getDateISOFormat
-        self.file= f"{date}.csv"
-        if self.fileUtils.folderExist(self.path) is False:
-              self.fileUtils.createFolderFull(self.path)
+        try:
+            date=self.dateUtils.getTimeStampSimple()
+            self.file= f"{date}.csv"
+            if self.fileUtils.folderExist(self.path) is False:
+                self.fileUtils.createFolderFull(self.path)
+            return True  
+        except Exception as ex:
+             return False    
 
         
         
