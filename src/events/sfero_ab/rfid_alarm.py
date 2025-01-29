@@ -28,6 +28,7 @@ class RFIDAlarmEvent(Event):
     TOPIC_CUSTOM_METHOD = "/settings/alarm"
     TOPIC_STANDARD_ALARM = "alarm"
     TOPIC_CUSTOM_NOTIFICATION_ALARM = "event/custom/alarm"
+    TOPIC_CAMERA_STATUS = "status/onvif/camera"
     TOPIC_CAMERA_IMAGE_BUFFER = "command/onvif/image/get_buffer"
     TOPIC_CAMERA_IMAGE_BUFFER_RESP = "command_resp/onvif/image/get_buffer"
     TOPIC_CAMERA_VIDEO = "command/onvif/video/get_video"
@@ -52,6 +53,7 @@ class RFIDAlarmEvent(Event):
 
         self.addTopicToSubscribe(self.TOPIC_CUSTOM_METHOD)
         self.addTopicToSubscribe(self.TOPIC_STANDARD_ALARM)
+        self.addTopicToSubscribe(self.TOPIC_CAMERA_STATUS)
         self.addTopicToSubscribe(self.TOPIC_CUSTOM_NOTIFICATION_ALARM)
         self.addTopicToSubscribe(self.TOPIC_CAMERA_IMAGE_BUFFER_RESP)
         self.addTopicToSubscribe(self.TOPIC_CAMERA_VIDEO_RESP)
@@ -68,8 +70,6 @@ class RFIDAlarmEvent(Event):
         self.sharepointService.subscribeResponses(self)
 
         self.isSharepointEnabled = False
-        if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
-            self.isSharepointEnabled = True
         
         self.sendConf = True     
 
@@ -114,6 +114,12 @@ class RFIDAlarmEvent(Event):
         if topic == self.TOPIC_CAMERA_VIDEO_RESP:
             self.logger.info(f"{self.EVENT_ID}: executing processVideo")
             self.processVideo(payload)
+
+        if topic == self.TOPIC_CAMERA_STATUS:
+            if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
+                if not self.isSharepointEnabled:
+                    self.logger.info(f"{self.EVENT_ID}: camera detected")
+                self.isSharepointEnabled = True            
 
 
     def eventThread(self):
