@@ -359,8 +359,10 @@ class RFIDAlarmEvent(Event):
                     self.EVENT_RFID_ALARM_AGGREGATION_WINDOW_SEC = int(param['value'][0])
                 elif param['key'] == self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE_ID:
                     self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE = float(param['value'][0])
+                    self.isSharepointEnabled = False
                 elif param['key'] == self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE_ID:
                     self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE = float(param['value'][0])
+                    self.isSharepointEnabled = False
                 elif param['key'] == self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC_ID:
                     self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC = float(param['value'][0])
 
