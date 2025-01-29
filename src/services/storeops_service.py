@@ -340,6 +340,10 @@ class StoreopsService():
         command.command_id = topic.rpartition('/')[-1]
         command.uuid = payload["uuid"]
         command.version = payload["version"]
+        if "destination" in payload:
+            command.destination = payload["destination"]
+        else:
+            command.destination.append(self.DEVICE_ID)
         command.data = payload["data"]
         command.timestamp = self.dateUtils.getDateISOFormat()
         command.send_local = send_local
