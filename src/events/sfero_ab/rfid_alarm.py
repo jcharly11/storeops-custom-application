@@ -28,6 +28,7 @@ class RFIDAlarmEvent(Event):
     TOPIC_CUSTOM_METHOD = "/settings/alarm"
     TOPIC_STANDARD_ALARM = "alarm"
     TOPIC_CUSTOM_NOTIFICATION_ALARM = "event/custom/alarm"
+    TOPIC_CAMERA_STATUS = "status/onvif/camera"
     TOPIC_CAMERA_IMAGE_BUFFER = "command/onvif/image/get_buffer"
     TOPIC_CAMERA_IMAGE_BUFFER_RESP = "command_resp/onvif/image/get_buffer"
     TOPIC_CAMERA_VIDEO = "command/onvif/video/get_video"
@@ -52,6 +53,7 @@ class RFIDAlarmEvent(Event):
 
         self.addTopicToSubscribe(self.TOPIC_CUSTOM_METHOD)
         self.addTopicToSubscribe(self.TOPIC_STANDARD_ALARM)
+        self.addTopicToSubscribe(self.TOPIC_CAMERA_STATUS)
         self.addTopicToSubscribe(self.TOPIC_CUSTOM_NOTIFICATION_ALARM)
         self.addTopicToSubscribe(self.TOPIC_CAMERA_IMAGE_BUFFER_RESP)
         self.addTopicToSubscribe(self.TOPIC_CAMERA_VIDEO_RESP)
@@ -63,13 +65,11 @@ class RFIDAlarmEvent(Event):
         self.images_in_process = []
         self.video_in_process = []
         self.event_messages = []
-        
+        self.event_messages_timeout = []
         self.sharepointService = sharepointService
         self.sharepointService.subscribeResponses(self)
 
         self.isSharepointEnabled = False
-        if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
-            self.isSharepointEnabled = True
         
         self.sendConf = True     
 
@@ -114,6 +114,12 @@ class RFIDAlarmEvent(Event):
         if topic == self.TOPIC_CAMERA_VIDEO_RESP:
             self.logger.info(f"{self.EVENT_ID}: executing processVideo")
             self.processVideo(payload)
+
+        if topic == self.TOPIC_CAMERA_STATUS:
+            if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
+                if not self.isSharepointEnabled:
+                    self.logger.info(f"{self.EVENT_ID}: camera detected")
+                self.isSharepointEnabled = True            
 
 
     def eventThread(self):
@@ -182,6 +188,8 @@ class RFIDAlarmEvent(Event):
                 self.logger.info(f"{self.EVENT_ID}: send message without link by timeout: {event['message'].data}")
                 
                 self.publishToStoreops(event["message"])
+                
+                self.event_messages_timeout.append(event)
                 delete_events.append(event)
 
         for event in delete_events:
@@ -192,23 +200,38 @@ class RFIDAlarmEvent(Event):
         try:
             
             delete_events = []
-            self.logger.info(f"{self.EVENT_ID}:TOTAL EVENTS {len(self.event_messages)}")
             for event in self.event_messages:
                 self.logger.info(f"{self.EVENT_ID}: Event {event['uuid']}")
                 
                 if event["uuid"] == message['uuid']:
                     if message['link'] is not None:
-                        event["message"].data.append({ "key": "mediaLink","type":'string' ,"value": [message['link']]})
-                        self.logger.info(f"{self.EVENT_ID}: send message: {event['message']}")
-                        self.publishToStoreops(message = event["message"])
-                        delete_events.append(event)
-                else:
-                    self.logger.info(f"{self.EVENT_ID}:******************************NOT LINK EVENT MESSAGES")
+                        self.sendMessageToStoreops(event=event, link=message['link'])   
+                        delete_events.append(event)    
+ 
+            
+            for event in self.event_messages_timeout:
+                self.logger.info(f"{self.EVENT_ID}: Event in timeout {event['uuid']}")
+                if event["uuid"] == message['uuid']:
+                    self.sendMessageToStoreops(event=event, link=message['link'])
+                    delete_events.append(event)                         
+
 
             for event in delete_events:
-                self.event_messages.remove(event)
+                if self.event_messages.count(event) >  0 :
+                    self.event_messages.remove(event)
+                elif self.event_messages_timeout.count(event) >  0:
+                     self.event_messages_timeout.remove(event)
+
+
         except Exception as err:
             self.logger.error(f"{self.EVENT_ID}: processSharepointMessage {err}, {type(err)}")
+
+
+    def sendMessageToStoreops(self, event, link):
+        event["message"].data.append({ "key": "mediaLink","type":'string' ,"value": [link]})
+        self.logger.info(f"{self.EVENT_ID}: send message: {event['message']}")
+        self.publishToStoreops(message = event["message"])
+         
 
 
     def request_media_creation(self, event_uuid):
@@ -353,8 +376,10 @@ class RFIDAlarmEvent(Event):
                     self.EVENT_RFID_ALARM_AGGREGATION_WINDOW_SEC = int(param['value'][0])
                 elif param['key'] == self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE_ID:
                     self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE = float(param['value'][0])
+                    self.isSharepointEnabled = False
                 elif param['key'] == self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE_ID:
                     self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE = float(param['value'][0])
+                    self.isSharepointEnabled = False
                 elif param['key'] == self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC_ID:
                     self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC = float(param['value'][0])
 

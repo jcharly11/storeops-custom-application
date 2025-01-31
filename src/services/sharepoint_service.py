@@ -54,7 +54,7 @@ class SharepointService():
     def publishResponseToSubscribers(self, message):
         for sub in self.subscribers:
             try:
-                self.logger.info("************************************GETTING MESSAGE WITH LINK*************************")
+                self.logger.info("GETTING MESSAGE WITH LINK")
                 sub.processSharepointMessage(message)
             except Exception as err:
                 self.logger.error(f"publishResponseToSubscribers sub {sub} has not function processSharepointMessage: {err}, {type(err)}")
@@ -88,38 +88,47 @@ class SharepointService():
 
 
                 delete_request = []
+                lr = len(requests_link)
+               
                 for request in requests_link:
+                    
                     now = datetime.datetime.now()
                     timeout = datetime.timedelta(minutes=sharepoint_settings.SHAREPOINT_CREATE_LINK_TIMEOUT_MIN)
                     timestamp_request = request["timestamp_request"] + timeout
                      
                     if now >  timestamp_request :
-                        
+                        self.logger.info(f"Deleting request: {request}")
                         delete_request.append(request)
 
                     else:
                         
+                         
                         retry = datetime.timedelta(seconds=sharepoint_settings.SHAREPOINT_CREATE_LINK_RETRY_SEC)
                         timestamp_last_try = request["timestamp_last_try"]
                         
                         if isinstance(timestamp_last_try, datetime.datetime):
-                            if now > timestamp_last_try + retry :
+                            dd = timestamp_last_try + retry 
+                            if now > dd :
 
                                 id_folder = message.uuid
-                                self.logger.info(f"{self.SERVICE_ID}: Request link") 
+                                self.logger.info(f"{self.SERVICE_ID}: Request link: {id_folder}") 
                                 link = self.sharepointUtils.generateLink(uuid=id_folder)   
                                                 
                                 if link is not None:
-                                    self.logger.info(f"{self.SERVICE_ID}: Link generated") 
+                                    uuid =message['uuid']
+                                    self.logger.info(f"{self.SERVICE_ID}: Link generated: {uuid}") 
                                     request["message"].link = link
-                                    msgl = request["message"].link
                                     self.links.append({"uuid":message['uuid'], "link": link}) 
                                     self.publishResponseToSubscribers(request["message"])
 
 
                                     delete_request.append(request)
                                 else:
-                                    request["timestamp_last_try"] = now
+                                    self.logger.info("Going to reintent because timeout requesting link")
+                                    request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
+                                    
+                                    self.logger.info(f"Content on requests {lr}")
+
                 
                 for request in delete_request:
                     requests_link.remove(request)

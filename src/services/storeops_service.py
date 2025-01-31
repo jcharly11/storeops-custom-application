@@ -4,6 +4,7 @@ from database.database import DataBase
 import threading
 import logging
 from utils.time_utils import DateUtils
+from utils.log_message_utils import LogMessagesUtil
 import json
 import multiprocessing as mp 
 import config.storeops_settings as settings
@@ -37,6 +38,8 @@ class StoreopsService():
         self.clientSSL =  ClientSSL(environment = environment)
         self.clientSSL.instance().on_message = self.onMessageStoreOps
         self.restart = Restart()
+        self.messageLogger = LogMessagesUtil()
+        self.messageLogger.create()
 
 
         self.command_topic = ""
@@ -182,7 +185,8 @@ class StoreopsService():
                 #self.logger.info(f"Message for External MQTT: {json.dumps(payload)} ")
                 result = self.clientSSL.publish(topic = topic, payload = json.dumps(payload) )
                 self.logger.info(f"{self.log_prefix}: Result message : {result} ")
-                if result:  
+                if result:
+                    self.messageLogger.save(message=message)
                     sentToStoreops = True
         else:
             sentToStoreops = True
@@ -340,6 +344,10 @@ class StoreopsService():
         command.command_id = topic.rpartition('/')[-1]
         command.uuid = payload["uuid"]
         command.version = payload["version"]
+        if "destination" in payload:
+            command.destination = payload["destination"]
+        else:
+            command.destination.append(self.DEVICE_ID)
         command.data = payload["data"]
         command.timestamp = self.dateUtils.getDateISOFormat()
         command.send_local = send_local

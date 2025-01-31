@@ -6,15 +6,22 @@ class FileUtils():
     def __init__(self) -> None:
         self.logger = logging.getLogger("main")
 
-    def createFolder(self, uuid):
+    def fileExists(self, path):
         try:
-            folder =  f"./snapshots/{uuid}"
-            os.makedirs(folder)
-            return folder
+            return os.path.exists(path)
             
         except Exception as ex:
-            self.logger.error(f"Error creating folder:  {ex}")
-            return None
+            self.logger.error(f"Error looking for file:  {ex}")
+            return None    
+        
+    def folderExist(self, path):
+        try:
+            return os.path.isdir(path)
+             
+            
+        except Exception as ex:
+            self.logger.error(f"Error looking for folder:  {ex}")
+            return None    
         
     def createFolderFull(self, path):
         try:
@@ -24,6 +31,7 @@ class FileUtils():
         except Exception as ex:
             self.logger.error(f"Error creating full folder:  {ex}")
             return None      
+        
     def deleteFolderContent(self, folder):
         try:
            shutil.rmtree(folder)
