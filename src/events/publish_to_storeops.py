@@ -16,6 +16,8 @@ class PublishToStoreops(Event):
     #Needed payload:
     # { "id":"name of the event",
     #   "type": "type of event",
+    #   "device_id": device_id to use. Optional value,
+    #   "uuid_request": uuid_request to use. Optional value,
     #   "is_local": True/False, Optional value, True by default
     #   "send_storeops": True/False, Optional value, True by default
     #   "version": "version of message"
@@ -26,8 +28,10 @@ class PublishToStoreops(Event):
     STATUS_ID = 'status'
     EVENT_ID = 'event'
     CONF_ID = 'configuration'
+    RESPONSE_ID = 'response'
 
     PUBLISH_TO_STOREOPS_TOPIC = 'status/publish_to_storeops'
+    PUBLISH_COMMAND_FROM_STOREOPS = 'command/command_from_storeops'
 
     def __init__(self, mqtt_client, sharepointService, storeopsService, environment):
         super().__init__( mqtt_client=mqtt_client, sharepointService=sharepointService, storeopsService=storeopsService, enable_thread = True, environment=environment)
@@ -75,9 +79,16 @@ class PublishToStoreops(Event):
             elif message_to_send["type"] == self.CONF_ID:
                 message = self.prepareHeaderMessage(ConfigurationMessage())
                 message.configuration_id = message_to_send["id"]
+            elif message_to_send["type"] == self.RESPONSE_ID:
+                message = self.prepareHeaderMessage(ResponseMessage())
+                message.response_id = message_to_send["id"]
+                message.uuid_request = message_to_send["uuid_request"]
             else:
                 self.logger.info(f"{self.PUBLISH_STOREOPS_ID}: unknown type for message {message_to_send}")
                 return
+
+            if "device_id" in message_to_send:
+                message.device_id = message_to_send["device_id"]
 
             if "send_local" in message_to_send:
                 message.send_local = message_to_send["send_local"]
@@ -94,3 +105,16 @@ class PublishToStoreops(Event):
         except Exception as err:
             self.logger.error(f"{self.PUBLISH_STOREOPS_ID} sendMessageToStoreOps: message_to_send {message_to_send} not correct {err}")
 
+
+    def processStoreopsMessage(self, message):
+        try:
+            if message.type == 'command':
+                payload = {"uuid": message.uuid,
+                           "command_id": message.command_id,
+                           "destination": message.destination,
+                           "version": message.version,
+                           "data": message.data }
+
+                self.publishInternalBroker(self.PUBLISH_COMMAND_FROM_STOREOPS, payload)
+        except Exception as err:
+            self.logger.error(f"{self.PUBLISH_STOREOPS_ID} processStoreopsMessage: message_to_send {message} not correct {err}")
