@@ -211,7 +211,12 @@ class RFIDAlarmEvent(Event):
 
 
             for event in delete_events:
-                self.event_messages.remove(event)
+                if self.event_messages.count(event) >  0 :
+                    self.event_messages.remove(event)
+                elif self.event_messages_timeout.count(event) >  0:
+                     self.event_messages_timeout.remove(event)
+
+
         except Exception as err:
             self.logger.error(f"{self.EVENT_ID}: processSharepointMessage {err}, {type(err)}")
 

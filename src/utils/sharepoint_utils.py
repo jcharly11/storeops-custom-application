@@ -89,7 +89,7 @@ class SharepointUtils():
             }
             body= json.dumps(data)
             
-            resLink = requests.post(url, headers=headers, data=body)
+            resLink = requests.post(url, headers=headers, data=body )
             resJs= resLink.json()
             folderLink= resJs["link"]["webUrl"]
             if "link" in resJs:
