@@ -126,10 +126,8 @@ class StoreopsService():
                         #Only for internal command, not for sending mqtt anywhere
                         pass
                     else:
-                        sent = self.sendMessage(message)
-                        if sent is not True:
-                            self.logger.info(f"{self.log_prefix}: Message send to internal queue to database")
-                            self.storeopInternalQueue.put({'type':'message', 'message': message, 'sent': sent})
+                        self.sendMessage(message)
+                       
         
             except Exception as err:
                 self.logger.error(f"{self.log_prefix}: storeopsThread {err}, {type(err)}")
@@ -165,7 +163,6 @@ class StoreopsService():
 
     
     def sendMessage(self, message):
-        sentToStoreops = False
         payload = self.getMessagePayloadToSend(message) 
         
         if payload is None:
@@ -187,11 +184,10 @@ class StoreopsService():
                 self.logger.info(f"{self.log_prefix}: Result message : {result} ")
                 if result:
                     self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId=None)
-                    sentToStoreops = True
-        else:
-            sentToStoreops = True
-  
-        return sentToStoreops
+                else:
+                    self.logger.info(f"{self.log_prefix}: Message send to internal queue to database")
+                    self.storeopInternalQueue.put({'type':'message', 'message': message, 'sent': False})
+
 
     def getLocalTopic(self, message):
         if message.type == 'event':
