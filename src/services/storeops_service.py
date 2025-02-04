@@ -186,7 +186,7 @@ class StoreopsService():
                 result = self.clientSSL.publish(topic = topic, payload = json.dumps(payload) )
                 self.logger.info(f"{self.log_prefix}: Result message : {result} ")
                 if result:
-                    self.messageLogger.save(message=message)
+                    self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId=None)
                     sentToStoreops = True
         else:
             sentToStoreops = True
