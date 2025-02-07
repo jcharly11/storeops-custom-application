@@ -27,13 +27,13 @@ class LogMessagesUtil:
         
 
 
-    def save(self, message, storeId, customerId, doorId):
+    def save(self, message, storeId, customerId, doorId, topic):
         self.writer = csv.writer(file,delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         data = message.data
-        listData = []
+        #timestamp,uuid,customer,store,door,device,typo,eventid,datakey0,datavalue0,datakey1,datavalue1
+        row = [message.timestamp, message.uuid, customerId, storeId, doorId, message.device_id, message.type, topic]
         for item in data:
-             listData.append(f"{item['key']}:{item['value']}")
-        dataMessage = " ".join(listData) 
-        row = [message.uuid, message.timestamp, customerId, storeId, doorId, message.device_id, dataMessage]
+             row.append(item['value'])
+             
         with open(f"{self.path}/{self.file}", mode='a') as file:
                     self.writer.writerow(row)

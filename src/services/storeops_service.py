@@ -183,7 +183,8 @@ class StoreopsService():
                 result = self.clientSSL.publish(topic = topic, payload = json.dumps(payload) )
                 self.logger.info(f"{self.log_prefix}: Result message : {result} ")
                 if result:
-                    self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId=None)
+                    topic = topic.split("/")
+                    self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId= self.STORE_ID, topic=topic[-1])
                 else:
                     self.logger.info(f"{self.log_prefix}: Message send to internal queue to database")
                     self.storeopInternalQueue.put({'type':'message', 'message': message, 'sent': False})
