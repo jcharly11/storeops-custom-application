@@ -33,7 +33,8 @@ class LogMessagesUtil:
         #timestamp,uuid,customer,store,door,device,typo,eventid,datakey0,datavalue0,datakey1,datavalue1
         row = [message.timestamp, message.uuid, customerId, storeId, doorId, message.device_id, message.type, topic]
         for item in data:
-             row.append(item['value'])
+             row.append(item['key'])
+             row.append(item['value'][0])
              
         with open(f"{self.path}/{self.file}", mode='a') as file:
                     self.writer.writerow(row)
