@@ -23,6 +23,7 @@ class RFIDAlarmEvent(Event):
     EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE_ID = 'rfid_alarm_image_capture_enable'
     EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE_ID = 'rfid_alarm_video_capture_enable'
     EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC_ID = 'rfid_alarm_link_creation_timeout_sec'
+    EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE_ID = 'rfid_alarm_alarm_number_of_items_queue'
 
 
     TOPIC_CUSTOM_METHOD = "/settings/alarm"
@@ -43,6 +44,8 @@ class RFIDAlarmEvent(Event):
     EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE = int(os.getenv("EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE", default=1))
     EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC = float(os.getenv("EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC", default=4))
     EVENT_RFID_ALARM_MEDIA_REQUEST_TIMEOUT_MIN = 10
+    EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE = float(os.getenv("EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE", default=3))
+
 
 
     def __init__(self, mqtt_client, sharepointService, storeopsService, environment):
@@ -80,6 +83,7 @@ class RFIDAlarmEvent(Event):
         variables.append(("EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE", self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE))
         variables.append(("EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE", self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE))
         variables.append(("EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC", self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC))
+        variables.append(("EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE", self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE))
 
 
     def processTopic(self, topic, payload):
@@ -127,7 +131,7 @@ class RFIDAlarmEvent(Event):
             try:
                 time.sleep(0.1)
                 epcs = []
-                if (self.event_queue.qsize() > 0):   
+                if (self.event_queue.qsize() > self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE):   
                     is_first = True
                     is_silence = True
 
@@ -353,7 +357,7 @@ class RFIDAlarmEvent(Event):
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_AGGREGATION_WINDOW_SEC_ID, 'type': 'integer', 'value': [self.EVENT_RFID_ALARM_AGGREGATION_WINDOW_SEC]})
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE_ID, 'type': 'boolean', 'value': [self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE]})
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE_ID, 'type': 'boolean', 'value': [self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE]})
-            rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC_ID, 'type': 'integer', 'value': [self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC]})
+            rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE_ID, 'type': 'integer', 'value': [self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE]})
 
             self.logger.info(f"{self.EVENT_ID}: send configuration message: {rfid_exit_conf_status}")
             self.publishToStoreops(rfid_exit_conf_status)
@@ -382,7 +386,8 @@ class RFIDAlarmEvent(Event):
                     self.isSharepointEnabled = False
                 elif param['key'] == self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC_ID:
                     self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC = float(param['value'][0])
-
+                elif param['key'] == self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE_ID:
+                    self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE = float(param['value'][0])
             self.updateLocalVariablesFile(restart=False)
             self.sendConf = True
             self.publishResponseToStoreops(self.EVENT_ID, message.uuid, status='ok')

@@ -4,12 +4,18 @@ import os
 import datetime
 
 from database.config.db_config import DB_PATH, TABLE_MESSAGES
-
+from utils.file_utils import FileUtils
+from config.settings import STORAGE_DB_BASE_PATH
 class DataBase():
      
     def __init__(self):
           try:     
                self.logger = logging.getLogger("main") 
+               self.fileUtils = FileUtils()
+               
+               if self.fileUtils.folderExist(path = STORAGE_DB_BASE_PATH) == False:
+                     self.fileUtils.createFolderFull(path = STORAGE_DB_BASE_PATH)
+
                self.createDB()
 
           except sqlite3.Error as err:

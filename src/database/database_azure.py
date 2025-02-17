@@ -2,14 +2,18 @@ import sqlite3
 import logging
 import os
 import datetime
-
 from database.config.db_config_azure import DB_AZURE_PATH, TABLE_FILES
+from config.settings import STORAGE_DB_BASE_PATH
+from utils.file_utils import FileUtils
 
 class DataBaseFiles():
      
     def __init__(self):
           try:     
                self.logger = logging.getLogger("main") 
+               self.fileUtils = FileUtils()
+               if self.fileUtils.folderExist(path = STORAGE_DB_BASE_PATH) == False:
+                     self.fileUtils.createFolderFull(path = STORAGE_DB_BASE_PATH)               
                self.createDB()
 
           except sqlite3.Error as err:
