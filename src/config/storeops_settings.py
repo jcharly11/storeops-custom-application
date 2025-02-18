@@ -1,7 +1,7 @@
 import os
 
 
-STOREOPS_MQTT_SSL_SERVER = os.getenv("STOREOPS_MQTT_SSL_SERVER", default="checkpointiot.westeurope-1.ts.eventgrid.azure.net")
+STOREOPS_MQTT_SSL_SERVER = os.getenv("STOREOPS_MQTT_SSL_SERVER", default="storeops_mqttbroker.checkpoint-service.com")
 STOREOPS_MQTT_SSL_PORT = int(os.getenv("STOREOPS_MQTT_SSL_PORT", default=8883))
 STOREOPS_SERVER_SSL_USERNAME = os.getenv("STOREOPS_SERVER_SSL_USERNAME", default="sfero-cert")
 STOREOPS_SERVER_SSL_PASSWORD = os.getenv("STOREOPS_SERVER_SSL_PASSWORD", default="")
