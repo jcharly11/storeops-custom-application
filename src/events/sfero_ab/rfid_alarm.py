@@ -83,6 +83,7 @@ class RFIDAlarmEvent(Event):
         variables.append(("EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE", self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE))
         variables.append(("EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE", self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE))
         variables.append(("EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC", self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC))
+        
         variables.append(("EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE", self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE))
 
 
@@ -131,15 +132,12 @@ class RFIDAlarmEvent(Event):
             try:
                 time.sleep(0.1)
                 epcs = []
-                if (self.event_queue.qsize() > self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE):   
+                if (self.event_queue.qsize() > 0):   
                     is_first = True
                     is_silence = True
 
                     while not self.event_queue.empty():
                         alarm = json.loads(self.event_queue.get())
-                        if self.isSharepointEnabled and is_first:
-                            event_uuid = alarm['uuid'] 
-                            self.request_media_creation(event_uuid)
 
                         if is_first:
                             is_first = False
@@ -153,14 +151,18 @@ class RFIDAlarmEvent(Event):
 
                         if alarm["extraPayload"]["epc"] not in epcs:
                             epcs.append(alarm["extraPayload"]["epc"])
-                       
+
+                    if self.isSharepointEnabled and len(epcs) > self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE:
+                        event_uuid = alarm['uuid'] 
+                        self.request_media_creation(event_uuid)  
+
                     rfid_alarm_event = self.prepareHeaderMessage(EventMessage(), set_timestamp=event_time, set_uuid=event_uuid)
                     rfid_alarm_event.event_id = self.EVENT_ID
                     rfid_alarm_event.version = "1.0.0"
                     rfid_alarm_event.data.append({ "key": "epc","type":"string" ,"value": epcs})
                     rfid_alarm_event.data.append({ "key": "silent","type":"boolean" ,"value": [is_silence]})
 
-                    if self.isSharepointEnabled:
+                    if self.isSharepointEnabled and len(epcs) > self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE:
 
                         create_link_message = SharepointCreateLinkMessage()
                         create_link_message.uuid = event_uuid
@@ -357,6 +359,7 @@ class RFIDAlarmEvent(Event):
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_AGGREGATION_WINDOW_SEC_ID, 'type': 'integer', 'value': [self.EVENT_RFID_ALARM_AGGREGATION_WINDOW_SEC]})
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE_ID, 'type': 'boolean', 'value': [self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE]})
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE_ID, 'type': 'boolean', 'value': [self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE]})
+            rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC_ID, 'type': 'integer', 'value': [self.EVENT_RFID_ALARM_MEDIA_LINK_CREATION_TIMEOUT_SEC]})
             rfid_exit_conf_status.data.append({'key': self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE_ID, 'type': 'integer', 'value': [self.EVENT_RFID_ALARM_NUMBER_OF_ITEMS_QUEUE]})
 
             self.logger.info(f"{self.EVENT_ID}: send configuration message: {rfid_exit_conf_status}")

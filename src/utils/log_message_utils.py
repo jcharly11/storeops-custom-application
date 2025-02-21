@@ -16,7 +16,7 @@ class LogMessagesUtil:
     def create(self):
         try:
             date=self.dateUtils.getTimeStampSimple()
-            self.file= f"storeops-messages-{date}.csv"
+            self.file= f"logs-storeops-messages.csv"
             if self.fileUtils.folderExist(self.path) is False:
                 self.fileUtils.createFolderFull(self.path)
             return True  
@@ -28,13 +28,13 @@ class LogMessagesUtil:
 
 
     def save(self, message, storeId, customerId, doorId, topic):
-        self.writer = csv.writer(file,delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        
         data = message.data
-        #timestamp,uuid,customer,store,door,device,typo,eventid,datakey0,datavalue0,datakey1,datavalue1
         row = [message.timestamp, message.uuid, customerId, storeId, doorId, message.device_id, message.type, topic]
         for item in data:
-             row.append(item['key'])
-             row.append(item['value'][0])
+            row.append(item['key'])
+            row.append(item['value'][0])
              
-        with open(f"{self.path}/{self.file}", mode='a') as file:
+        with open(f"{self.path}/{self.file}", mode='a') as flog:
+                    self.writer = csv.writer(flog, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     self.writer.writerow(row)
