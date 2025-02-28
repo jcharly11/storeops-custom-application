@@ -92,7 +92,7 @@ function setEnvironmentVariables(){
     
    }).catch(error => {
        console.log(error)
-       message = error.message 
+       message = error.message + "\n" +"Please turn to administrative access"
        window.alert(message)
    });
 
