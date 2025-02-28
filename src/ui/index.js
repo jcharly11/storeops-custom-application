@@ -92,6 +92,8 @@ function setEnvironmentVariables(){
     
    }).catch(error => {
        console.log(error)
+       message = error.message 
+       window.alert(message)
    });
 
 }

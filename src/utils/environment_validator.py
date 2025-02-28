@@ -12,7 +12,7 @@ class EnvironmentValidator():
         self.logger = logging.getLogger("main")
         self.fileUtils = FileUtils()
         self.managers = []
-        path = "./environment"
+        path =settings.ENVIRONMENT_VARS_PATH
         self.fileName = f"{path}/local-environment-vars.txt"
         self.fileName_ui = f"{path}/ui-local-environment-vars.txt"
 
