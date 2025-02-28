@@ -152,7 +152,7 @@ class RFIDAlarmEvent(Event):
                         if alarm["extraPayload"]["epc"] not in epcs:
                             epcs.append(alarm["extraPayload"]["epc"])
 
-                    if self.isSharepointEnabled and len(epcs) > self.MIN_EPCS_TO_REQUEST_MEDIA:
+                    if self.isSharepointEnabled and len(epcs) >= self.MIN_EPCS_TO_REQUEST_MEDIA:
                         event_uuid = alarm['uuid'] 
                         self.request_media_creation(event_uuid)  
 
@@ -162,7 +162,7 @@ class RFIDAlarmEvent(Event):
                     rfid_alarm_event.data.append({ "key": "epc","type":"string" ,"value": epcs})
                     rfid_alarm_event.data.append({ "key": "silent","type":"boolean" ,"value": [is_silence]})
 
-                    if self.isSharepointEnabled and len(epcs) > self.MIN_EPCS_TO_REQUEST_MEDIA:
+                    if self.isSharepointEnabled and len(epcs) >= self.MIN_EPCS_TO_REQUEST_MEDIA:
 
                         create_link_message = SharepointCreateLinkMessage()
                         create_link_message.uuid = event_uuid
