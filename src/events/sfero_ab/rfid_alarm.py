@@ -89,6 +89,9 @@ class RFIDAlarmEvent(Event):
 
     def processTopic(self, topic, payload):
         super().processTopic(topic, payload)
+
+        if self.EVENT_RFID_ALARM_ENABLE == 0:
+            return
         
         if topic == self.TOPIC_STANDARD_ALARM:
             if not self.custom_app_alarm_decision_enabled:
