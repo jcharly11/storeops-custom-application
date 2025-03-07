@@ -13,4 +13,7 @@ COPY ./src/ ./
 RUN chmod +x ./docker-entrypoint.sh
 
 EXPOSE 80/tcp
+
+RUN useradd -ms /bin/bash checkpoint
+USER checkpoint
 CMD ["./docker-entrypoint.sh"]
