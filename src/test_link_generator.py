@@ -8,3 +8,5 @@ settings.ACCOUNT_NUMBER = "4784"
 utils = SharepointUtils()
 link = utils.generateLink(uuid=uuid)
 print(link)
+total = utils.count()
+print(total)

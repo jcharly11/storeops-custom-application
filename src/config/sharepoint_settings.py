@@ -14,7 +14,6 @@ TENANT_ID = '1b7f891b-ffd5-438b-afd7-e35a90c2bf8d'
 SITE_ID = '98b69461-651a-4762-8fe3-7453337b1e50'
 LIBRARY_NAME = 'Documents'
 DRIVE_ID = 'b!YZS2mBplYkeP43RTM3seUKqHML44vudKuioX9BbIAhQ7W9iNPjNtSLa0d_k10uTH'
-FOLDER_NAME= "Video"
 BASE_URL="https://graph.microsoft.com/v1.0"
 BASE_URL_LOGIN= "https://login.microsoftonline.com"
 
