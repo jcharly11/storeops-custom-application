@@ -98,7 +98,7 @@ class SharepointUtils():
                 return None
 
         except Exception as err:
-            self.logger.error(f"error creating link: {err}, {type(err)}")
+            self.logger.error(f"error creating link: {resJs}, {type(err)}")
             return None
 
 
