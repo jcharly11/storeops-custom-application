@@ -43,6 +43,9 @@ class StoreopsService():
 
 
         self.command_topic = ""
+        self.info_request = []
+        self.info_topics = []
+        self.info_topic_prefix = ""
         self.clientLocal = Client().instance()
         self.clientLocal.on_message = self.onMessageLocal
         self.clientLocal.subscribe(self.TOPIC_STORE_INFO)
@@ -74,6 +77,24 @@ class StoreopsService():
                     self.logger.info(f"{self.log_prefix}: Unsubscribe to storeOps old command topic {new_command_topic}")
                     self.clientSSL.unsubscribe(self.command_topic)
                 self.command_topic = new_command_topic
+
+
+    def subscribeToInfoCommand(self, force=False):
+        if self.context_intialized:
+            new_info_store_prefix = f"checkpoint/{self.CUSTOMER_ID}/{self.STORE_ID}/info/response/" 
+            if self.info_topic_prefix != new_info_store_prefix or force:
+                for old_info in self.info_topics:
+                    self.logger.info(f"{self.log_prefix}: Unsubscribe to storeOps old info topic {old_info}")
+                    self.clientSSL.unsubscribe(old_info)
+
+                for new_info in self.info_request:
+                    new_info_store_topic = f"{new_info_store_prefix}/{new_info}"
+                    new_info_device_topic = f"{new_info_store_topic}/{self.DEVICE_ID}"
+                    self.logger.info(f"{self.log_prefix}: subscribe to storeOps info topics {new_info_store_topic} and {new_info_device_topic}")
+                    self.clientSSL.subscribe(new_info_store_topic)
+                    self.clientSSL.subscribe(new_info_device_topic)
+                    self.info_topics.append(new_info_store_topic)
+                    self.info_topics.append(new_info_device_topic)
 
         
     def publishToStoreops(self, message): 
@@ -124,7 +145,8 @@ class StoreopsService():
 
                     if message.type  == 'internal':
                         #Only for internal command, not for sending mqtt anywhere
-                        pass
+                        if message.command_id == 'info':
+                            processInternalInfoMessage(message)
                     else:
                         self.sendMessage(message)
                        
@@ -134,7 +156,29 @@ class StoreopsService():
                 self.logger.error(traceback.format_exc())
                 self.logger.error(sys.exc_info()[2])
 
+    def processInternalInfoMessage(self, message):
+        try:
+            if message.command_id == 'info':
+                self.logger.info(f"{self.log_prefix}: processInternalInfoMessage: info with data {message.data}")
+                if message.data[0] == 'add':
+                    for info in message.data[1:]:
+                        if info not in self.info_request:
+                            self.info_request.append(info)
+                elif message.data[0] == 'remove':
+                    for info in message.data[1:]:
+                        if info in self.info_request:
+                            self.info_request.remove(info)
+                elif message.data[0] == 'set':
+                    self.info_request.clear()
+                    for info in message.data[1:]:
+                        self.info_request.append(info)
+                elif message.data[0] == 'clear':
+                    self.info_request.clear()
 
+                self.subscribeToInfoCommand(force=True)
+
+        except Exception as err:
+            self.logger.error(f"{self.log_prefix}: processInternalInfoMessage {message} - {err}, {type(err)}")
 
     def storeopsDatabaseThread(self): 
         while True:
@@ -201,6 +245,8 @@ class StoreopsService():
             return f"command/storeops/{message.command_id}"
         elif message.type == 'response':
             return f"command_resp/storeops/{message.response_id}"
+        elif message.type == 'info':
+            return f"info/storeops/{message.info_id}"
         return None
 
     def getStoreopsTopic(self, message):
@@ -214,6 +260,8 @@ class StoreopsService():
             return f"checkpoint/{message.customer}/{message.store}/service/command/{message.command_id}"
         elif message.type == 'response':
             return f"checkpoint/{message.customer}/{message.store}/service/response/{message.response_id}"
+        elif message.type == 'info':
+            return f"checkpoint/{message.customer}/{message.store}/info/request/{message.info_id}/{message.device_id}"
         return None
 
     def getMessagePayloadToSend(self, message):
@@ -244,6 +292,15 @@ class StoreopsService():
                                 'version': message.version,
                                 'data': message.data
             }
+        elif message.type == 'info':
+            message_to_send = {
+                                'uuid': message.uuid,
+                                'timestamp': message.timestamp,
+                                'version': message.version,
+                                'expiration_date': message.expiration_date,
+                                'data': message.data
+            }
+
         return message_to_send
 
 
@@ -301,6 +358,7 @@ class StoreopsService():
                         self.context_intialized = True
                         self.clientSSL.setAccountAndDevice(self.CUSTOMER_ID, self.DEVICE_ID)
                         self.subscribeToStoreOpsCommand()
+                        self.subscribeToInfoCommand()
 
             elif topic.startswith(self.TOPIC_COMMAND_LOCAL[:-1]):
                 self.logger.info(f"{self.log_prefix}: Receive local command {payload}")
