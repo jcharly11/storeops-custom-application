@@ -14,6 +14,6 @@ RUN chmod +x ./docker-entrypoint.sh
 
 EXPOSE 80/tcp
 
-RUN adduser checkpoint
+RUN adduser checkpoint sudo
 USER checkpoint
 CMD ["./docker-entrypoint.sh"]
