@@ -83,7 +83,7 @@ function setEnvironmentVariables(){
 
   })
   console.log(replaceContent)
-   cockpit.file(tempFile).replace(replaceContent)
+   cockpit.file(file).replace(replaceContent)
    .then((content, tag) => {
     console.log(content)
     copyFile()
@@ -98,7 +98,7 @@ function setEnvironmentVariables(){
 
 }
 function copyFile(){
-  cockpit.spawn(["/usr/bin/cp", tempFile, ui_file]).then((data) => { 
+  cockpit.spawn(["/usr/bin/cp", file, ui_file]).then((data) => { 
  
     console.log(data);
     restartCustomApplication()

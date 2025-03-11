@@ -4,8 +4,7 @@ var localItems = []
 
 const file = "/var/environment/storeops-custom-application/local-environment-vars.txt"
 const ui_file = "/var/environment/storeops-custom-application/ui-local-environment-vars.txt" 
-const tempFile = "/tmp/local-environment-vars.txt"
-
+ 
 let getEnvironmentVariablesFromBaseFilePromise = function getVariablesData(){
     return new Promise((resolve, reject) => {
         cockpit.file(file).read()
@@ -41,22 +40,3 @@ let getEnvironmentVariablesFromLocalFilePromise = function getVariablesData(){
       };   
       
  
-function replaceContentFile(content){
-  var replaceContent = ""
-   content.forEach(element => {
-    nline =element + "\n"
-    replaceContent += nline 
-
-  })
-
-   console.log(replaceContent)
-   cockpit.file(localFile).replace(replaceContent)
-   .then((content, tag) => {
-    console.log(content)
-    console.log(tag)
-   
-    
-   }).catch(error => {
-       console.log(error)
-   });
-}
