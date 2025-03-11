@@ -11,8 +11,8 @@ RUN mkdir /app
 WORKDIR /app
 COPY ./src/ ./
 RUN chmod +x ./docker-entrypoint.sh
-
+RUN chmod 777 /app
 EXPOSE 80/tcp
 
-USER checkpoint
+
 CMD ["./docker-entrypoint.sh"]
