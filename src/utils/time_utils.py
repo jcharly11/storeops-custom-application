@@ -5,8 +5,10 @@ import os
 
 class DateUtils():
 
-    def getDateISOFormat(self ):
+    def getDateISOFormat(self, offset_sec = 0):
         dt = datetime.now(timezone.utc)
+        if offset_sec != 0:
+            dt = dt + datetime.timedelta(seconds=offset_sec)
         tz = dt.astimezone()
         return  tz.isoformat()
     
