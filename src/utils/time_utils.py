@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import config.settings as settings
 import pytz
 import os
@@ -8,7 +8,7 @@ class DateUtils():
     def getDateISOFormat(self, offset_sec = 0):
         dt = datetime.now(timezone.utc)
         if offset_sec != 0:
-            dt = dt + datetime.timedelta(seconds=offset_sec)
+            dt = dt + timedelta(seconds=offset_sec)
         tz = dt.astimezone()
         return  tz.isoformat()
     
