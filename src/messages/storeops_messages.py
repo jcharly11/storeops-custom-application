@@ -59,6 +59,18 @@ class CommandMessage(StoreOpsMessage):
         self.destination = []
         self.expiration_date = None
 
+
+class InfoMessage(StoreOpsMessage):
+    
+    def __init__(self) -> None:
+        StoreOpsMessage.__init__(self)
+        self.type = 'info'
+        self.customer = None
+        self.store = None
+        self.info_id = None
+        self.expiration_date = None
+        self.uuid_request = None
+
 class ResponseMessage(StoreOpsMessage):
     
     def __init__(self) -> None:

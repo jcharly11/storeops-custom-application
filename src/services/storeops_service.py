@@ -11,7 +11,7 @@ import config.storeops_settings as settings
 from config.settings import TOPIC_RESTART_APPLICATION
 import time
 import datetime
-from messages.storeops_messages import StoreOpsMessage, CommandMessage
+from messages.storeops_messages import StoreOpsMessage, CommandMessage, InfoMessage
 from mqtt.client_ssl import ClientSSL
 from mqtt.client import Client
 from utils.restart import Restart
@@ -95,6 +95,8 @@ class StoreopsService():
                     self.clientSSL.subscribe(new_info_device_topic)
                     self.info_topics.append(new_info_store_topic)
                     self.info_topics.append(new_info_device_topic)
+
+                self.info_topic_prefix = new_info_store_prefix
 
         
     def publishToStoreops(self, message): 
@@ -375,6 +377,11 @@ class StoreopsService():
 
             payload = json.loads(message.payload.decode())
             topic = message.topic
+            if message.topic.startswith(self.info_topic_prefix):
+                self.logger.info(f"{self.log_prefix}: Info message received from {topic}")
+                self.publishReceivedInfoResponse(topic, payload)
+                return
+
             isDestinationCorrect = False
 
             for dest in payload["destination"]:
@@ -383,7 +390,7 @@ class StoreopsService():
                     break
 
             if isDestinationCorrect:
-                self.logger.info(f"{self.log_prefix}: Command directed to me")
+                self.logger.info(f"{self.log_prefix}: Command directed to me: {topic} : {payload}")
                 expiration_date = datetime.datetime.fromisoformat(payload["expiration_date"])
                 if expiration_date > datetime.datetime.now():
                     self.publishReceivedCommand(topic, payload, send_storeops=True)
@@ -407,5 +414,20 @@ class StoreopsService():
         command.timestamp = self.dateUtils.getDateISOFormat()
         command.send_local = send_local
         command.send_storeops = send_storeops
+        self.publishResponseToSubscribers(command)
+
+
+    def publishReceivedInfoResponse(self, topic, payload):
+        command = InfoMessage()
+        command.customer = self.CUSTOMER_ID
+        command.store = self.STORE_ID
+        command.info_id = topic.rpartition('/')[-1]
+        if command.info_id == self.DEVICE_ID:
+            command.info_id = topic.rpartition('/')[-2]
+        command.uuid = payload["uuid"]
+        command.uuid_request = payload["uuid_request"]
+        command.version = payload["version"]
+        command.data = payload["data"]
+        command.timestamp = payload["timestamp"]
         self.publishResponseToSubscribers(command)
 
