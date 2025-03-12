@@ -2,7 +2,7 @@
 
 cp -a /app/ui/* /app/cockpit
 cp -a /app/scripts/* /app/shell-scripts
-cp -a /app/ssl/* /app/certificates
+cp -a /app/certificates/* /app/certificates
 chmod 777 /app/environment/
 while :
 do
