@@ -82,11 +82,12 @@ function setEnvironmentVariables(){
     replaceContent += nline 
 
   })
-  console.log(replaceContent)
-   cockpit.file(file).replace(replaceContent)
+
+   console.log(replaceContent)
+   cockpit.file(ui_file).replace(replaceContent)
    .then((content, tag) => {
     console.log(content)
-    copyFile()
+    restartCustomApplication()
    
     
     

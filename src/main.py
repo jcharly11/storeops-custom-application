@@ -12,16 +12,15 @@ from services.storeops_service import StoreopsService
 environment = EnvironmentValidator()
 
 storeOpsService = StoreopsService(environment = environment)
-environment.addManager(storeOpsService)
-
 sharepointService = SharepointService()
-environment.addManager(sharepointService)
+
+environment.addManager(storeOpsService)
 
 eventManager =  Event_manager(storeopsService = storeOpsService,
                               sharepointService = sharepointService,
                               environment = environment)
 
-
+environment.addManager(sharepointService)
 
 # application logging
 dictConfig(LogConfig().dict())

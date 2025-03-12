@@ -14,7 +14,7 @@ let getEnvironmentVariablesFromBaseFilePromise = function getVariablesData(){
               resolve(content);
             }
         }).catch(error => {
-            reject('Rejected')
+            reject('Can not read local file')
         });
     
     
@@ -31,7 +31,7 @@ let getEnvironmentVariablesFromLocalFilePromise = function getVariablesData(){
               
           }).catch(error => {
               console.log(error)
-              reject('Rejected')
+              reject('Can not read UI file')
           });
       
       
