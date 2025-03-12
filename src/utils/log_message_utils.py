@@ -33,7 +33,8 @@ class LogMessagesUtil:
         row = [message.timestamp, message.uuid, customerId, storeId, doorId, message.device_id, message.type, topic]
         for item in data:
             row.append(item['key'])
-            row.append(item['value'][0])
+            if len(item['value']) > 0 :
+                 row.append(item['value'][0])
              
         with open(f"{self.path}/{self.file}", mode='a') as flog:
                     self.writer = csv.writer(flog, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
