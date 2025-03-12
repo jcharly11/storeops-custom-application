@@ -23,6 +23,7 @@ class EnvironmentValidator():
             if self.fileUtils.fileExists(path=self.fileName_ui) == False:      
                 with open(self.fileName_ui, mode="w") as file_ui:
                     file_ui.write("")
+
             os.chmod(self.fileName_ui, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO | stat.S_IWOTH | stat.S_IROTH)  
 
         except Exception as err:
@@ -33,9 +34,10 @@ class EnvironmentValidator():
         self.create(self.fileName)
 
     def create(self, fileName):
-        with open(fileName, mode="w") as file:
-            for manager in self.managers:
-                manager.saveVariables(file)
+        if self.fileUtils.fileExists(fileName) == False:
+            with open(fileName, mode="w") as file:
+                for manager in self.managers:
+                    manager.saveVariables(file)
         os.chmod(self.fileName, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO | stat.S_IWOTH | stat.S_IROTH)
 
     def updateLocalVariables(self, restart = False):

@@ -184,7 +184,8 @@ class StoreopsService():
                 self.logger.info(f"{self.log_prefix}: Result message : {result} ")
                 if result:
                     topic = topic.split("/")
-                    self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId= self.STORE_ID, topic=topic[-1])
+                    if len(topic) > 0:
+                        self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId= self.STORE_ID, topic=topic[-1])
                 else:
                     self.logger.info(f"{self.log_prefix}: Message send to internal queue to database")
                     self.storeopInternalQueue.put({'type':'message', 'message': message, 'sent': False})
