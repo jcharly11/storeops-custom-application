@@ -50,7 +50,7 @@ $(document).ready(function() {
      
      }).catch((error) => {
        console.log(error);
-      // alertError("Error getting data file base")
+       printUI(baseItems) 
   
      }); 
      
@@ -59,7 +59,7 @@ $(document).ready(function() {
    
    }).catch((error) => {
      console.log(error);
-     alertError("Error getting data file base")
+     printUI(baseItems)
 
    });  
    

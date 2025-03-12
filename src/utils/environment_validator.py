@@ -19,13 +19,12 @@ class EnvironmentValidator():
         try:
             if self.fileUtils.folderExist(path=path) == False:
                 self.fileUtils.createFolderFull(path=path)
-
-
             
             if self.fileUtils.fileExists(path=self.fileName_ui) == False:      
                 with open(self.fileName_ui, mode="w") as file_ui:
                     file_ui.write("")
-            os.chmod(self.fileName_ui, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  
+            os.chmod(self.fileName_ui, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO | stat.S_IWOTH | stat.S_IROTH)  
+
         except Exception as err:
             self.logger.info(f"Error Env validator: {err}")   
 
@@ -37,7 +36,7 @@ class EnvironmentValidator():
         with open(fileName, mode="w") as file:
             for manager in self.managers:
                 manager.saveVariables(file)
-        os.chmod(self.fileName, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        os.chmod(self.fileName, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO | stat.S_IWOTH | stat.S_IROTH)
 
     def updateLocalVariables(self, restart = False):
         self.create(self.fileName_ui)
