@@ -4,7 +4,7 @@ import time
 print("*****************************")
 
 t = 0
-while t <= 10:
+while t <= 1000:
     uuid = f"0000-0000-0000-0000{t}"
     settings.STORE_NUMBER = "110"
     settings.ACCOUNT_NUMBER = "4784"

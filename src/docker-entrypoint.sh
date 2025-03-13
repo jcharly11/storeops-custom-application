@@ -2,8 +2,7 @@
 
 cp -a /app/ui/* /app/cockpit
 cp -a /app/scripts/* /app/shell-scripts
-cp -ar /app/certificates/* /app/certificates
-chmod 777 /app/environment/
+
 while :
 do
     if [ -f /app/etc/timezone ]; then
@@ -14,10 +13,10 @@ do
         fi
     fi
 
-
+    chmod 777 /app/environment/
     source /app/environment/local-environment-vars.txt
     source /app/environment/ui-local-environment-vars.txt
-    chmod 777 /app/environment/
+    
     uvicorn main:app --host 127.0.0.1 --port 80 --log-config /app/log.ini
 done
 

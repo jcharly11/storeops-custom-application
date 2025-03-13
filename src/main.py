@@ -9,12 +9,13 @@ from services.storeops_service import StoreopsService
 
 
  
+ 
 environment = EnvironmentValidator()
 
 storeOpsService = StoreopsService(environment = environment)
-sharepointService = SharepointService()
-
 environment.addManager(storeOpsService)
+
+sharepointService = SharepointService()
 
 eventManager =  Event_manager(storeopsService = storeOpsService,
                               sharepointService = sharepointService,
