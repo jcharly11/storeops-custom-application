@@ -104,6 +104,7 @@ class PublishToStoreops(Event):
                     message.expiration_date = message_to_send["uuid_request"]
                 else:
                     message.expiration_date = self.dateUtils.getDateISOFormat(offset_sec=3600)
+                self.subscribeToStoreops({"type":self.INFO_ID, "action":"add", "id":message.info_id})
             else:
                 self.logger.info(f"{self.PUBLISH_STOREOPS_ID}: unknown type for message {message_to_send}")
                 return
