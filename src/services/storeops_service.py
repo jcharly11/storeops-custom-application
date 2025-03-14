@@ -81,7 +81,7 @@ class StoreopsService():
 
     def subscribeToInfoCommand(self, force=False):
         if self.context_intialized:
-            new_info_store_prefix = f"checkpoint/{self.CUSTOMER_ID}/{self.STORE_ID}/info/response/" 
+            new_info_store_prefix = f"checkpoint/{self.CUSTOMER_ID}/{self.STORE_ID}/info/response" 
             if self.info_topic_prefix != new_info_store_prefix or force:
                 for old_info in self.info_topics:
                     self.logger.info(f"{self.log_prefix}: Unsubscribe to storeOps old info topic {old_info}")
@@ -148,7 +148,7 @@ class StoreopsService():
                     if message.type  == 'internal':
                         #Only for internal command, not for sending mqtt anywhere
                         if message.command_id == 'info':
-                            processInternalInfoMessage(message)
+                            self.processInternalInfoMessage(message)
                     else:
                         self.sendMessage(message)
                        
@@ -162,22 +162,28 @@ class StoreopsService():
         try:
             if message.command_id == 'info':
                 self.logger.info(f"{self.log_prefix}: processInternalInfoMessage: info with data {message.data}")
+                force_update = False
                 if message.data[0] == 'add':
                     for info in message.data[1:]:
                         if info not in self.info_request:
                             self.info_request.append(info)
+                            force_update = True
                 elif message.data[0] == 'remove':
                     for info in message.data[1:]:
                         if info in self.info_request:
                             self.info_request.remove(info)
+                            force_update = True
                 elif message.data[0] == 'set':
                     self.info_request.clear()
                     for info in message.data[1:]:
                         self.info_request.append(info)
+                    force_update = True
                 elif message.data[0] == 'clear':
-                    self.info_request.clear()
+                    if len(self.info_request) > 0:
+                        self.info_request.clear()
+                        force_update = True
 
-                self.subscribeToInfoCommand(force=True)
+                self.subscribeToInfoCommand(force=force_update)
 
         except Exception as err:
             self.logger.error(f"{self.log_prefix}: processInternalInfoMessage {message} - {err}, {type(err)}")
@@ -421,9 +427,10 @@ class StoreopsService():
         command = InfoMessage()
         command.customer = self.CUSTOMER_ID
         command.store = self.STORE_ID
-        command.info_id = topic.rpartition('/')[-1]
+        split = topic.split('/')
+        command.info_id = split[-1]
         if command.info_id == self.DEVICE_ID:
-            command.info_id = topic.rpartition('/')[-2]
+            command.info_id = split[-2]
         command.uuid = payload["uuid"]
         command.uuid_request = payload["uuid_request"]
         command.version = payload["version"]
