@@ -34,7 +34,7 @@ class EnvironmentValidator():
         self.create(self.fileName)
 
     def create(self, fileName):
-        if self.fileUtils.fileExists(fileName) == False:
+        if fileName != self.fileName_ui:
             with open(fileName, mode="w") as file:
                 for manager in self.managers:
                     manager.saveVariables(file)

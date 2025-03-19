@@ -30,6 +30,8 @@ class SharepointUtils():
         day = str(today.day).zfill(2)
  
         folder_name=f"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
+        folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
+
         self.logger.info(f"Upload group id:{uuid}")
         for file_name in data:
             file_full_path = f"{path}/{file_name}"
@@ -127,6 +129,8 @@ class SharepointUtils():
             day = str(today.day).zfill(2)
 
             folder_base= F"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
+            folder_base= F"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
+
             url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}:/children"
             
             headers = {
@@ -179,3 +183,17 @@ class SharepointUtils():
                 self.logger.error(f"error get token: {err}, {type(err)}")
                 return None
                 
+    def ping(self,  url ):
+            success = False
+            headers = {'Authorization': f'Bearer {self.access_token}','Content-Type': 'application/octet-stream'}
+            try:
+                with open(url, 'rb')  as res:
+                #res =  requests.put(url, headers=headers, data=None)
+                    print(res)
+                    return res
+                
+            except Exception as ex:
+                self.logger.error(f"Exception making ping images: {ex}")
+                
+            return success
+    
