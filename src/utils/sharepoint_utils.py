@@ -29,7 +29,9 @@ class SharepointUtils():
         month =  str(today.month).zfill(2)
         day = str(today.day).zfill(2)
  
-        folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
+        folder_name=f"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
+        folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
+
         self.logger.info(f"Upload group id:{uuid}")
         for file_name in data:
             file_full_path = f"{path}/{file_name}"
@@ -60,11 +62,6 @@ class SharepointUtils():
             
         return success
                  
-        
-
-
-
-
 
     def generateLink(self, uuid):
         try:
@@ -91,14 +88,17 @@ class SharepointUtils():
             
             resLink = requests.post(url, headers=headers, data=body )
             resJs= resLink.json()
-            folderLink= resJs["link"]["webUrl"]
+           
+
             if "link" in resJs:
+                folderLink= resJs["link"]["webUrl"]
                 return folderLink
             else:
+                self.logger.error(f"error creating link: {resJs['error']['code']}, {resJs['error']['message']}")
                 return None
-
+            
         except Exception as err:
-            self.logger.error(f"error creating link: {err}, {type(err)}")
+            self.logger.error(f"error creating link: {err}")
             return None
 
 
@@ -128,7 +128,9 @@ class SharepointUtils():
             month = str(today.month).zfill(2)
             day = str(today.day).zfill(2)
 
-            folder_base= F"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
+            folder_base= F"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
+            folder_base= F"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
+
             url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}:/children"
             
             headers = {
@@ -167,3 +169,31 @@ class SharepointUtils():
         except Exception as err:
             self.logger.error(f"error create sharepoint folder: {err}, {type(err)}")
             return ""
+
+    def count(self):
+            try:
+                headers = {
+                    "Authorization": f"{self.access_token}",
+                    "Content-Type": "application/json"
+                    }
+                url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{sharepointSettings.FOLDER_NAME}:/children"
+                response = requests.get(url= url, headers=headers)
+                return response.json()
+            except Exception as err:
+                self.logger.error(f"error get token: {err}, {type(err)}")
+                return None
+                
+    def ping(self,  url ):
+            success = False
+            headers = {'Authorization': f'Bearer {self.access_token}','Content-Type': 'application/octet-stream'}
+            try:
+                with open(url, 'rb')  as res:
+                #res =  requests.put(url, headers=headers, data=None)
+                    print(res)
+                    return res
+                
+            except Exception as ex:
+                self.logger.error(f"Exception making ping images: {ex}")
+                
+            return success
+    

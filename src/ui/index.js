@@ -50,7 +50,7 @@ $(document).ready(function() {
      
      }).catch((error) => {
        console.log(error);
-      // alertError("Error getting data file base")
+       printUI(baseItems) 
   
      }); 
      
@@ -59,7 +59,7 @@ $(document).ready(function() {
    
    }).catch((error) => {
      console.log(error);
-     alertError("Error getting data file base")
+     printUI(baseItems)
 
    });  
    
@@ -82,11 +82,12 @@ function setEnvironmentVariables(){
     replaceContent += nline 
 
   })
-  console.log(replaceContent)
-   cockpit.file(tempFile).replace(replaceContent)
+
+   console.log(replaceContent)
+   cockpit.file(ui_file).replace(replaceContent)
    .then((content, tag) => {
     console.log(content)
-    copyFile()
+    restartCustomApplication()
    
     
     
@@ -98,7 +99,7 @@ function setEnvironmentVariables(){
 
 }
 function copyFile(){
-  cockpit.spawn(["/usr/bin/cp", tempFile, ui_file]).then((data) => { 
+  cockpit.spawn(["/usr/bin/cp", file, ui_file]).then((data) => { 
  
     console.log(data);
     restartCustomApplication()

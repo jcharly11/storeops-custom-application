@@ -13,4 +13,6 @@ COPY ./src/ ./
 RUN chmod +x ./docker-entrypoint.sh
 
 EXPOSE 80/tcp
+
+
 CMD ["./docker-entrypoint.sh"]
