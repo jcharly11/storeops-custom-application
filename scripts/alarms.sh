@@ -1,6 +1,6 @@
 #!/bin/bash
 
-max=1
+max=3
 for  x in `seq 1 $max`
 do
 dt=$(date '+%Y-%m-%dT%H:%M:%S.%3N')
@@ -15,7 +15,7 @@ echo  $uuid
 pwd=$(pwd) 
 workingfile=$(echo $pwd  | awk '{gsub(/scripts/,"src")}1') 
 mosquitto_pub -t 'alarm' -m "$payload"
- 
+mosquitto_pub -t 'alarm' -m "$payload" 
 
 mkdir "$workingfile/videos/$uuid"
 touch "$workingfile/videos/$uuid/$uuid.mp4"
