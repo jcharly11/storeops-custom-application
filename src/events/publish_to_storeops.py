@@ -18,6 +18,7 @@ class PublishToStoreops(Event):
     # { "id":"name of the event",
     #   "type": "type of event",
     #   "device_id": device_id to use. Optional value,
+    #   "uuid": uuid to use. Optional value,
     #   "uuid_request": uuid_request to use. Optional value,
     #   "expiration_date": expiration date of message. Optional value
     #   "is_local": True/False, Optional value, True by default
@@ -101,7 +102,7 @@ class PublishToStoreops(Event):
                 message = self.prepareHeaderMessage(InfoMessage())
                 message.info_id = message_to_send["id"]
                 if "expiration_date" in  message_to_send:
-                    message.expiration_date = message_to_send["uuid_request"]
+                    message.expiration_date = message_to_send["expiration_date"]
                 else:
                     message.expiration_date = self.dateUtils.getDateISOFormat(offset_sec=3600)
                 self.subscribeToStoreops({"type":self.INFO_ID, "action":"add", "id":message.info_id})
@@ -111,6 +112,9 @@ class PublishToStoreops(Event):
 
             if "device_id" in message_to_send:
                 message.device_id = message_to_send["device_id"]
+
+            if "uuid" in message_to_send:
+                message.uuid = message_to_send["uuid"]
 
             if "send_local" in message_to_send:
                 message.send_local = message_to_send["send_local"]
