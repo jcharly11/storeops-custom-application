@@ -41,10 +41,13 @@ class FilesManagerTaks:
                     for file_name in files:
                         file_full_path = f"{path}/{file_name}"
                         dest =  f"{backupLocation}/{file_name}"
+                        self.logger.info(f"Moving file: {file_full_path} to {dest}")
                         if self.fileUtils.exist(file=file_full_path):
-                            self.fileUtils.moveFiles(file_full_path, dest)
-                            dests.append(dest)
-                        destinations = ','.join(dests) 
+                            moved = self.fileUtils.moveFiles(file_full_path, dest)
+                            if moved:
+                                dests.append(dest)
+                                
+                    destinations = ','.join(dests) 
                     self.database.saveFiles(request_uuid=uuid, link=link, files=destinations,path=path)
 
                 except Exception as ex:

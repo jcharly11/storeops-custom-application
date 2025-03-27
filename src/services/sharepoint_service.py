@@ -120,13 +120,10 @@ class SharepointService():
                                     request["message"].link = link
                                     self.links.append({"uuid":message['uuid'], "link": link}) 
                                     self.publishResponseToSubscribers(request["message"])
-
-
                                     delete_request.append(request)
                                 else:
                                     self.logger.info("Going to reintent because timeout requesting link")
                                     request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
-                                    
                                     self.logger.info(f"Content on requests {lr}")
 
                 
@@ -147,7 +144,7 @@ class SharepointService():
                 while self.sharepointInternalQueue.qsize() > 0:
                     message = self.sharepointInternalQueue.get()
                     self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.destination_path} , uuid:  {message.uuid}, files: {message.files}]") 
-                    self.upload(message = message)
+                    self.uploadToSharepoint(message = message)
 
 
                 #check if pending files to upload and push them.
@@ -172,7 +169,7 @@ class SharepointService():
             if items is not None:
 
                 for item in items:
-                    
+                    self.logger.info("Retry upload files")
                     message  = SharepointUploadFilesMessage()
                     message.type = 'upload'
                     message.uuid= item[0]
@@ -180,7 +177,8 @@ class SharepointService():
                     link = item[2]
                     message.path= item[3]
                     self.links.append({"uuid":message.uuid, "link":link })
-                    self.upload(message = message)
+                    self.logger.info(f"UUID: {message.uuid}, IMAGES:{message.files} LINK:{link} ")
+                    self.uploadToSharepoint(message = message)
             
                  
 
@@ -193,7 +191,7 @@ class SharepointService():
             #Get any message older than SHAREPOINT_KEEP_MESSAGES_DAYS from now and remove them from databasae
             pass
 
-    def upload(self, message):
+    def uploadToSharepoint(self, message):
         link = None
         link = self.checkLink(message.uuid) # check for link previus request
         if link is None:
@@ -208,7 +206,7 @@ class SharepointService():
 
         else:
            
-            self.logger.info(f"{self.SERVICE_ID}: Fail uploading safe to db images")
+            self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
             self.sendSharepointLastRetry = datetime.datetime.now()
             self.fileManageTask.addItem({
                 'files': message.files, 

@@ -40,15 +40,15 @@ class FileUtils():
 
     def moveFiles(self, origin, destiny):
         try:
-           self.logger.info(f"Moving file: {origin} To {destiny}")
+           
            
            shutil.move(origin, destiny)
+           self.logger.info(f"Success moving to backup")
            
            return True
            
         except Exception as ex:
             self.logger.error(f"Error moving folder content: {ex}") 
-            pass 
             return False 
     
     def exist(self, file):
