@@ -38,10 +38,12 @@ class FileUtils():
         except Exception as ex:
             self.logger.error(f"Error deleting folder: {folder,ex}")    
 
-    def moveFiles(self, origin, detiny):
+    def moveFiles(self, origin, destiny):
         try:
-            
-           shutil.move(origin, detiny)
+           self.logger.info(f"Moving file: {origin} To {destiny}")
+           
+           shutil.move(origin, destiny)
+           
            return True
            
         except Exception as ex:

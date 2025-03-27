@@ -194,32 +194,28 @@ class SharepointService():
             pass
 
     def upload(self, message):
+        link = None
         link = self.checkLink(message.uuid) # check for link previus request
-        if link:
+        if link is None:
             link = self.sharepointUtils.generateLink(message.uuid)# generate link in case of previus None exist
         
-        uploaded = self.sharepointUtils.upload_group(path = message.destination_path, uuid = message.uuid, data = message.files)
+        uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files)
+
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")
             self.publishResponseToSubscribers(message={"uuid":message.uuid ,"link": link})
             self.filesUtils.deleteFolderContent(folder=message.destination_path)
-        else:
-            content = True
-            if message.destination_path is None:
-                self.logger.info(f"{self.SERVICE_ID}: Images does not exist sholud delete")
-                content = False
 
+        else:
+           
             self.logger.info(f"{self.SERVICE_ID}: Fail uploading safe to db images")
             self.sendSharepointLastRetry = datetime.datetime.now()
             self.fileManageTask.addItem({
                 'files': message.files, 
                 'uuid': message.uuid, 
                 'path': message.destination_path,
-                'link': link,
-                'content':content})
-            
-            #put files in database and remove from the filesystem
-            #database includes timestamp, destination path, files
+                'link': link})
+             
         
     def checkLink(self, uuid):
         link = None

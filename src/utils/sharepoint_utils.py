@@ -1,3 +1,5 @@
+import traceback
+import sys
 import datetime
 import json
 import logging 
@@ -15,7 +17,7 @@ class SharepointUtils():
         self.filesUtils =  FileUtils()
  
 
-    def upload_group(self, path, uuid, data): 
+    def uploadGroup(self, path, uuid, data): 
         self.access_token = self.getAuthToken()
         self.logger.info(f"Starting to upload files : {len(data)} items")
         self.logger.info(f"Path: {path}")
@@ -29,7 +31,6 @@ class SharepointUtils():
         month =  str(today.month).zfill(2)
         day = str(today.day).zfill(2)
  
-        folder_name=f"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
         folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
 
         self.logger.info(f"Upload group id:{uuid}")
@@ -41,8 +42,8 @@ class SharepointUtils():
             urls.append(upload_url) 
             
         uploaded = map(self.upload, urls, files)
-        up = all(i for i in list(uploaded))
-        return up
+       
+        return all(i for i in list(uploaded)) 
         
         
     def upload(self,  url, file_url ):
@@ -51,14 +52,18 @@ class SharepointUtils():
         try:
             with open(file_url, 'rb') as file:
                 response = requests.put(url, headers=headers, data=file)
+                print(f"{response.status_code}")
+                print("***********************************************")
                 if response:
-                    self.filesUtils.deleteSingleFile(file_url)
                     success=True
                 else:
                     success = False
              
         except Exception as ex:
             self.logger.error(f"Exception uploading images: {ex}")
+            self.logger.error(traceback.format_exc())
+            self.logger.error(sys.exc_info()[2])
+            return False
             
         return success
                  

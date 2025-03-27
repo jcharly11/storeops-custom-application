@@ -1,6 +1,6 @@
 #!/bin/bash
 
-max=3
+max=1
 for  x in `seq 1 $max`
 do
 dt=$(date '+%Y-%m-%dT%H:%M:%S.%3N')
@@ -15,7 +15,6 @@ echo  $uuid
 pwd=$(pwd) 
 workingfile=$(echo $pwd  | awk '{gsub(/scripts/,"src")}1') 
 mosquitto_pub -t 'alarm' -m "$payload"
-mosquitto_pub -t 'alarm' -m "$payload" 
 
 mkdir "$workingfile/videos/$uuid"
 touch "$workingfile/videos/$uuid/$uuid.mp4"
@@ -35,7 +34,8 @@ mp4="$uuid.mp4"
 echo $snapshots
 echo $videos
 echo $mp4 
-sleep 2
+sleep 5
+
 get_buffer=$(jq -n \
  --arg uuid "$uuid" \
  --arg snapshots "$snapshots" \
@@ -43,14 +43,15 @@ get_buffer=$(jq -n \
 )
 mosquitto_pub -t 'command_resp/onvif/image/get_buffer' -m "$get_buffer"
 
-sleep 5
+# sleep 5
 
-get_video=$(jq -n \
- --arg uuid "$uuid" \
- --arg videos "$videos" \
-  --arg mp4 "$mp4" \
- '{"header": {"timestamp": "2024-09-13T16:16:45.944-05:00", "uuid_request": $uuid, "version": "1.0.0"}, "data": {"status": "OK", "destination_path": $videos, "file_name": $mp4}}'
-)
-mosquitto_pub -t 'command_resp/onvif/video/get_video' -m "$get_video" 
+# get_video=$(jq -n \
+#  --arg uuid "$uuid" \
+#  --arg videos "$videos" \
+#   --arg mp4 "$mp4" \
+#  '{"header": {"timestamp": "2024-09-13T16:16:45.944-05:00", "uuid_request": $uuid, "version": "1.0.0"}, "data": {"status": "OK", "destination_path": $videos, "file_name": $mp4}}'
+# )
+# mosquitto_pub -t 'command_resp/onvif/video/get_video' -m "$get_video" 
 
+sleep 10
 done

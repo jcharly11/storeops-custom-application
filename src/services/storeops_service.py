@@ -265,7 +265,7 @@ class StoreopsService():
         timeout_retry = datetime.timedelta(hours=4)
         rt =  + timeout_retry.total_seconds()
 
-        if now > self.nextOldMessageRemove:
+        if now > self.nextOldMessageRemove:# CHEK THIS VALIDATION
             self.nextOldMessageRemove = now + datetime.timedelta(hours=int(settings.STOREOPS_CHECK_OLD_MESSAGES_HOUS))
             self.logger.info(f"{self.log_prefix}: Remove old messages in database.")
             self.database.deleteOldMessage(now - datetime.timedelta(hours=int(settings.STOREOPS_KEEP_MESSAGES_DAYS)))
