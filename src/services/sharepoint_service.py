@@ -24,7 +24,6 @@ class SharepointService():
         # if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
 
         self.subscribers = []
-        self.links = []
         self.sendSharepointLastRetry = datetime.datetime.now()
         self.removeOldMessagesLastRetry = 0
 
@@ -83,24 +82,22 @@ class SharepointService():
                         timestamp_last_try =  datetime.datetime.now() - timeout
                         requests_link.append({ "timestamp_request": datetime.datetime.now(), "timestamp_last_try": datetime.datetime.now() , "message": message })
 
-                self.createLinkManagement()
+                self.createLinkManagement(requests_link)
             except Exception as err:
                 self.logger.error(f"{self.SERVICE_ID}: sharepointThread {err}, {type(err)}")
                 self.logger.error(traceback.format_exc())
                 self.logger.error(sys.exc_info()[2]) # This line is getting for the error type.
 
-    def createLinkManagement(self):
+    def createLinkManagement(self, requests_link):
         try:
-            delete_request = []
-            lr = len(requests_link)
-           
+            delete_request = []       
             for request in requests_link:
                 now = datetime.datetime.now()
                 timeout = datetime.timedelta(days=sharepoint_settings.SHAREPOINT_KEEP_MESSAGES_DAYS)
                 timestamp_request = request["timestamp_request"] + timeout
                  
                 if now >  timestamp_request :
-                    self.logger.info(f"{self.SERVICE_ID}:Deleting request: {request}")
+                    self.logger.info(f"{self.SERVICE_ID}:Deleting create link request: {request}")
                     delete_request.append(request)
 
                 else:
@@ -118,13 +115,11 @@ class SharepointService():
                                 uuid = request["message"]['uuid']
                                 self.logger.info(f"{self.SERVICE_ID}: Link generated: {uuid}") 
                                 request["message"].link = link
-                                self.links.append({"uuid":message['uuid'], "link": link}) 
                                 self.publishResponseToSubscribers(request["message"])
                                 delete_request.append(request)
                             else:
                                 self.logger.info(f"{self.SERVICE_ID}: Going to reintent {request["message"]['uuid']} because timeout requesting link")
                                 request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
-                                self.logger.info(f"{self.SERVICE_ID}: Content on requests {lr}")
             
             for request in delete_request:
                 requests_link.remove(request)
@@ -175,7 +170,6 @@ class SharepointService():
                     message.files = item[1].split(",")
                     link = item[2]
                     message.path= item[3]
-                    self.links.append({"uuid":message.uuid, "link":link })
                     self.logger.info(f"UUID: {message.uuid}, IMAGES:{message.files} LINK:{link} ")
                     self.uploadToSharepoint(message = message)
             
@@ -190,12 +184,7 @@ class SharepointService():
             #Get any message older than SHAREPOINT_KEEP_MESSAGES_DAYS from now and remove them from databasae
             pass
 
-    def uploadToSharepoint(self, message):
-        link = None
-        link = self.checkLink(message.uuid) # check for link previus request
-        if link is None:
-            link = self.sharepointUtils.generateLink(message.uuid)# generate link in case of previus None exist
-        
+    def uploadToSharepoint(self, message):    
         uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files)
 
         if uploaded:
@@ -213,14 +202,3 @@ class SharepointService():
                 'path': message.destination_path,
                 'link': link})
              
-        
-    def checkLink(self, uuid):
-        link = None
-        for item in self.links:
-            if item['uuid'] == uuid:
-                link =  item['link']
-                self.links.remove(item)
-                break
-
-        return link
-                
