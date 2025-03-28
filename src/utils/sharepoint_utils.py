@@ -17,10 +17,15 @@ class SharepointUtils():
         self.filesUtils =  FileUtils()
  
 
-    def uploadGroup(self, path, uuid, data): 
+    def uploadGroup(self, path, uuid, data, check_folder=True): 
         self.access_token = self.getAuthToken()
         self.logger.info(f"Starting to upload files : {len(data)} items")
         self.logger.info(f"Path: {path}")
+
+        if check_folder:
+            if self.createFolderAzure(uuid) is None:
+                self.logger.error(f"error creating folder for uuid: {uuid}")
+                return False
         
         uploaded =False
         files = []
@@ -71,6 +76,10 @@ class SharepointUtils():
     def generateLink(self, uuid):
         try:
             id_folder= self.createFolderAzure(uuid)
+
+            if id_folder is None:
+                self.logger.error(f"error creating folder for uuid: {uuid}")
+                return None
             
             url=f"{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drive/items/{id_folder}/createLink"
             headers = {
@@ -80,7 +89,7 @@ class SharepointUtils():
 
 
             date_now = datetime.datetime.now()
-            modified_date = date_now + datetime.timedelta(days=60)
+            modified_date = date_now + datetime.timedelta(days=90)
             expiration_date = modified_date.strftime("%Y-%m-%dT%H:%M:%SZ") 
             
             data = {
@@ -173,7 +182,7 @@ class SharepointUtils():
 
         except Exception as err:
             self.logger.error(f"error create sharepoint folder: {err}, {type(err)}")
-            return ""
+            return None
 
     def count(self):
             try:
