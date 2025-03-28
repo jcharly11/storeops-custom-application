@@ -82,51 +82,58 @@ class SharepointService():
                         timeout = datetime.timedelta(minutes=sharepoint_settings.SHAREPOINT_CREATE_LINK_TIMEOUT_MIN)
                         timestamp_last_try =  datetime.datetime.now() - timeout
                         requests_link.append({ "timestamp_request": datetime.datetime.now(), "timestamp_last_try": datetime.datetime.now() , "message": message })
- 
 
-                delete_request = []
-                lr = len(requests_link)
-               
-                for request in requests_link:
-                    now = datetime.datetime.now()
-                    timeout = datetime.timedelta(minutes=sharepoint_settings.SHAREPOINT_CREATE_LINK_TIMEOUT_MIN)
-                    timestamp_request = request["timestamp_request"] + timeout
-                     
-                    if now >  timestamp_request :
-                        self.logger.info(f"{self.SERVICE_ID}:Deleting request: {request}")
-                        delete_request.append(request)
-
-                    else:
-                        retry = datetime.timedelta(seconds=sharepoint_settings.SHAREPOINT_CREATE_LINK_RETRY_SEC)
-                        timestamp_last_try = request["timestamp_last_try"]
-                        
-                        if isinstance(timestamp_last_try, datetime.datetime):
-                            dd = timestamp_last_try + retry 
-                            if now > dd :
-                                id_folder = request["message"].uuid
-                                self.logger.info(f"{self.SERVICE_ID}: Request link: {id_folder}") 
-                                link = self.sharepointUtils.generateLink(uuid=id_folder)   
-                                                
-                                if link is not None:
-                                    uuid = request["message"]['uuid']
-                                    self.logger.info(f"{self.SERVICE_ID}: Link generated: {uuid}") 
-                                    request["message"].link = link
-                                    self.links.append({"uuid":message['uuid'], "link": link}) 
-                                    self.publishResponseToSubscribers(request["message"])
-                                    delete_request.append(request)
-                                else:
-                                    self.logger.info(f"{self.SERVICE_ID}: Going to reintent {request["message"]['uuid']} because timeout requesting link")
-                                    request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
-                                    self.logger.info(f"{self.SERVICE_ID}: Content on requests {lr}")
-                
-                for request in delete_request:
-                    requests_link.remove(request)
-
-                  
+                self.createLinkManagement()
             except Exception as err:
-                self.logger.error(f"sharepointThread {err}, {type(err)}")
+                self.logger.error(f"{self.SERVICE_ID}: sharepointThread {err}, {type(err)}")
                 self.logger.error(traceback.format_exc())
                 self.logger.error(sys.exc_info()[2]) # This line is getting for the error type.
+
+    def createLinkManagement(self):
+        try:
+            delete_request = []
+            lr = len(requests_link)
+           
+            for request in requests_link:
+                now = datetime.datetime.now()
+                timeout = datetime.timedelta(days=sharepoint_settings.SHAREPOINT_KEEP_MESSAGES_DAYS)
+                timestamp_request = request["timestamp_request"] + timeout
+                 
+                if now >  timestamp_request :
+                    self.logger.info(f"{self.SERVICE_ID}:Deleting request: {request}")
+                    delete_request.append(request)
+
+                else:
+                    retry = datetime.timedelta(seconds=sharepoint_settings.SHAREPOINT_CREATE_LINK_RETRY_SEC)
+                    timestamp_last_try = request["timestamp_last_try"]
+                    
+                    if isinstance(timestamp_last_try, datetime.datetime):
+                        dd = timestamp_last_try + retry 
+                        if now > dd :
+                            id_folder = request["message"].uuid
+                            self.logger.info(f"{self.SERVICE_ID}: Request link: {id_folder}") 
+                            link = self.sharepointUtils.generateLink(uuid=id_folder)   
+                                            
+                            if link is not None:
+                                uuid = request["message"]['uuid']
+                                self.logger.info(f"{self.SERVICE_ID}: Link generated: {uuid}") 
+                                request["message"].link = link
+                                self.links.append({"uuid":message['uuid'], "link": link}) 
+                                self.publishResponseToSubscribers(request["message"])
+                                delete_request.append(request)
+                            else:
+                                self.logger.info(f"{self.SERVICE_ID}: Going to reintent {request["message"]['uuid']} because timeout requesting link")
+                                request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
+                                self.logger.info(f"{self.SERVICE_ID}: Content on requests {lr}")
+            
+            for request in delete_request:
+                requests_link.remove(request)
+
+        except Exception as err:
+            self.logger.error(f"sharepointThread {err}, {type(err)}")
+            self.logger.error(traceback.format_exc())
+            self.logger.error(sys.exc_info()[2]) # This line is getting for the error type.
+
     
     def sharepointThreadUploading(self): 
         while True:
