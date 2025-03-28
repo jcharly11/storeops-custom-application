@@ -35,8 +35,10 @@ class FileUtils():
     def deleteFolderContent(self, folder):
         try:
            shutil.rmtree(folder)
+           return True
         except Exception as ex:
-            self.logger.error(f"Error deleting folder: {folder,ex}")    
+            self.logger.error(f"Error deleting folder: {folder,ex}")  
+            return False  
 
     def moveFiles(self, origin, destiny):
         try:

@@ -11,6 +11,7 @@ from utils.files_manager_task import FilesManagerTaks
 import time
 import threading
 import multiprocessing as mp
+ 
 
 class SharepointService():
     def __init__(self):   
@@ -141,20 +142,19 @@ class SharepointService():
                 while self.sharepointInternalQueue.qsize() > 0:
                     message = self.sharepointInternalQueue.get()
                     self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.destination_path} , uuid:  {message.uuid}, files: {message.files}]") 
-                    if self.uploadToSharepoint(message) == False:
+                    if self.uploadToSharepoint(message, isReintent = False) == False:
                         self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
                         self.fileManageTask.addItem({
                             'files': message.files, 
                             'uuid': message.uuid, 
-                            'path': message.destination_path,
-                            'link': ""})
+                            'path': message.destination_path })
 
 
                 #check if pending files to upload and push them.
                 #when files uploaded remove them from database.
                 #control max timeout trying to upload files and remove them
                 self.retrySendToSharepoint()
-                self.removeOldFiles()
+                #self.removeOldFiles()
 
             except Exception as err:
                 self.logger.error(f"sharepointThreadUploading {err}, {type(err)}")
@@ -177,9 +177,9 @@ class SharepointService():
                     message.uuid = item[0]
                     message.files = item[1].split(",")
                     link = item[2]
-                    message.path= item[3]
+                    message.path= item[4] 
                     self.logger.info(f"UUID: {message.uuid}, IMAGES:{message.files} LINK:{link} ")
-                    if self.uploadToSharepoint(message = message):
+                    if self.uploadToSharepoint(message = message, isReintent = True):
                         self.fileManageTask.deleteItem(message.uuid)
             
                  
@@ -189,19 +189,25 @@ class SharepointService():
         #Then remote the files and self.fileManageTask.deleteItem
         
         #Not correct code
-        now = datetime.datetime.now()
-        timeout_retry = datetime.timedelta(hours=4)
-        rt = self.removeOldMessagesLastRetry + timeout_retry.total_seconds()
-
-        if now > datetime.datetime.fromtimestamp(rt):
+        try:
+            now = datetime.datetime.now() 
+            old_uuids = self.fileManageTask.getItemsOlderThan(timestamp=now)
+            for uuid in old_uuids:
+                if self.filesUtils.deleteFolderContent(uuid=uuid):
+                    self.publishResponseToSubscribers()
+                    self.fileManageTask.deleteItem(uuid=uuid)
+        
             #Get any message older than SHAREPOINT_KEEP_MESSAGES_DAYS:
             #  1- Delete files in backup folder
             #  2- publishResponeToSubscriber con status TIMEOUT
             #  3- Remove from database
-            pass
+        except Exception as err:
+                self.logger.error(f"{self.SERVICE_ID }: {err}, {type(err)}")
+                self.logger.error(traceback.format_exc())
+                self.logger.error(sys.exc_info()[2])
 
-    def uploadToSharepoint(self, message):    
-        uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files)
+    def uploadToSharepoint(self, message, isReintent):    
+        uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files, isReintent=isReintent)
 
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")

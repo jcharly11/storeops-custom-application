@@ -20,7 +20,6 @@ class FilesManagerTaks:
             files = message['files'] 
             uuid = message['uuid']
             path = message['path']
-            link = ""
             dests = []
             backupPath = str(path).replace('.','')
             backupLocation = f"{BACKUP_FILES_AZURE_PATH}{backupPath}"
@@ -37,7 +36,7 @@ class FilesManagerTaks:
                         dests.append(dest)
                         
             destinations = ','.join(dests) 
-            self.database.saveFiles(request_uuid=uuid, link=link, files=destinations,path=path)  
+            self.database.saveFiles(request_uuid=uuid, link=None, files=destinations,path=path)  
 
         except Exception as ex:
             self.logger.error(f"Error in backup process: {ex}")
@@ -49,8 +48,10 @@ class FilesManagerTaks:
         return self.database.deleteFiles(uuid)
 
     def getItemsOlderThan(self, timestamp):
-        #self.database.getFilesOlderThan(timestamp)<<<<-----------------------
-        pass
+        items = self.database.getFilesOlderThan(timestamp = timestamp)
+        return items
+        
+         
 
          
 

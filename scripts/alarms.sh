@@ -43,15 +43,15 @@ get_buffer=$(jq -n \
 )
 mosquitto_pub -t 'command_resp/onvif/image/get_buffer' -m "$get_buffer"
 
-sleep 5
+# sleep 5
 
-get_video=$(jq -n \
- --arg uuid "$uuid" \
- --arg videos "$videos" \
-  --arg mp4 "$mp4" \
- '{"header": {"timestamp": "2024-09-13T16:16:45.944-05:00", "uuid_request": $uuid, "version": "1.0.0"}, "data": {"status": "OK", "destination_path": $videos, "file_name": $mp4}}'
-)
-mosquitto_pub -t 'command_resp/onvif/video/get_video' -m "$get_video" 
+# get_video=$(jq -n \
+#  --arg uuid "$uuid" \
+#  --arg videos "$videos" \
+#   --arg mp4 "$mp4" \
+#  '{"header": {"timestamp": "2024-09-13T16:16:45.944-05:00", "uuid_request": $uuid, "version": "1.0.0"}, "data": {"status": "OK", "destination_path": $videos, "file_name": $mp4}}'
+# )
+# mosquitto_pub -t 'command_resp/onvif/video/get_video' -m "$get_video" 
 
-sleep 10
+# sleep 10
 done
