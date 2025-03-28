@@ -17,6 +17,7 @@ class DataBaseFiles():
                self.createDB()
 
           except sqlite3.Error as err:
+               
                self.recreateDB()
                self.logger.error(f"Database for images creation exception:", err.args)
 
@@ -26,8 +27,16 @@ class DataBaseFiles():
        self.connection = sqlite3.connect(path, check_same_thread=False, timeout=20)
        if self.connection is not None:
              self.connection.execute(TABLE_FILES)
- 
 
+    def recreateDB(self):
+          try:
+              path = os.path.realpath(DB_AZURE_PATH)
+              os.remove(path=path)
+              os.remove(path=DB_AZURE_PATH)
+              self.createDB()
+                
+          except Exception as err:
+                self.logger.error(f"Database remove file exception:", err.args)
     def getAllFiles(self):
           try:
                 self.cursor = self.connection.cursor()

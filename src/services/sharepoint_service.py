@@ -121,7 +121,7 @@ class SharepointService():
                                 self.publishResponseToSubscribers(request["message"])
                                 delete_request.append(request)
                             else:
-                                self.logger.info(f"{self.SERVICE_ID}: Going to reintent {request["message"]['uuid']} because timeout requesting link")
+                                self.logger.info(f"{self.SERVICE_ID}: Going to reintent {request['message']['uuid']} because timeout requesting link")
                                 request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
             
             for request in delete_request:
@@ -205,7 +205,7 @@ class SharepointService():
 
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")
-            mesage.status = SharepointMessage.UPLOADED
+            message.status = SharepointMessage.UPLOADED
             self.publishResponseToSubscribers(message)
             self.filesUtils.deleteFolderContent(folder=message.destination_path)
         

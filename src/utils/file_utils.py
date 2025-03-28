@@ -25,7 +25,7 @@ class FileUtils():
         
     def createFolderFull(self, path):
         try:
-            os.makedirs(path, mode=777)
+            os.makedirs(path)
             return path
             
         except Exception as ex:

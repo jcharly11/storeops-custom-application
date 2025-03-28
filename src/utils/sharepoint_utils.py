@@ -63,8 +63,6 @@ class SharepointUtils():
         try:
             with open(file_url, 'rb') as file:
                 response = requests.put(url, headers=headers, data=file)
-                print(f"{response.status_code}")
-                print("***********************************************")
                 if response:
                     success=True
                 else:

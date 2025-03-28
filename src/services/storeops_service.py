@@ -253,11 +253,12 @@ class StoreopsService():
             self.nextRetrySendStoreops = now + datetime.timedelta(minutes=int(settings.STOREOPS_RETRY_SEND_MIN))
             #Get any message from database with status "not_sent" and retry sending (only to storeOps not internal)
             self.messages = self.database.getMessages(status='not_sent', date= now)
-            for message in self.messages: 
-                message.send_local = False
-                self.logger.info(f"{self.log_prefix}: Retry of message {message}")
-                if self.sendMessage(message=message):
-                    self.database.upadateMessage(request_id=message['uui'], status = 'sent')
+            if self.messages:
+                for message in self.messages: 
+                    message.send_local = False
+                    self.logger.info(f"{self.log_prefix}: Retry of message {message}")
+                    if self.sendMessage(message=message):
+                        self.database.upadateMessage(request_id=message['uui'], status = 'sent')
 
 
     def removeOldMessages(self, now):
