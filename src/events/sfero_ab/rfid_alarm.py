@@ -207,29 +207,29 @@ class RFIDAlarmEvent(Event):
 
     def processSharepointMessage(self, message):
         try:
-            
-            delete_events = []
-            for event in self.event_messages:
-                self.logger.info(f"{self.EVENT_ID}: Event {event['uuid']}")
+            if message["type"] == 'create_link':
+                delete_events = []
+                for event in self.event_messages:
+                    self.logger.info(f"{self.EVENT_ID}: Event {event['uuid']}")
+                    
+                    if event["uuid"] == message['uuid']:
+                        if message['link'] is not None:
+                            self.sendMessageToStoreops(event=event, link=message['link'])   
+                            delete_events.append(event)    
+     
                 
-                if event["uuid"] == message['uuid']:
-                    if message['link'] is not None:
-                        self.sendMessageToStoreops(event=event, link=message['link'])   
-                        delete_events.append(event)    
- 
-            
-            for event in self.event_messages_timeout:
-                self.logger.info(f"{self.EVENT_ID}: Event in timeout {event['uuid']}")
-                if event["uuid"] == message['uuid']:
-                    self.sendMessageToStoreops(event=event, link=message['link'])
-                    delete_events.append(event)                         
+                for event in self.event_messages_timeout:
+                    self.logger.info(f"{self.EVENT_ID}: Event in timeout {event['uuid']}")
+                    if event["uuid"] == message['uuid']:
+                        self.sendMessageToStoreops(event=event, link=message['link'])
+                        delete_events.append(event)                         
 
 
-            for event in delete_events:
-                if self.event_messages.count(event) >  0 :
-                    self.event_messages.remove(event)
-                elif self.event_messages_timeout.count(event) >  0:
-                     self.event_messages_timeout.remove(event)
+                for event in delete_events:
+                    if self.event_messages.count(event) >  0 :
+                        self.event_messages.remove(event)
+                    elif self.event_messages_timeout.count(event) >  0:
+                         self.event_messages_timeout.remove(event)
 
 
         except Exception as err:
