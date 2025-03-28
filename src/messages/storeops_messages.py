@@ -8,6 +8,7 @@ class StoreOpsMessage:
         self.device_model = None
         self.device_id = None
         self.version = None
+        self.extraFields = None
         self.data = []
         self.send_local = True
         self.send_storeops = True

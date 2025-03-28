@@ -420,6 +420,8 @@ class StoreopsService():
         command.timestamp = self.dateUtils.getDateISOFormat()
         command.send_local = send_local
         command.send_storeops = send_storeops
+        if "extraFields" in payload:
+            command.extraFields = payload["extraFields"]
         self.publishResponseToSubscribers(command)
 
 
@@ -436,5 +438,7 @@ class StoreopsService():
         command.version = payload["version"]
         command.data = payload["data"]
         command.timestamp = payload["timestamp"]
+        if "extraFields" in payload:
+            command.extraFields = payload["extraFields"]
         self.publishResponseToSubscribers(command)
 

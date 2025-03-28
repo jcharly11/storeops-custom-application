@@ -140,6 +140,7 @@ class PublishToStoreops(Event):
                            "destination": message.destination,
                            "timestamp": message.timestamp,
                            "version": message.version,
+                           "extraFields": message.extraFields,
                            "data": message.data }
 
                 self.publishInternalBroker(self.PUBLISH_COMMAND_FROM_STOREOPS, payload)
@@ -149,6 +150,7 @@ class PublishToStoreops(Event):
                            "uuid_request": message.uuid_request,
                            "timestamp": message.timestamp,
                            "version": message.version,
+                           "extraFields": message.extraFields,
                            "data": message.data }
 
                 self.publishInternalBroker(self.PUBLISH_INFO_FROM_STOREOPS, payload)
