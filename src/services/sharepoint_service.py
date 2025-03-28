@@ -76,7 +76,6 @@ class SharepointService():
                     message = self.sharepointQueue.get()
 
                     if message.type == "upload":
-                        
                         self.sharepointInternalQueue.put(message)
 
                     elif message.type == "create_link":
@@ -85,47 +84,40 @@ class SharepointService():
                         requests_link.append({ "timestamp_request": datetime.datetime.now(), "timestamp_last_try": datetime.datetime.now() , "message": message })
  
 
-
-
                 delete_request = []
                 lr = len(requests_link)
                
                 for request in requests_link:
-                    
                     now = datetime.datetime.now()
                     timeout = datetime.timedelta(minutes=sharepoint_settings.SHAREPOINT_CREATE_LINK_TIMEOUT_MIN)
                     timestamp_request = request["timestamp_request"] + timeout
                      
                     if now >  timestamp_request :
-                        self.logger.info(f"Deleting request: {request}")
+                        self.logger.info(f"{self.SERVICE_ID}:Deleting request: {request}")
                         delete_request.append(request)
 
                     else:
-                        
-                         
                         retry = datetime.timedelta(seconds=sharepoint_settings.SHAREPOINT_CREATE_LINK_RETRY_SEC)
                         timestamp_last_try = request["timestamp_last_try"]
                         
                         if isinstance(timestamp_last_try, datetime.datetime):
                             dd = timestamp_last_try + retry 
                             if now > dd :
-
-                                id_folder = message.uuid
+                                id_folder = request["message"].uuid
                                 self.logger.info(f"{self.SERVICE_ID}: Request link: {id_folder}") 
                                 link = self.sharepointUtils.generateLink(uuid=id_folder)   
                                                 
                                 if link is not None:
-                                    uuid =message['uuid']
+                                    uuid = request["message"]['uuid']
                                     self.logger.info(f"{self.SERVICE_ID}: Link generated: {uuid}") 
                                     request["message"].link = link
                                     self.links.append({"uuid":message['uuid'], "link": link}) 
                                     self.publishResponseToSubscribers(request["message"])
                                     delete_request.append(request)
                                 else:
-                                    self.logger.info("Going to reintent because timeout requesting link")
+                                    self.logger.info(f"{self.SERVICE_ID}: Going to reintent {request["message"]['uuid']} because timeout requesting link")
                                     request["timestamp_last_try"] = datetime.datetime.now() # addinglast time to reintent request link
-                                    self.logger.info(f"Content on requests {lr}")
-
+                                    self.logger.info(f"{self.SERVICE_ID}: Content on requests {lr}")
                 
                 for request in delete_request:
                     requests_link.remove(request)
