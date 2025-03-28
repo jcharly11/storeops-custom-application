@@ -194,7 +194,10 @@ class SharepointService():
         rt = self.removeOldMessagesLastRetry + timeout_retry.total_seconds()
 
         if now > datetime.datetime.fromtimestamp(rt):
-            #Get any message older than SHAREPOINT_KEEP_MESSAGES_DAYS from now and remove them from databasae
+            #Get any message older than SHAREPOINT_KEEP_MESSAGES_DAYS:
+            #  1- Delete files in backup folder
+            #  2- publishResponeToSubscriber con status TIMEOUT
+            #  3- Remove from database
             pass
 
     def uploadToSharepoint(self, message):    
