@@ -15,46 +15,42 @@ class FilesManagerTaks:
         if not self.fileUtils.folderExist(BACKUP_FILES_AZURE_PATH):
             self.fileUtils.createFolderFull(BACKUP_FILES_AZURE_PATH)
 
-        thread = threading.Thread(target=self.fileManager, args=(self.sharepointMediaQueue,))
-        thread.start()
-
     def addItem(self, message):
-        self.sharepointMediaQueue.put(message)
+        try:
+            files = message['files'] 
+            uuid = message['uuid']
+            path = message['path']
+            link = ""
+            dests = []
+            backupPath = str(path).replace('.','')
+            backupLocation = f"{BACKUP_FILES_AZURE_PATH}{backupPath}"
+            if not self.fileUtils.existFolder(backupLocation):
+                self.fileUtils.createFolderFull(f"{backupLocation}")
 
-    def fileManager(self, sharepointMediaQueue):
-        while True:
-            time.sleep(0.1)
-            if not sharepointMediaQueue.empty() :
-                data = sharepointMediaQueue.get()
-                try:
-                    
-                    files = data['files'] 
-                    uuid = data['uuid']
-                    path = data['path']
-                    link = data['link']
-                    dests = []
-                    backupPath = str(path).replace('.','')
-                    backupLocation = f"{BACKUP_FILES_AZURE_PATH}{backupPath}"
-                    if not self.fileUtils.existFolder(backupLocation):
-                        self.fileUtils.createFolderFull(f"{backupLocation}")
+            for file_name in files:
+                file_full_path = f"{path}/{file_name}"
+                dest =  f"{backupLocation}/{file_name}"
+                self.logger.info(f"Moving file: {file_full_path} to {dest}")
+                if self.fileUtils.exist(file=file_full_path):
+                    moved = self.fileUtils.moveFiles(file_full_path, dest)
+                    if moved:
+                        dests.append(dest)
+                        
+            destinations = ','.join(dests) 
+            self.database.saveFiles(request_uuid=uuid, link=link, files=destinations,path=path)  
 
-                    for file_name in files:
-                        file_full_path = f"{path}/{file_name}"
-                        dest =  f"{backupLocation}/{file_name}"
-                        self.logger.info(f"Moving file: {file_full_path} to {dest}")
-                        if self.fileUtils.exist(file=file_full_path):
-                            moved = self.fileUtils.moveFiles(file_full_path, dest)
-                            if moved:
-                                dests.append(dest)
-                                
-                    destinations = ','.join(dests) 
-                    self.database.saveFiles(request_uuid=uuid, link=link, files=destinations,path=path)
-
-                except Exception as ex:
-                    self.logger.error(f"Error in backup process: {ex}")
-                    self.sharepointMediaQueue.put(data)
+        except Exception as ex:
+            self.logger.error(f"Error in backup process: {ex}")
     
     def getItems(self):
         return self.database.getAllFiles()
+
+    def deleteItem(self, uuid):
+        return self.database.deleteFiles(uuid)
+
+    def getItemsOlderThan(self, timestamp):
+        #self.database.getFilesOlderThan(timestamp)<<<<-----------------------
+        pass
+
          
 

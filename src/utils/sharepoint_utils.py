@@ -18,38 +18,44 @@ class SharepointUtils():
  
 
     def uploadGroup(self, path, uuid, data, check_folder=True): 
-        self.access_token = self.getAuthToken()
-        self.logger.info(f"Starting to upload files : {len(data)} items")
-        self.logger.info(f"Path: {path}")
+        try:
+            self.access_token = self.getAuthToken()
+            self.logger.info(f"Starting to upload files : {len(data)} items")
+            self.logger.info(f"Path: {path}")
 
-        if check_folder:
-            if self.createFolderAzure(uuid) is None:
-                self.logger.error(f"error creating folder for uuid: {uuid}")
-                return False
-        
-        uploaded =False
-        files = []
-        urls = []
-        today = datetime.datetime.today()
-    
-        year = today.year
-        month =  str(today.month).zfill(2)
-        day = str(today.day).zfill(2)
- 
-        folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
-
-        self.logger.info(f"Upload group id:{uuid}")
-        for file_name in data:
-            file_full_path = f"{path}/{file_name}"
-            self.logger.info(f"Uploading file full path: {file_full_path}")
-            upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
-            files.append(file_full_path) 
-            urls.append(upload_url) 
+            if check_folder:
+                if self.createFolderAzure(uuid) is None:
+                    self.logger.error(f"error creating folder for uuid: {uuid}")
+                    return False
             
-        uploaded = map(self.upload, urls, files)
-       
-        return all(i for i in list(uploaded)) 
+            uploaded =False
+            files = []
+            urls = []
+            today = datetime.datetime.today()
         
+            year = today.year
+            month =  str(today.month).zfill(2)
+            day = str(today.day).zfill(2)
+     
+            folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
+
+            self.logger.info(f"Upload group id:{uuid}")
+            for file_name in data:
+                file_full_path = f"{path}/{file_name}"
+                self.logger.info(f"Uploading file full path: {file_full_path}")
+                upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
+                files.append(file_full_path) 
+                urls.append(upload_url) 
+                
+            uploaded = map(self.upload, urls, files)
+           
+            return all(i for i in list(uploaded)) 
+        
+        except Exception as ex:
+            self.logger.error(f"Exception uploadGroup: {ex}")
+            self.logger.error(traceback.format_exc())
+            self.logger.error(sys.exc_info()[2])
+            return False
         
     def upload(self,  url, file_url ):
         success = False

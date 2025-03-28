@@ -141,7 +141,13 @@ class SharepointService():
                 while self.sharepointInternalQueue.qsize() > 0:
                     message = self.sharepointInternalQueue.get()
                     self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.destination_path} , uuid:  {message.uuid}, files: {message.files}]") 
-                    self.uploadToSharepoint(message = message)
+                    if self.uploadToSharepoint(message) == False:
+                        self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
+                        self.fileManageTask.addItem({
+                            'files': message.files, 
+                            'uuid': message.uuid, 
+                            'path': message.destination_path,
+                            'link': ""})
 
 
                 #check if pending files to upload and push them.
@@ -160,25 +166,29 @@ class SharepointService():
         timeout_retry = datetime.timedelta(seconds=float(sharepoint_settings.SHAREPOINT_RETRY_SEND_MIN))
         current_retry = self.sendSharepointLastRetry + timeout_retry
        
-       
         if now >= current_retry: # Reintent to upload using local upload default method
+            self.sendSharepointLastRetry = now
             items = self.fileManageTask.getItems()  
             if items is not None:
-
                 for item in items:
                     self.logger.info("Retry upload files")
                     message  = SharepointUploadFilesMessage()
                     message.type = 'upload'
-                    message.uuid= item[0]
+                    message.uuid = item[0]
                     message.files = item[1].split(",")
                     link = item[2]
                     message.path= item[3]
                     self.logger.info(f"UUID: {message.uuid}, IMAGES:{message.files} LINK:{link} ")
-                    self.uploadToSharepoint(message = message)
+                    if self.uploadToSharepoint(message = message):
+                        self.fileManageTask.deleteItem(message.uuid)
             
                  
 
     def removeOldFiles(self):
+        #SRJ: get from self.fileManagerTask items older than SHAREPOINT_KEEP_MESSAGES_DAYS.
+        #Then remote the files and self.fileManageTask.deleteItem
+        
+        #Not correct code
         now = datetime.datetime.now()
         timeout_retry = datetime.timedelta(hours=4)
         rt = self.removeOldMessagesLastRetry + timeout_retry.total_seconds()
@@ -195,14 +205,6 @@ class SharepointService():
             mesage.status = SharepointMessage.UPLOADED
             self.publishResponseToSubscribers(message)
             self.filesUtils.deleteFolderContent(folder=message.destination_path)
-
-        else:
-           
-            self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
-            self.sendSharepointLastRetry = datetime.datetime.now()
-            self.fileManageTask.addItem({
-                'files': message.files, 
-                'uuid': message.uuid, 
-                'path': message.destination_path,
-                'link': link})
+        
+        return uploaded
              
