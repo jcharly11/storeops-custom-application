@@ -1,5 +1,9 @@
 
 class SharepointMessage:
+
+    TIMEOUT = 'timeout'
+    LINK_CREATED = 'link_created'
+    UPLOADED = 'uploaded'
     
     def __init__(self) -> None:
         self.type = None

@@ -99,6 +99,8 @@ class SharepointService():
                 if now >  timestamp_request :
                     self.logger.info(f"{self.SERVICE_ID}:Deleting create link request: {request}")
                     delete_request.append(request)
+                    request["message"].status = SharepointMessage.TIMEOUT
+                    self.publishResponseToSubscribers(request["message"])
 
                 else:
                     retry = datetime.timedelta(seconds=sharepoint_settings.SHAREPOINT_CREATE_LINK_RETRY_SEC)
@@ -115,6 +117,7 @@ class SharepointService():
                                 uuid = request["message"]['uuid']
                                 self.logger.info(f"{self.SERVICE_ID}: Link generated: {uuid}") 
                                 request["message"].link = link
+                                request["message"].status = SharepointMessage.LINK_CREATED
                                 self.publishResponseToSubscribers(request["message"])
                                 delete_request.append(request)
                             else:
@@ -189,7 +192,8 @@ class SharepointService():
 
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")
-            self.publishResponseToSubscribers(message={"uuid":message.uuid ,"link": link})
+            mesage.status = SharepointMessage.UPLOADED
+            self.publishResponseToSubscribers(message)
             self.filesUtils.deleteFolderContent(folder=message.destination_path)
 
         else:
