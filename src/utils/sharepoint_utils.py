@@ -17,7 +17,7 @@ class SharepointUtils():
         self.filesUtils =  FileUtils()
  
 
-    def uploadGroup(self, path, uuid, data, check_folder=True, isReintent=False): 
+    def uploadGroup(self, path, uuid, data, check_folder=True): 
         try:
             self.access_token = self.getAuthToken()
             self.logger.info(f"Starting to upload files : {len(data)} items")
