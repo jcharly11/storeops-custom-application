@@ -36,16 +36,14 @@ class SharepointUtils():
             year = today.year
             month =  str(today.month).zfill(2)
             day = str(today.day).zfill(2)
-     
             folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
 
             self.logger.info(f"Upload group id:{uuid}")
             for file_name in data:
                 file_full_path = f"{path}/{file_name}"
-                if isReintent:
-                    file_full_path = f"{file_name}"
                 
-                self.logger.info(f"Uploading file full path: {file_full_path}")
+                
+                self.logger.info(f"Prepare upload file full path: {file_full_path}")
                 upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
                 files.append(file_full_path) 
                 urls.append(upload_url) 

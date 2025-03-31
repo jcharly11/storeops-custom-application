@@ -142,7 +142,7 @@ class SharepointService():
                 while self.sharepointInternalQueue.qsize() > 0:
                     message = self.sharepointInternalQueue.get()
                     self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.destination_path} , uuid:  {message.uuid}, files: {message.files}]") 
-                    if self.uploadToSharepoint(message, isReintent = False) == False:
+                    if self.uploadToSharepoint(message) == False:
                         self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
                         self.fileManageTask.addItem({
                             'files': message.files, 
@@ -171,15 +171,15 @@ class SharepointService():
             items = self.fileManageTask.getItems()  
             if items is not None:
                 for item in items:
-                    self.logger.info("Retry upload files")
                     message  = SharepointUploadFilesMessage()
                     message.type = 'upload'
                     message.uuid = item[0]
                     message.files = item[1].split(",")
-                    link = item[2]
-                    message.path= item[4] 
-                    self.logger.info(f"UUID: {message.uuid}, IMAGES:{message.files} LINK:{link} ")
-                    if self.uploadToSharepoint(message = message, isReintent = True):
+                    message.path = item[4]
+                    message.destination_path = item[4]
+                    self.logger.info(f"Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}, DEST: {message.destination_path} ")
+
+                    if self.uploadToSharepoint(message = message):
                         self.fileManageTask.deleteItem(message.uuid)
             
                  
@@ -206,8 +206,8 @@ class SharepointService():
                 self.logger.error(traceback.format_exc())
                 self.logger.error(sys.exc_info()[2])
 
-    def uploadToSharepoint(self, message, isReintent):    
-        uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files, isReintent=isReintent)
+    def uploadToSharepoint(self, message):    
+        uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files)
 
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")

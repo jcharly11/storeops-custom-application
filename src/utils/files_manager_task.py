@@ -20,7 +20,7 @@ class FilesManagerTaks:
             files = message['files'] 
             uuid = message['uuid']
             path = message['path']
-            dests = []
+            moved = False
             backupPath = str(path).replace('.','')
             backupLocation = f"{BACKUP_FILES_AZURE_PATH}{backupPath}"
             if not self.fileUtils.existFolder(backupLocation):
@@ -32,11 +32,9 @@ class FilesManagerTaks:
                 self.logger.info(f"Moving file: {file_full_path} to {dest}")
                 if self.fileUtils.exist(file=file_full_path):
                     moved = self.fileUtils.moveFiles(file_full_path, dest)
-                    if moved:
-                        dests.append(dest)
-                        
-            destinations = ','.join(dests) 
-            self.database.saveFiles(request_uuid=uuid, link=None, files=destinations,path=path)  
+            if moved:
+                files = ",".join(files)    
+                self.database.saveFiles(request_uuid=uuid, link=None, files=files, path=backupLocation)  
 
         except Exception as ex:
             self.logger.error(f"Error in backup process: {ex}")
