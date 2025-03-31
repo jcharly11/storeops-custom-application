@@ -72,19 +72,14 @@ class DataBaseFiles():
                self.logger.info(f"Error executing query insert files: ",ex.args)
                return False
         
-    def getFilesOlderThan(self,  timestamp):
-          result = []
+    def getFilesOlderThan(self):
+          
           try:
                 self.cursor = self.connection.cursor()
-                self.cursor.execute("SELECT request_uuid, date_time_inserted from files")
+                self.cursor.execute("SELECT request_uuid, date_time_inserted, path from files")
                 events = self.cursor.fetchall()
-                if events:
-                  for item in events:
-                        uuid = item[0]
-                        date_inserted =  item[1]
-                        if timestamp > date_inserted:
-                             result.append(uuid)
-                return result
+
+                return events
           
           except Exception as ex:
                self.logger.info(f"Error get files: ",ex)

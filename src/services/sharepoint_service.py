@@ -153,8 +153,8 @@ class SharepointService():
                 #check if pending files to upload and push them.
                 #when files uploaded remove them from database.
                 #control max timeout trying to upload files and remove them
-                self.retrySendToSharepoint()
-                #self.removeOldFiles()
+                #self.retrySendToSharepoint()
+                self.removeOldFiles()
 
             except Exception as err:
                 self.logger.error(f"sharepointThreadUploading {err}, {type(err)}")
@@ -187,15 +187,24 @@ class SharepointService():
     def removeOldFiles(self):
         #SRJ: get from self.fileManagerTask items older than SHAREPOINT_KEEP_MESSAGES_DAYS.
         #Then remote the files and self.fileManageTask.deleteItem
+        daysKeeped = sharepoint_settings.SHAREPOINT_KEEP_MESSAGES_DAYS
+        now = datetime.datetime.now()
+        dateBackup = now - datetime.timedelta(days = daysKeeped)
         
         #Not correct code
         try:
-            now = datetime.datetime.now() 
-            old_uuids = self.fileManageTask.getItemsOlderThan(timestamp=now)
-            for uuid in old_uuids:
-                if self.filesUtils.deleteFolderContent(uuid=uuid):
-                    self.publishResponseToSubscribers()
-                    self.fileManageTask.deleteItem(uuid=uuid)
+            
+            
+            old = self.fileManageTask.getItemsOlderThan(timestamp=dateBackup)
+            for data in old:
+                uuid = data['uuid']
+                path = data['path']
+                self.filesUtils.deleteFolderContent(folder= path)
+                self.fileManageTask.deleteItem(uuid=uuid)
+                message = SharepointUploadFilesMessage()
+                message.status = SharepointMessage.TIMEOUT
+                self.publishResponseToSubscribers(message)
+                    
         
             #Get any message older than SHAREPOINT_KEEP_MESSAGES_DAYS:
             #  1- Delete files in backup folder

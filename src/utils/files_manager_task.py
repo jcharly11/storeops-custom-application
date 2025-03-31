@@ -1,7 +1,6 @@
-import threading
 import logging
 import multiprocessing as mp
-import time
+import datetime
 from database.database_azure import DataBaseFiles
 from utils.file_utils import FileUtils
 from config.settings import BACKUP_FILES_AZURE_PATH
@@ -46,10 +45,16 @@ class FilesManagerTaks:
         return self.database.deleteFiles(uuid)
 
     def getItemsOlderThan(self, timestamp):
-        items = self.database.getFilesOlderThan(timestamp = timestamp)
-        return items
-        
-         
-
+        items = self.database.getFilesOlderThan()
+        result = []
+        for item in items:
+             if item[0] and item[1]:
+                uuid = item[0]
+                di =   item[1]
+                path = item[2]
+                date_inserted = datetime.datetime.strptime(di, "%Y-%m-%d %H:%M:%S.%f")
+                if  date_inserted <= timestamp:
+                    result.append({'uuid':uuid, 'path': path})       
+        return result
          
 
