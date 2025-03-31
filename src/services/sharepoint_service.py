@@ -153,7 +153,7 @@ class SharepointService():
                 #check if pending files to upload and push them.
                 #when files uploaded remove them from database.
                 #control max timeout trying to upload files and remove them
-                #self.retrySendToSharepoint()
+                self.retrySendToSharepoint()
                 self.removeOldFiles()
 
             except Exception as err:
@@ -191,9 +191,7 @@ class SharepointService():
         now = datetime.datetime.now()
         dateBackup = now - datetime.timedelta(days = daysKeeped)
         
-        #Not correct code
         try:
-            
             
             old = self.fileManageTask.getItemsOlderThan(timestamp=dateBackup)
             for data in old:
