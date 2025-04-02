@@ -141,10 +141,8 @@ class SharepointService():
 
                 while self.sharepointInternalQueue.qsize() > 0:
                     message = self.sharepointInternalQueue.get()
-                    self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.destination_path} , uuid:  {message.uuid}, files: {message.files}]") 
-                    if self.uploadToSharepoint(message) == False:
-                        self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
-                        self.fileManageTask.addItem(message)
+                    self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.path} , uuid:  {message.uuid}, files: {message.files}]") 
+                    self.uploadToSharepoint(message)
 
 
                 #check if pending files to upload and push them.
@@ -174,10 +172,7 @@ class SharepointService():
                     message.files = item[1].split(",")
                     message.path = item[4]
                     self.logger.info(f"{self.SERVICE_ID}:Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}")
-
-                    if self.uploadToSharepoint(message = message):
-                        self.fileManageTask.deleteItem( uuid = message.uuid, path=message.destination_path)
-                        self.filesUtils.deleteFolderContent(folder= message.destination_path) 
+                    self.uploadToSharepoint(message = message)
             
                  
 
@@ -214,10 +209,13 @@ class SharepointService():
         uploaded = self.sharepointUtils.uploadGroup(path = message.path, uuid = message.uuid, data = message.files)
 
         if uploaded:
-            self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")
+            self.logger.info(f"{self.SERVICE_ID}: Success uploading: {message.uuid}, uuid:{message.path}")
             message.status = SharepointMessage.UPLOADED
             self.publishResponseToSubscribers(message)
-            self.filesUtils.deleteFolderContent(folder=message.destination_path)
+            self.filesUtils.deleteFolderContent(folder=message.path)
+            self.fileManageTask.deleteItem( uuid = message.uuid, path=message.path)
         
-        return uploaded
+        else:
+             self.logger.info(f"{self.SERVICE_ID}: Fail uploading: {message.uuid}, uuid:{message.path}")
+             self.fileManageTask.addItem(message)
              
