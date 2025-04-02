@@ -25,7 +25,7 @@ class SharepointUtils():
 
             if check_folder:
                 if self.createFolderAzure(uuid) is None:
-                    self.logger.error(f" {self.SERVICE_ID}: error creating folder for uuid: {uuid}")
+                    self.logger.error(f" {self.SERVICE_ID}: Error creating folder for uuid: {uuid}")
                     return False
             
             uploaded =False
@@ -38,12 +38,12 @@ class SharepointUtils():
             day = str(today.day).zfill(2)
             folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
 
-            self.logger.info(f"Upload group id:{uuid}")
+            self.logger.info(f"{self.SERVICE_ID}: Upload group id:{uuid}")
             for file_name in data:
                 file_full_path = f"{path}/{file_name}"
                 
                 
-                self.logger.info(f"Prepare upload file full path: {file_full_path}")
+                self.logger.info(f"{self.SERVICE_ID}: Prepare upload file full path: {file_full_path}")
                 upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
                 files.append(file_full_path) 
                 urls.append(upload_url) 
@@ -53,7 +53,7 @@ class SharepointUtils():
             return all(i for i in list(uploaded)) 
         
         except Exception as ex:
-            self.logger.error(f"Exception uploadGroup: {ex}")
+            self.logger.error(f"{self.SERVICE_ID}: Exception uploadGroup: {ex}")
             self.logger.error(traceback.format_exc())
             self.logger.error(sys.exc_info()[2])
             return False
@@ -70,7 +70,7 @@ class SharepointUtils():
                     success = False
              
         except Exception as ex:
-            self.logger.error(f"Exception uploading images: {ex}")
+            self.logger.error(f"{self.SERVICE_ID}: Exception uploading images: {ex}")
             self.logger.error(traceback.format_exc())
             self.logger.error(sys.exc_info()[2])
             return False
@@ -107,17 +107,15 @@ class SharepointUtils():
             
             resLink = requests.post(url, headers=headers, data=body )
             resJs= resLink.json()
-           
-
             if "link" in resJs:
                 folderLink= resJs["link"]["webUrl"]
                 return folderLink
             else:
-                self.logger.error(f"error creating link: {resJs['error']['code']}, {resJs['error']['message']}")
+                self.logger.error(f"{self.SERVICE_ID}: Error creating link: {resJs['error']['code']}, {resJs['error']['message']}")
                 return None
             
         except Exception as err:
-            self.logger.error(f"error creating link: {err}")
+            self.logger.error(f"{self.SERVICE_ID}: Error creating link: {resLink}")
             return None
 
 
@@ -133,7 +131,7 @@ class SharepointUtils():
             response = requests.post(auth_url, data=data)
             return response.json()['access_token']
         except Exception as err:
-            self.logger.error(f"error get token: {err}, {type(err)}")
+            self.logger.error(f"{self.SERVICE_ID}: Error requestiong token: {err}, {response}")
             return None
         
 

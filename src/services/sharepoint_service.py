@@ -149,7 +149,7 @@ class SharepointService():
                 #when files uploaded remove them from database.
                 #control max timeout trying to upload files and remove them
                 self.retrySendToSharepoint()
-                #self.removeOldFiles()
+                self.removeOldFiles()
 
             except Exception as err:
                 self.logger.error(f"{self.SERVICE_ID}:sharepointThreadUploading {err}, {type(err)}")
