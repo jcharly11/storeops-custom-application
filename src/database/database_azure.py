@@ -60,11 +60,11 @@ class DataBaseFiles():
                return ex.args
 
 
-    def deleteFiles(self, request_uuid):
+    def deleteFiles(self, request_uuid, path):
         try:
                
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM files WHERE request_uuid =?', (request_uuid,))
+               self.cursor.execute('DELETE FROM files WHERE request_uuid =? AND path=?' , (request_uuid, path))
                self.connection.commit()
                return True
                   

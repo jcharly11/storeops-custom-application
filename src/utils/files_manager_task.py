@@ -41,8 +41,8 @@ class FilesManagerTaks:
     def getItems(self):
         return self.database.getAllFiles()
 
-    def deleteItem(self, uuid):
-        return self.database.deleteFiles(uuid)
+    def deleteItem(self, uuid, path):
+        return self.database.deleteFiles(uuid, path)
 
     def getItemsOlderThan(self, timestamp):
         items = self.database.getFilesOlderThan()

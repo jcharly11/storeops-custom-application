@@ -154,7 +154,7 @@ class SharepointService():
                 #when files uploaded remove them from database.
                 #control max timeout trying to upload files and remove them
                 self.retrySendToSharepoint()
-                self.removeOldFiles()
+                #self.removeOldFiles()
 
             except Exception as err:
                 self.logger.error(f"sharepointThreadUploading {err}, {type(err)}")
@@ -180,7 +180,8 @@ class SharepointService():
                     self.logger.info(f"Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}, DEST: {message.destination_path} ")
 
                     if self.uploadToSharepoint(message = message):
-                        self.fileManageTask.deleteItem(message.uuid)
+                        self.fileManageTask.deleteItem( uuid = message.uuid, path=message.destination_path)
+                        self.filesUtils.deleteFolderContent(folder= message.destination_path) 
             
                  
 
@@ -198,7 +199,7 @@ class SharepointService():
                 uuid = data['uuid']
                 path = data['path']
                 self.filesUtils.deleteFolderContent(folder= path)
-                self.fileManageTask.deleteItem(uuid=uuid)
+                self.fileManageTask.deleteItem(uuid=uuid, path=path)
                 message = SharepointUploadFilesMessage()
                 message.status = SharepointMessage.TIMEOUT
                 self.publishResponseToSubscribers(message)
