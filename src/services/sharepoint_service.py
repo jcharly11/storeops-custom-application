@@ -144,10 +144,7 @@ class SharepointService():
                     self.logger.info(f"{self.SERVICE_ID}: Processing upload queue values destination_path: {message.destination_path} , uuid:  {message.uuid}, files: {message.files}]") 
                     if self.uploadToSharepoint(message) == False:
                         self.logger.info(f"{self.SERVICE_ID}: Fail uploading saving data to db images")
-                        self.fileManageTask.addItem({
-                            'files': message.files, 
-                            'uuid': message.uuid, 
-                            'path': message.destination_path })
+                        self.fileManageTask.addItem(message)
 
 
                 #check if pending files to upload and push them.
@@ -157,7 +154,7 @@ class SharepointService():
                 #self.removeOldFiles()
 
             except Exception as err:
-                self.logger.error(f"sharepointThreadUploading {err}, {type(err)}")
+                self.logger.error(f"{self.SERVICE_ID}:sharepointThreadUploading {err}, {type(err)}")
                 self.logger.error(traceback.format_exc())
                 self.logger.error(sys.exc_info()[2])
 
@@ -176,8 +173,7 @@ class SharepointService():
                     message.uuid = item[0]
                     message.files = item[1].split(",")
                     message.path = item[4]
-                    message.destination_path = item[4]
-                    self.logger.info(f"Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}, DEST: {message.destination_path} ")
+                    self.logger.info(f"{self.SERVICE_ID}:Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}")
 
                     if self.uploadToSharepoint(message = message):
                         self.fileManageTask.deleteItem( uuid = message.uuid, path=message.destination_path)
@@ -215,7 +211,7 @@ class SharepointService():
                 self.logger.error(sys.exc_info()[2])
 
     def uploadToSharepoint(self, message):    
-        uploaded = self.sharepointUtils.uploadGroup(path = message.destination_path, uuid = message.uuid, data = message.files)
+        uploaded = self.sharepointUtils.uploadGroup(path = message.path, uuid = message.uuid, data = message.files)
 
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading {uploaded}")

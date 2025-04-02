@@ -28,7 +28,6 @@ class SharepointUploadFilesMessage(SharepointMessage):
     
     def __init__(self) -> None:
         self.type = 'upload'
-        self.destination_path = None
 
     def __getitem__(self, cls):
         return getattr(self, cls)     
