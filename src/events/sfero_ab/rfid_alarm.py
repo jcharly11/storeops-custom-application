@@ -308,9 +308,7 @@ class RFIDAlarmEvent(Event):
 
                     uploadFilesMessage = SharepointUploadFilesMessage() 
                     uploadFilesMessage.uuid = requests['uuid']
-                    uploadFilesMessage.destination_path = payload["data"]["destination_path"]        
-                    uploadFilesMessage.path = f"{self.CUSTOMER_ID}/{self.STORE_ID}/{requests['uuid']}"
-                    
+                    uploadFilesMessage.path = payload["data"]["destination_path"]                
 
                     #TODO  Reove extension name from onvif list
                     for file in payload["data"]["file_name"]:
@@ -333,8 +331,7 @@ class RFIDAlarmEvent(Event):
                 if payload["data"]["status"] == "OK": 
                     uploadFilesMessage = SharepointUploadFilesMessage()
                     uploadFilesMessage.uuid = requests['uuid']
-                    uploadFilesMessage.destination_path = payload["data"]["destination_path"]
-                    uploadFilesMessage.path = f"{self.CUSTOMER_ID}/{self.STORE_ID}/{requests['uuid']}"
+                    uploadFilesMessage.path = payload["data"]["destination_path"]
                     fileName =  payload["data"]["file_name"]
                     uploadFilesMessage.files = [fileName]
                     self.sharepointService.publishToSharepoint(uploadFilesMessage)
