@@ -171,7 +171,7 @@ class SharepointService():
                     message.uuid = item[0]
                     message.files = item[1].split(",")
                     message.path = item[4]
-                    self.logger.info(f"{self.SERVICE_ID}:Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}")
+                    self.logger.info(f"{self.SERVICE_ID}: Retry upload message : {message.uuid}, IMAGES:{message.files} ,PATH: {message.path}")
                     self.uploadToSharepoint(message = message)
             
                  

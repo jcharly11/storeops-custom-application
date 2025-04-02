@@ -15,17 +15,17 @@ class SharepointUtils():
         self.encoder = ImageEncoder()
         self.access_token = None
         self.filesUtils =  FileUtils()
+        self.SERVICE_ID = 'sharepoint_utils'
  
 
     def uploadGroup(self, path, uuid, data, check_folder=True): 
         try:
             self.access_token = self.getAuthToken()
-            self.logger.info(f"Starting to upload files : {len(data)} items")
-            self.logger.info(f"Path: {path}")
+            self.logger.info(f"{self.SERVICE_ID}: Starting to upload files : {len(data)} items to Path: {path}")
 
             if check_folder:
                 if self.createFolderAzure(uuid) is None:
-                    self.logger.error(f"error creating folder for uuid: {uuid}")
+                    self.logger.error(f" {self.SERVICE_ID}: error creating folder for uuid: {uuid}")
                     return False
             
             uploaded =False
@@ -186,33 +186,6 @@ class SharepointUtils():
 
 
         except Exception as err:
-            self.logger.error(f"error create sharepoint folder: {err}, {type(err)}")
+            self.logger.error(f"{self.SERVICE_ID}: Error {err} creating sharepoint folder: for {uuid} , {response}")
             return None
 
-    def count(self):
-            try:
-                headers = {
-                    "Authorization": f"{self.access_token}",
-                    "Content-Type": "application/json"
-                    }
-                url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{sharepointSettings.FOLDER_NAME}:/children"
-                response = requests.get(url= url, headers=headers)
-                return response.json()
-            except Exception as err:
-                self.logger.error(f"error get token: {err}, {type(err)}")
-                return None
-                
-    def ping(self,  url ):
-            success = False
-            headers = {'Authorization': f'Bearer {self.access_token}','Content-Type': 'application/octet-stream'}
-            try:
-                with open(url, 'rb')  as res:
-                #res =  requests.put(url, headers=headers, data=None)
-                    print(res)
-                    return res
-                
-            except Exception as ex:
-                self.logger.error(f"Exception making ping images: {ex}")
-                
-            return success
-    
