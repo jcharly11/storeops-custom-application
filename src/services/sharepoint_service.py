@@ -206,7 +206,7 @@ class SharepointService():
                 self.logger.error(sys.exc_info()[2])
 
     def uploadToSharepoint(self, message):    
-        uploaded = False #self.sharepointUtils.uploadGroup(path = message.path, uuid = message.uuid, data = message.files)
+        uploaded = self.sharepointUtils.uploadGroup(path = message.path, uuid = message.uuid, data = message.files)
 
         if uploaded:
             self.logger.info(f"{self.SERVICE_ID}: Success uploading: {message.uuid}, uuid:{message.path}")
