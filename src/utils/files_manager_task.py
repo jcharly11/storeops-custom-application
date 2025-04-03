@@ -20,7 +20,7 @@ class FilesManagerTaks:
             uuid = message['uuid']
             path = message['path']
             moved = False
-            backupPath = str(path).replace('.','')
+            backupPath = str(path).replace('.','').replace('/backup','')
             backupLocation = f"{BACKUP_FILES_AZURE_PATH}{backupPath}"
             if not self.fileUtils.existFolder(backupLocation):
                 self.fileUtils.createFolderFull(f"{backupLocation}")
