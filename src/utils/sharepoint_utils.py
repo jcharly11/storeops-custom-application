@@ -180,6 +180,9 @@ class SharepointUtils():
                     if(name==uuid):
                         id_folder= folder["id"]
                         break
+                if id_folder is None:
+                     self.logger.error(f"{self.SERVICE_ID}: Error {409} creating sharepoint folder: for {uuid}: Cant get new id folder trhoug 200 list size")
+
                 return id_folder
 
 
