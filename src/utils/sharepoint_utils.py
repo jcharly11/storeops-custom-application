@@ -166,24 +166,16 @@ class SharepointUtils():
             
             if(response.status_code==200 or response.status_code==201):
                 resJs= response.json()
-                id_folder = resJs["id"]
-                return  id_folder
+                id_folder = resJs["id"] 
             
             #folder already exists
             elif(response.status_code==409):
+                url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}/{uuid}"
                 response_folder = requests.get(url, headers=headers)
                 response_folder_json= response_folder.json()
+                id_folder = response_folder_json["id"]
                  
-                for folder in response_folder_json["value"]:
-                    name=folder["name"]
-                    
-                    if(name==uuid):
-                        id_folder= folder["id"]
-                        break
-                if id_folder is None:
-                     self.logger.error(f"{self.SERVICE_ID}: Error {409} creating sharepoint folder: for {uuid}: Cant get new id folder trhoug 200 list size")
-
-                return id_folder
+            return id_folder
 
 
         except Exception as err:
