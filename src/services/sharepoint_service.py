@@ -158,10 +158,9 @@ class SharepointService():
 
     def retrySendToSharepoint(self):
         now = datetime.datetime.now()
-        timeout_retry = datetime.timedelta(seconds=float(sharepoint_settings.SHAREPOINT_RETRY_SEND_MIN))
-        current_retry = self.sendSharepointLastRetry + timeout_retry
-       
-        if now >= current_retry: # Reintent to upload using local upload default method
+        nextRetry = self.sendSharepointLastRetry +  datetime.timedelta(minutes=float(sharepoint_settings.SHAREPOINT_RETRY_SEND_MIN))
+ 
+        if now >= nextRetry: # Reintent to upload using local upload default method
             self.sendSharepointLastRetry = now
             items = self.fileManageTask.getItems()  
             if items is not None:
