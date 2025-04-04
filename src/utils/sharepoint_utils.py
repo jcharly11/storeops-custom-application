@@ -171,9 +171,9 @@ class SharepointUtils():
             #folder already exists
             elif(response.status_code==409):
                 url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}/{uuid}"
-                response_folder = requests.get(url, headers=headers)
-                response_folder_json= response_folder.json()
-                id_folder = response_folder_json["id"]
+                response = requests.get(url, headers=headers)
+                resJs= response.json()
+                id_folder = resJs["id"]
                  
             return id_folder
 
