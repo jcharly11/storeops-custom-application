@@ -15,7 +15,6 @@ echo  $uuid
 pwd=$(pwd) 
 workingfile=$(echo $pwd  | awk '{gsub(/scripts/,"src")}1') 
 mosquitto_pub -t 'alarm' -m "$payload"
- 
 
 mkdir "$workingfile/videos/$uuid"
 touch "$workingfile/videos/$uuid/$uuid.mp4"
@@ -35,7 +34,8 @@ mp4="$uuid.mp4"
 echo $snapshots
 echo $videos
 echo $mp4 
-sleep 2
+sleep 5
+
 get_buffer=$(jq -n \
  --arg uuid "$uuid" \
  --arg snapshots "$snapshots" \
@@ -53,4 +53,5 @@ get_video=$(jq -n \
 )
 mosquitto_pub -t 'command_resp/onvif/video/get_video' -m "$get_video" 
 
+sleep 10
 done

@@ -25,7 +25,7 @@ class FileUtils():
         
     def createFolderFull(self, path):
         try:
-            os.makedirs(path, mode=777)
+            os.makedirs(path)
             return path
             
         except Exception as ex:
@@ -35,18 +35,22 @@ class FileUtils():
     def deleteFolderContent(self, folder):
         try:
            shutil.rmtree(folder)
+           return True
         except Exception as ex:
-            self.logger.error(f"Error deleting folder: {folder,ex}")    
+            self.logger.error(f"Error deleting folder: {folder,ex}")  
+            return False  
 
-    def moveFiles(self, origin, detiny):
+    def moveFiles(self, origin, destiny):
         try:
-            
-           shutil.move(origin, detiny)
+           
+           
+           shutil.move(origin, destiny)
+           self.logger.info(f"Success moving to backup")
+           
            return True
            
         except Exception as ex:
             self.logger.error(f"Error moving folder content: {ex}") 
-            pass 
             return False 
     
     def exist(self, file):

@@ -253,22 +253,21 @@ class StoreopsService():
             self.nextRetrySendStoreops = now + datetime.timedelta(minutes=int(settings.STOREOPS_RETRY_SEND_MIN))
             #Get any message from database with status "not_sent" and retry sending (only to storeOps not internal)
             self.messages = self.database.getMessages(status='not_sent', date= now)
-            for message in self.messages: 
-                message.send_local = False
-                self.logger.info(f"{self.log_prefix}: Retry of message {message}")
-                if self.sendMessage(message=message):
-                    self.database.upadateMessage(request_id=message['uui'], status = 'sent')
+            if self.messages:
+                for message in self.messages: 
+                    message.send_local = False
+                    self.logger.info(f"{self.log_prefix}: Retry of message {message}")
+                    if self.sendMessage(message=message):
+                        self.database.upadateMessage(request_id=message['uui'], status = 'sent')
 
 
     def removeOldMessages(self, now):
-        now = datetime.datetime.now()
-        timeout_retry = datetime.timedelta(hours=4)
-        rt =  + timeout_retry.total_seconds()
 
-        if now > self.nextOldMessageRemove:
-            self.nextOldMessageRemove = now + datetime.timedelta(hours=int(settings.STOREOPS_CHECK_OLD_MESSAGES_HOUS))
+        if now > self.nextOldMessageRemove:# CHEK THIS VALIDATION
+            self.nextOldMessageRemove = now + datetime.timedelta(hours=int(settings.STOREOPS_CHECK_OLD_MESSAGES_HOURS))
             self.logger.info(f"{self.log_prefix}: Remove old messages in database.")
-            self.database.deleteOldMessage(now - datetime.timedelta(hours=int(settings.STOREOPS_KEEP_MESSAGES_DAYS)))
+            removeDate = now - datetime.timedelta(days=int(settings.STOREOPS_KEEP_MESSAGES_DAYS))
+            self.database.deleteOldMessage(removeDate)
              
     def checkSSLConnection(self): 
         if  not self.clientSSL.isConnected():
