@@ -5,6 +5,7 @@ import os
 import queue
 import time
 from utils.time_utils import DateUtils
+from pyepc import decode
 import json
 
 class RFIDExitEvent(Event):
@@ -92,6 +93,7 @@ class RFIDExitEvent(Event):
                         rfid_exit_event.data.append({ 'key': "epc", 'type': 'string', "value": epcs})
                         rfid_exit_event.data.append({ 'key': "tx", 'type': 'string', "value": txs})
                         rfid_exit_event.data.append({ 'key': "ip", 'type': 'string', "value": ips})
+                        rfid_exit_event.data.append({ "key": "gtin","type":"string" ,"value": self.getGtinOfEpc(epcs)})
 
                         self.logger.info(f"{self.EVENT_ID}: send {self.EVENT_ID} event message: {rfid_exit_event}")
                         self.publishToStoreops(rfid_exit_event)
@@ -102,6 +104,17 @@ class RFIDExitEvent(Event):
                 self.logger.error(f"{self.EVENT_ID}: error process_events_queue {err}, {type(err)}")
 
                 
+    def getGtinOfEpc(self, epcs):
+        gtin = []
+
+        for epc in epcs:
+            try:
+                gtin.append(decode(epc).gtin)
+            except Exception as err:
+                gtin.append("")
+
+        return gtin
+
     def processStoreopsMessage(self, message):
         if message.type == 'command':
             if message.command_id == self.EVENT_GET_CONFIG_ID:
