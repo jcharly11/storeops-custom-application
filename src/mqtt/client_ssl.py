@@ -14,7 +14,7 @@ class ClientSSL():
     # valdacion de certificado correcto
     # reconexion considerando ondisconnect
 
-    def __init__(self, environment) -> None:
+    def __init__(self, environment, onMessage) -> None:
         self.logger = logging.getLogger("main")
         self.logger.info(f"Creating instance of SSL client")
         self.environment = environment
@@ -30,6 +30,7 @@ class ClientSSL():
         self.fileUtils = FileUtils()
 
         self.subscribe_topics = []
+        self.onMessage = onMessage
         
         self.connect() 
               
@@ -46,9 +47,6 @@ class ClientSSL():
 
           time.sleep(storeopsSettings.STOREOPS_CERTIFICATES_REQUEST_RETRY_SECS)
                    
-    def instance(self):
-         return self.client
-    
     def connect(self):
         try:
           certificate = self.certificateUtils.exists(path=storeopsSettings.STOREOPS_FOLDER_SSL)
@@ -59,7 +57,7 @@ class ClientSSL():
                                             key=f"{storeopsSettings.STOREOPS_FOLDER_SSL}/{certificate}.key")
                
                if not self.connected:
-                     
+                    self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
                     self.client.tls_set(ca_certs=None,
                                         certfile=storeopsSettings.STOREOPS_MQTT_SSL_CA_CERTIFICATE_PATH,
                                         keyfile=storeopsSettings.STOREOPS_MQTT_SSL_KEY_CERTIFICATE_PATH,
@@ -68,16 +66,14 @@ class ClientSSL():
                          username=storeopsSettings.STOREOPS_SERVER_SSL_USERNAME,
                          password=None)
                     
-                    self.logger.info(f"{self.log_prefix}: connecting to broker: {storeopsSettings.STOREOPS_MQTT_SSL_SERVER}")
-                    self.client.connect(host=storeopsSettings.STOREOPS_MQTT_SSL_SERVER, port=storeopsSettings.STOREOPS_MQTT_SSL_PORT, keepalive=60)
                     self.client.on_connect = self.onConnect
                     self.client.on_disconnect = self.onDisConnect 
+                    self.client.on_message = self.onMessage
+                    self.logger.info(f"{self.log_prefix}: connecting to broker: {storeopsSettings.STOREOPS_MQTT_SSL_SERVER}")
+                    self.client.connect(host=storeopsSettings.STOREOPS_MQTT_SSL_SERVER, port=storeopsSettings.STOREOPS_MQTT_SSL_PORT, keepalive=60)
                     self.logger.info(f"{self.log_prefix}: Creating secure connection")
                     self.client.loop_start()
                     self.connected = True
-                 
-
-
           else:
                print(f"{self.log_prefix}: No certificates founded")
                self.generateCertificates()
@@ -140,7 +136,6 @@ class ClientSSL():
           storeopsSettings.STOREOPS_MQTT_SSL_CA_CERTIFICATE_PATH = pem
           storeopsSettings.STOREOPS_MQTT_SSL_KEY_CERTIFICATE_PATH = key
           storeopsSettings.STOREOPS_SERVER_SSL_USERNAME = username 
-          self.environment.updateLocalVariables(restart=False)
          except Exception as ex:
               self.logger.error(ex) 
                

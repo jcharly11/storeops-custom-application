@@ -35,8 +35,7 @@ class StoreopsService():
         self.database = DataBase()
         self.storeopsQueue = mp.Queue()
         self.storeopInternalQueue = mp.Queue() 
-        self.clientSSL =  ClientSSL(environment = environment)
-        self.clientSSL.instance().on_message = self.onMessageStoreOps
+        self.clientSSL =  ClientSSL(environment = environment, onMessage=self.onMessageStoreOps)
         self.restart = Restart()
         self.messageLogger = LogMessagesUtil()
         self.messageLogger.create()
@@ -336,6 +335,7 @@ class StoreopsService():
              
     def checkSSLConnection(self): 
         if  not self.clientSSL.isConnected():
+            time.sleep(5)
             self.clientSSL.reconnect()
 
 
