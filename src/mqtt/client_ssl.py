@@ -105,10 +105,11 @@ class ClientSSL():
 
 
     def publish(self, topic, payload):
-         if self.connect:
-              return self.client.publish(topic=topic, payload=payload)
-         else:
-              return False
+          result = self.client.publish(topic=topic, payload=payload)
+          if result.rc == mqtt.MQTT_ERR_SUCCESS:
+               return True
+          else:
+               return False 
              
     def onConnect(self, client, userdata, flags, rc):
            self.logger.info(f"{self.log_prefix}: MQTT ssl Connected:  {client},{flags},{rc}")
