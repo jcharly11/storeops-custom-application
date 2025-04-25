@@ -126,9 +126,15 @@ class RFIDAlarmEvent(Event):
 
         if topic == self.TOPIC_CAMERA_STATUS:
             if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
-                if not self.isSharepointEnabled:
-                    self.logger.info(f"{self.EVENT_ID}: camera detected")
-                self.isSharepointEnabled = True            
+                camera_status = json.loads(payload)
+                if camera_status["data"]["status"] == "OK":
+                    if not self.isSharepointEnabled:
+                        self.logger.info(f"{self.EVENT_ID}: camera detected")
+                    self.isSharepointEnabled = True
+                else:
+                    if self.isSharepointEnabled:
+                        self.logger.info(f"{self.EVENT_ID}: camera not ready")
+                    self.isSharepointEnabled = False
 
 
     def eventThread(self):
