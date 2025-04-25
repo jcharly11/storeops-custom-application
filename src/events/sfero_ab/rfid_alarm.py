@@ -10,6 +10,7 @@ import time
 import datetime
 import config.settings as settings
 from utils.time_utils import DateUtils
+from pyepc import decode
 import json
 
 class RFIDAlarmEvent(Event):
@@ -125,9 +126,15 @@ class RFIDAlarmEvent(Event):
 
         if topic == self.TOPIC_CAMERA_STATUS:
             if self.EVENT_RFID_ALARM_IMAGES_CAPTURE_ENABLE or self.EVENT_RFID_ALARM_VIDEO_CAPTURE_ENABLE:
-                if not self.isSharepointEnabled:
-                    self.logger.info(f"{self.EVENT_ID}: camera detected")
-                self.isSharepointEnabled = True            
+                camera_status = json.loads(payload)
+                if camera_status["data"]["status"] == "OK":
+                    if not self.isSharepointEnabled:
+                        self.logger.info(f"{self.EVENT_ID}: camera detected")
+                    self.isSharepointEnabled = True
+                else:
+                    if self.isSharepointEnabled:
+                        self.logger.info(f"{self.EVENT_ID}: camera not ready")
+                    self.isSharepointEnabled = False
 
 
     def eventThread(self):
@@ -164,6 +171,7 @@ class RFIDAlarmEvent(Event):
                     rfid_alarm_event.version = "1.0.0"
                     rfid_alarm_event.data.append({ "key": "epc","type":"string" ,"value": epcs})
                     rfid_alarm_event.data.append({ "key": "silent","type":"boolean" ,"value": [is_silence]})
+                    rfid_alarm_event.data.append({ "key": "gtin","type":"string" ,"value": self.getGtinOfEpc(epcs)})
 
                     if self.isSharepointEnabled and len(epcs) >= self.MIN_EPCS_TO_REQUEST_MEDIA:
 
@@ -184,7 +192,16 @@ class RFIDAlarmEvent(Event):
             except Exception as err:
                 self.logger.error(f"{self.EVENT_ID}: process_events_queue {err}, {type(err)}")
                 
-    
+    def getGtinOfEpc(self, epcs):
+        gtin = []
+
+        for epc in epcs:
+            try:
+                gtin.append(decode(epc).gtin)
+            except Exception as err:
+                gtin.append("")
+
+        return gtin
 
     def checkEventMessagesTimeout(self):
         delete_events = []

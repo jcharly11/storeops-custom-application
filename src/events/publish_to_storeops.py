@@ -1,5 +1,6 @@
 from events.event_class import Event
-from messages.storeops_messages import StatusMessage, EventMessage, ConfigurationMessage, ResponseMessage
+from messages.storeops_messages import StatusMessage, EventMessage, ConfigurationMessage, ResponseMessage, InfoMessage, InternalMessage
+from utils.time_utils import DateUtils
 
 import logging
 import os
@@ -17,11 +18,19 @@ class PublishToStoreops(Event):
     # { "id":"name of the event",
     #   "type": "type of event",
     #   "device_id": device_id to use. Optional value,
+    #   "uuid": uuid to use. Optional value,
     #   "uuid_request": uuid_request to use. Optional value,
+    #   "expiration_date": expiration date of message. Optional value
     #   "is_local": True/False, Optional value, True by default
     #   "send_storeops": True/False, Optional value, True by default
     #   "version": "version of message"
     #   "data": []
+    # }
+
+    #SUBSCRIBE_TO_INFO
+    # { "id":"name of the event",
+    #   "type": "type of event",
+    #   "action": "add" - "add", "remove", "set", "clear"
     # }
 
     PUBLISH_STOREOPS_ID = 'publish_to_storeops_id'
@@ -29,17 +38,22 @@ class PublishToStoreops(Event):
     EVENT_ID = 'event'
     CONF_ID = 'configuration'
     RESPONSE_ID = 'response'
+    INFO_ID = 'info'
 
     PUBLISH_TO_STOREOPS_TOPIC = 'status/publish_to_storeops'
+    SUBSCRIBE_TO_STOREOPS = 'command/subscribe_to_storeops'
     PUBLISH_COMMAND_FROM_STOREOPS = 'command/command_from_storeops'
+    PUBLISH_INFO_FROM_STOREOPS = 'info_resp/info_from_storeops'
 
     def __init__(self, mqtt_client, sharepointService, storeopsService, environment):
         super().__init__( mqtt_client=mqtt_client, sharepointService=sharepointService, storeopsService=storeopsService, enable_thread = True, environment=environment)
         self.logger = logging.getLogger("main")
 
         self.addTopicToSubscribe(self.PUBLISH_TO_STOREOPS_TOPIC)
+        self.addTopicToSubscribe(self.SUBSCRIBE_TO_STOREOPS)
         self.event_queue = queue.Queue()
         self.forceSendConf = True
+        self.dateUtils = DateUtils()
 
 
     def updateVariablesToSave(self, variables):
@@ -51,7 +65,8 @@ class PublishToStoreops(Event):
         
         if topic == self.PUBLISH_TO_STOREOPS_TOPIC:
             self.event_queue.put(payload)
-
+        elif topic == self.SUBSCRIBE_TO_STOREOPS:
+            self.subscribeToStoreops(json.loads(payload))
     
     def eventThread(self):
         while True:
@@ -83,12 +98,23 @@ class PublishToStoreops(Event):
                 message = self.prepareHeaderMessage(ResponseMessage())
                 message.response_id = message_to_send["id"]
                 message.uuid_request = message_to_send["uuid_request"]
+            elif message_to_send["type"] == self.INFO_ID:
+                message = self.prepareHeaderMessage(InfoMessage())
+                message.info_id = message_to_send["id"]
+                if "expiration_date" in  message_to_send:
+                    message.expiration_date = message_to_send["expiration_date"]
+                else:
+                    message.expiration_date = self.dateUtils.getDateISOFormat(offset_sec=3600)
+                self.subscribeToStoreops({"type":self.INFO_ID, "action":"add", "id":message.info_id})
             else:
                 self.logger.info(f"{self.PUBLISH_STOREOPS_ID}: unknown type for message {message_to_send}")
                 return
 
             if "device_id" in message_to_send:
                 message.device_id = message_to_send["device_id"]
+
+            if "uuid" in message_to_send:
+                message.uuid = message_to_send["uuid"]
 
             if "send_local" in message_to_send:
                 message.send_local = message_to_send["send_local"]
@@ -112,9 +138,35 @@ class PublishToStoreops(Event):
                 payload = {"uuid": message.uuid,
                            "command_id": message.command_id,
                            "destination": message.destination,
+                           "timestamp": message.timestamp,
                            "version": message.version,
+                           "extraFields": message.extraFields,
                            "data": message.data }
 
                 self.publishInternalBroker(self.PUBLISH_COMMAND_FROM_STOREOPS, payload)
+            elif message.type == self.INFO_ID:
+                payload = {"uuid": message.uuid,
+                           "info_id": message.info_id,
+                           "uuid_request": message.uuid_request,
+                           "timestamp": message.timestamp,
+                           "version": message.version,
+                           "extraFields": message.extraFields,
+                           "data": message.data }
+
+                self.publishInternalBroker(self.PUBLISH_INFO_FROM_STOREOPS, payload)
+
         except Exception as err:
             self.logger.error(f"{self.PUBLISH_STOREOPS_ID} processStoreopsMessage: message_to_send {message} not correct {err}")
+
+    def subscribeToStoreops(self, subscribe_info):
+        try:
+            self.logger.info(f"{self.PUBLISH_STOREOPS_ID}: subscribeToStoreops {subscribe_info}")
+            if subscribe_info["type"] == self.INFO_ID:
+                message = InternalMessage()
+                message.command_id = self.INFO_ID
+                message.data.append(subscribe_info["action"])
+                message.data.append(subscribe_info["id"])
+
+                self.publishToStoreops(message)
+        except Exception as err:
+            self.logger.error(f"{self.PUBLISH_STOREOPS_ID} subscribeToStoreops: {subscribe_info} not correct {err}")

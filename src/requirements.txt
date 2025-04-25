@@ -23,3 +23,4 @@ azure-storage-file-share
 paho-mqtt==2.0.0
 pillow==10.3.0
 deepdiff==8.0.1
+pyepc==0.5.0

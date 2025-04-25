@@ -2,12 +2,12 @@ DB_PATH = './storage/storeops-database.db'
 
 TABLE_MESSAGES = """
 
-    CREATE TABLE IF NOT EXISTS messages(
+    CREATE TABLE IF NOT EXISTS messages_storeops(
         request_uuid TEXT,
-        message TEXT,
+        message BLOB,
         status TEXT,
         type TEXT,
-        timestamp TEXT,
-        date_time_inserted TEXT
+        timestamp TIMESTAMP,
+        date_time_inserted TIMESTAMP
     );
     """

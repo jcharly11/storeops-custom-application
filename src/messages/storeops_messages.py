@@ -8,6 +8,7 @@ class StoreOpsMessage:
         self.device_model = None
         self.device_id = None
         self.version = None
+        self.extraFields = None
         self.data = []
         self.send_local = True
         self.send_storeops = True
@@ -58,6 +59,18 @@ class CommandMessage(StoreOpsMessage):
         self.command_id = None
         self.destination = []
         self.expiration_date = None
+
+
+class InfoMessage(StoreOpsMessage):
+    
+    def __init__(self) -> None:
+        StoreOpsMessage.__init__(self)
+        self.type = 'info'
+        self.customer = None
+        self.store = None
+        self.info_id = None
+        self.expiration_date = None
+        self.uuid_request = None
 
 class ResponseMessage(StoreOpsMessage):
     
