@@ -44,11 +44,11 @@ class DataBase():
     def getMessages(self, date , status = 'sent'):
           try:
                 self.cursor = self.connection.cursor()
-                self.cursor.execute("SELECT message FROM messages WHERE date_time_inserted <= ? and status = ?", (date, status ))
+                self.cursor.execute("SELECT message FROM messages_storeops WHERE date_time_inserted <= ? and status = ?", (date, status ))
                 messages = []
                 events = self.cursor.fetchall()
                 for event in events:
-                    m = pickle.loads(event)
+                    m = pickle.loads(event[0])
                     messages.append(m)
                 return messages
           
@@ -59,7 +59,7 @@ class DataBase():
     def getMessageAll(self):
           try:
                 self.cursor = self.connection.cursor()
-                self.cursor.execute("SELECT message FROM messages ORDER BY date_time_inserted DESC")
+                self.cursor.execute("SELECT message FROM messages_storeops ORDER BY date_time_inserted DESC")
                 events = self.cursor.fetchall()
                 return events
           
@@ -72,12 +72,12 @@ class DataBase():
                # usar datetime now para inserted message
                date_time_inserted= datetime.datetime.now()
                self.cursor = self.connection.cursor()
-               self.cursor.execute('INSERT or REPLACE INTO messages VALUES (?,?,?,?,?,?)',(message['message'].uuid,
-                                                                                         pickle.dumps (message['message']), 
-                                                                                         message_status, 
-                                                                                         message['type'], 
-                                                                                         message['message'].timestamp,
-                                                                                         date_time_inserted))
+               self.cursor.execute('INSERT or REPLACE INTO messages_storeops VALUES (?,?,?,?,?,?)',(message['message'].uuid,
+                                                                                                    pickle.dumps (message['message']), 
+                                                                                                    message_status, 
+                                                                                                    message['type'], 
+                                                                                                    message['message'].timestamp,
+                                                                                                    date_time_inserted))
                self.connection.commit()
                return True
                   
@@ -90,7 +90,7 @@ class DataBase():
         try:
                
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM messages WHERE request_uuid =?', (request_uuid,))
+               self.cursor.execute('DELETE FROM messages_storeops WHERE request_uuid =?', (request_uuid,))
                self.connection.commit()
                return True
                   
@@ -102,7 +102,7 @@ class DataBase():
         try:
                
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM messages WHERE date_time_inserted <= ?', (date,))
+               self.cursor.execute('DELETE FROM messages_storeops WHERE date_time_inserted <= ?', (date,))
                self.connection.commit()
                return True
                   
@@ -115,7 +115,7 @@ class DataBase():
         try:
                
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM messages WHERE status == ?', (status,))
+               self.cursor.execute('DELETE FROM messages_storeops WHERE status == ?', (status,))
                self.connection.commit()
                return True
                   
@@ -127,7 +127,7 @@ class DataBase():
     def upadateMessage(self, request_uuid, status):
         try:
                self.cursor = self.connection.cursor()
-               self.cursor.execute('UPDATE messages SET status=? WHERE request_uuid == ?', (status, request_uuid))
+               self.cursor.execute('UPDATE messages_storeops SET status=? WHERE request_uuid == ?', (status, request_uuid))
                self.connection.commit()
                return True
                   
