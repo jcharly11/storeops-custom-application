@@ -17,6 +17,7 @@ class DataBaseFiles():
                self.createDB()
 
           except sqlite3.Error as err:
+               
                self.recreateDB()
                self.logger.error(f"Database for images creation exception:", err.args)
 
@@ -26,8 +27,16 @@ class DataBaseFiles():
        self.connection = sqlite3.connect(path, check_same_thread=False, timeout=20)
        if self.connection is not None:
              self.connection.execute(TABLE_FILES)
- 
 
+    def recreateDB(self):
+          try:
+              path = os.path.realpath(DB_AZURE_PATH)
+              os.remove(path=path)
+              os.remove(path=DB_AZURE_PATH)
+              self.createDB()
+                
+          except Exception as err:
+                self.logger.error(f"Database remove file exception:", err.args)
     def getAllFiles(self):
           try:
                 self.cursor = self.connection.cursor()
@@ -51,11 +60,11 @@ class DataBaseFiles():
                return ex.args
 
 
-    def deleteFiles(self, request_uuid):
+    def deleteFiles(self, request_uuid, path):
         try:
                
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM files WHERE request_uuid =?', (request_uuid,))
+               self.cursor.execute('DELETE FROM files WHERE request_uuid =? AND path=?' , (request_uuid, path))
                self.connection.commit()
                return True
                   
@@ -63,4 +72,14 @@ class DataBaseFiles():
                self.logger.info(f"Error executing query insert files: ",ex.args)
                return False
         
-        
+    def getFilesOlderThan(self):
+          
+          try:
+                self.cursor = self.connection.cursor()
+                self.cursor.execute("SELECT request_uuid, date_time_inserted, path from files")
+                events = self.cursor.fetchall()
+
+                return events
+          
+          except Exception as ex:
+               self.logger.info(f"Error get files: ",ex)

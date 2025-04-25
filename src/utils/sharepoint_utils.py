@@ -1,3 +1,5 @@
+import traceback
+import sys
 import datetime
 import json
 import logging 
@@ -13,35 +15,48 @@ class SharepointUtils():
         self.encoder = ImageEncoder()
         self.access_token = None
         self.filesUtils =  FileUtils()
+        self.SERVICE_ID = 'sharepoint_utils'
  
 
-    def upload_group(self, path, uuid, data): 
-        self.access_token = self.getAuthToken()
-        self.logger.info(f"Starting to upload files : {len(data)} items")
-        self.logger.info(f"Path: {path}")
-        
-        uploaded =False
-        files = []
-        urls = []
-        today = datetime.datetime.today()
-    
-        year = today.year
-        month =  str(today.month).zfill(2)
-        day = str(today.day).zfill(2)
- 
-        folder_name=f"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
-        self.logger.info(f"Upload group id:{uuid}")
-        for file_name in data:
-            file_full_path = f"{path}/{file_name}"
-            self.logger.info(f"Uploading file full path: {file_full_path}")
-            upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
-            files.append(file_full_path) 
-            urls.append(upload_url) 
+    def uploadGroup(self, path, uuid, data, check_folder=True): 
+        try:
+            self.access_token = self.getAuthToken()
+            self.logger.info(f"{self.SERVICE_ID}: Starting to upload files : {len(data)} items to Path: {path}")
+
+            if check_folder:
+                if self.createFolderAzure(uuid) is None:
+                    self.logger.error(f" {self.SERVICE_ID}: Error creating folder for uuid: {uuid}")
+                    return False
             
-        uploaded = map(self.upload, urls, files)
-        up = all(i for i in list(uploaded))
-        return up
+            uploaded =False
+            files = []
+            urls = []
+            today = datetime.datetime.today()
         
+            year = today.year
+            month =  str(today.month).zfill(2)
+            day = str(today.day).zfill(2)
+            folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
+
+            self.logger.info(f"{self.SERVICE_ID}: Upload group id:{uuid}")
+            for file_name in data:
+                file_full_path = f"{path}/{file_name}"
+                
+                
+                self.logger.info(f"{self.SERVICE_ID}: Prepare upload file full path: {file_full_path}")
+                upload_url = f'{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drives/{sharepointSettings.DRIVE_ID}/items/root:/{folder_name}/{file_name}:/content'
+                files.append(file_full_path) 
+                urls.append(upload_url) 
+                
+            uploaded = map(self.upload, urls, files)
+           
+            return all(i for i in list(uploaded)) 
+        
+        except Exception as ex:
+            self.logger.error(f"{self.SERVICE_ID}: Exception uploadGroup: {ex}")
+            self.logger.error(traceback.format_exc())
+            self.logger.error(sys.exc_info()[2])
+            return False
         
     def upload(self,  url, file_url ):
         success = False
@@ -50,25 +65,26 @@ class SharepointUtils():
             with open(file_url, 'rb') as file:
                 response = requests.put(url, headers=headers, data=file)
                 if response:
-                    self.filesUtils.deleteSingleFile(file_url)
                     success=True
                 else:
                     success = False
              
         except Exception as ex:
-            self.logger.error(f"Exception uploading images: {ex}")
+            self.logger.error(f"{self.SERVICE_ID}: Exception uploading images: {ex}")
+            self.logger.error(traceback.format_exc())
+            self.logger.error(sys.exc_info()[2])
+            return False
             
         return success
                  
-        
-
-
-
-
 
     def generateLink(self, uuid):
         try:
             id_folder= self.createFolderAzure(uuid)
+
+            if id_folder is None:
+                self.logger.error(f"error creating folder for uuid: {uuid}")
+                return None
             
             url=f"{sharepointSettings.BASE_URL}/sites/{sharepointSettings.SITE_ID}/drive/items/{id_folder}/createLink"
             headers = {
@@ -78,7 +94,7 @@ class SharepointUtils():
 
 
             date_now = datetime.datetime.now()
-            modified_date = date_now + datetime.timedelta(days=60)
+            modified_date = date_now + datetime.timedelta(days=90)
             expiration_date = modified_date.strftime("%Y-%m-%dT%H:%M:%SZ") 
             
             data = {
@@ -91,14 +107,15 @@ class SharepointUtils():
             
             resLink = requests.post(url, headers=headers, data=body )
             resJs= resLink.json()
-            folderLink= resJs["link"]["webUrl"]
             if "link" in resJs:
+                folderLink= resJs["link"]["webUrl"]
                 return folderLink
             else:
+                self.logger.error(f"{self.SERVICE_ID}: Error creating link: {resJs['error']['code']}, {resJs['error']['message']}")
                 return None
-
+            
         except Exception as err:
-            self.logger.error(f"error creating link: {err}, {type(err)}")
+            self.logger.error(f"{self.SERVICE_ID}: Error creating link: {resLink}")
             return None
 
 
@@ -114,7 +131,7 @@ class SharepointUtils():
             response = requests.post(auth_url, data=data)
             return response.json()['access_token']
         except Exception as err:
-            self.logger.error(f"error get token: {err}, {type(err)}")
+            self.logger.error(f"{self.SERVICE_ID}: Error requestiong token: {err}, {response}")
             return None
         
 
@@ -128,7 +145,9 @@ class SharepointUtils():
             month = str(today.month).zfill(2)
             day = str(today.day).zfill(2)
 
-            folder_base= F"Onvif_Photos/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
+            folder_base= F"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
+            folder_base= F"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
+
             url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}:/children"
             
             headers = {
@@ -147,23 +166,19 @@ class SharepointUtils():
             
             if(response.status_code==200 or response.status_code==201):
                 resJs= response.json()
-                id_folder = resJs["id"]
-                return  id_folder
+                id_folder = resJs["id"] 
             
             #folder already exists
             elif(response.status_code==409):
-                response_folder = requests.get(url, headers=headers)
-                response_folder_json= response_folder.json()
+                url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}/{uuid}"
+                response = requests.get(url, headers=headers)
+                resJs= response.json()
+                id_folder = resJs["id"]
                  
-                for folder in response_folder_json["value"]:
-                    name=folder["name"]
-                    
-                    if(name==uuid):
-                        id_folder= folder["id"]
-                        break
-                return id_folder
+            return id_folder
 
 
         except Exception as err:
-            self.logger.error(f"error create sharepoint folder: {err}, {type(err)}")
-            return ""
+            self.logger.error(f"{self.SERVICE_ID}: Error {err} creating sharepoint folder: for {uuid} , {response}")
+            return None
+

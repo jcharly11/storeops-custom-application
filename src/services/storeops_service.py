@@ -237,7 +237,8 @@ class StoreopsService():
                 if result:
                     sended = True
                     topic = topic.split("/")
-                    self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId= self.STORE_ID, topic=topic[-1])
+                    if len(topic) > 0:
+                        self.messageLogger.save(message=message, storeId=self.STORE_ID, customerId=self.CUSTOMER_ID, doorId= self.STORE_ID, topic=topic[-1])
                 else:
                     self.logger.info(f"{self.log_prefix}: Message send to internal queue to database")
                     self.storeopInternalQueue.put({'type':'message', 'message': message, 'sent': False})
@@ -328,11 +329,11 @@ class StoreopsService():
 
     def removeOldMessages(self, now):
         now = datetime.datetime.now()
-
-        if now > self.nextOldMessageRemove:
-            self.nextOldMessageRemove = now + datetime.timedelta(hours=int(settings.STOREOPS_CHECK_OLD_MESSAGES_HOUS))
+        if now > self.nextOldMessageRemove:# CHEK THIS VALIDATION
+            self.nextOldMessageRemove = now + datetime.timedelta(hours=int(settings.STOREOPS_CHECK_OLD_MESSAGES_HOURS))
             self.logger.info(f"{self.log_prefix}: Remove old messages in database.")
             self.database.deleteOldMessage(now - datetime.timedelta(days=int(settings.STOREOPS_KEEP_MESSAGES_DAYS)))
+
              
     def checkSSLConnection(self): 
         if  not self.clientSSL.isConnected():

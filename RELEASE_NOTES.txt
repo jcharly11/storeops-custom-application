@@ -1,0 +1,6 @@
+UI validation of message without link
+UI validation for number of items to alarm
+Retry send message when link is acquired
+CSV file with messages for field service debug
+Fordwarding messages to storeops
+Enable messages only if camera status is valid
