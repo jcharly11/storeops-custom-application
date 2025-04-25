@@ -2,6 +2,7 @@ import sqlite3
 import logging
 import os
 import datetime
+import pickle
 
 from database.config.db_config import DB_PATH, TABLE_MESSAGES
 from utils.file_utils import FileUtils
@@ -44,11 +45,16 @@ class DataBase():
           try:
                 self.cursor = self.connection.cursor()
                 self.cursor.execute("SELECT message FROM messages WHERE date_time_inserted <= ? and status = ?", (date, status ))
+                messages = []
                 events = self.cursor.fetchall()
-                return events
+                for event in events:
+                    m = pickle.loads(event)
+                    messages.append(m)
+                return messages
           
           except Exception as ex:
                self.logger.info(f"Error get messages: ",ex)
+               return []
 
     def getMessageAll(self):
           try:
@@ -59,6 +65,7 @@ class DataBase():
           
           except Exception as ex:
                self.logger.info(f"Error get messages: ",ex)
+               return []
 
     def saveMessage(self, message, message_status):
         try:
@@ -66,7 +73,7 @@ class DataBase():
                date_time_inserted= datetime.datetime.now()
                self.cursor = self.connection.cursor()
                self.cursor.execute('INSERT or REPLACE INTO messages VALUES (?,?,?,?,?,?)',(message['message'].uuid,
-                                                                                         message['message'].__str__(), 
+                                                                                         pickle.dumps (message['message']), 
                                                                                          message_status, 
                                                                                          message['type'], 
                                                                                          message['message'].timestamp,

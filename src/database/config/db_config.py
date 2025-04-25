@@ -4,10 +4,10 @@ TABLE_MESSAGES = """
 
     CREATE TABLE IF NOT EXISTS messages(
         request_uuid TEXT,
-        message TEXT,
+        message BLOB,
         status TEXT,
         type TEXT,
-        timestamp TEXT,
-        date_time_inserted TEXT
+        timestamp TIMESTAMP,
+        date_time_inserted TIMESTAMP
     );
     """
