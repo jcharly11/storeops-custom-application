@@ -127,7 +127,7 @@ class DataBase():
     def upadateMessage(self, request_uuid, status):
         try:
                self.cursor = self.connection.cursor()
-               self.cursor.execute('UPDATE SET status=? FROM messages WHERE request_uuid == ?', (status, request_uuid))
+               self.cursor.execute('UPDATE messages SET status=? WHERE request_uuid == ?', (status, request_uuid))
                self.connection.commit()
                return True
                   
