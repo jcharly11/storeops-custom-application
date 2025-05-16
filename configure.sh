@@ -35,3 +35,7 @@ for f in ./pkg/*.sh ./pkg/${APPLICATION_ID}/DEBIAN/* ./pkg/${APPLICATION_ID}/etc
     sed -i "s/<APPLICATION_ID>/${APPLICATION_ID}/g" "${f}"
     sed -i "s/<APPLICATION_NAME>/${APPLICATION_NAME}/g" "${f}"
 done;
+
+sed -i "s/<APPLICATION_ID>/${APPLICATION_ID}/g" src/ui/files.js
+sed -i "s/<APPLICATION_ID>/${APPLICATION_ID}/g" src/ui/index.js
+sed -i "s/<APPLICATION_ID>/${APPLICATION_ID}/g" src/ui/setup.sh

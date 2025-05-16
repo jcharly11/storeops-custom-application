@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+    storeops:
+        image: checkpt/storeops-custom-application:v0.0.42
+        volumes:
+            - type: bind
+              source: /var/log/storeops-custom-application
+              target: /app/logs
+            - type: bind
+              source: /usr/share/cockpit/storeops-custom-application
+              target: /app/cockpit
+            - type: bind
+              source: /var/environment/storeops-custom-application
+              target: /app/environment
+            - type: bind
+              source: /var/scripts/storeops-custom-application
+              target: /app/shell-scripts
+            - type: bind
+              source: /etc
+              target: /app/etc
+
