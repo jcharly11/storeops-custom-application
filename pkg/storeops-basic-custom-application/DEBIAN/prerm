@@ -1,0 +1,5 @@
+#!/bin/bash
+
+systemctl daemon-reload
+systemctl disable storeops-basic-custom-application
+systemctl stop storeops-basic-custom-application

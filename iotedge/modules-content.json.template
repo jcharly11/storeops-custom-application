@@ -1,0 +1,99 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "modules": {
+          "storeops-basic-custom-application": {
+            "env": {
+              "HOST_SFTP": {
+                "value": "<HOST_SFTP>"
+              },
+              "PORT_SFTP": {
+                "value": "<PORT_SFTP>"
+              },
+              "USERNAME_SFTP": {
+                "value": "<USERNAME_SFTP>"
+              },
+              "PASSWORD_SFTP": {
+                "value": "<PASSWORD_SFTP>"
+              },
+              "CREATE_CSV_FILES_ENABLE": {
+                "value": "<CREATE_CSV_FILES_ENABLE>"
+              },
+              "SHEDULE_CREATE_CSV_FILES": {
+                "value": "<SHEDULE_CREATE_CSV_FILES>"
+              },
+              "ALARM_AGGREGATION_WINDOW_SEC": {
+                "value": "<ALARM_AGGREGATION_WINDOW_SEC>"
+              },
+              "LOG_LEVEL": {
+                "value": "<LOG_LEVEL>"
+              }
+            },
+            "restartPolicy": "always",
+            "settings": {
+              "image": "docker.io/checkpt/storeops-basic-custom-application:<VERSION>",
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/var/log/storeops-basic-custom-application:/app/logs\",\"/var/files/storeops-basic-custom-application:/app/files\",\"/var/storage/storeops-basic-custom-application:/app/storage\",\"/usr/share/cockpit/environment:/app/cockpit\",\"/var/environment/storeops-basic-custom-application:/app/environment\",\"/usr/share/cockpit/visualizer:/app/cockpit-visualizer\"],\"PortBindings\":{\"80/tcp\":[{\"HostPort\":\"8005\"}]}}}"
+            },
+            "status": "running",
+            "type": "docker"
+          }
+        },
+        "runtime": {
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "registryCredentials": {
+              "DockerHub": {
+                "address": "docker.io",
+                "password": "forest",
+                "username": "ckpforest"
+              }
+            }
+          },
+          "type": "docker"
+        },
+        "schemaVersion": "1.1",
+        "systemModules": {
+          "edgeAgent": {
+            "env": {
+              "UpstreamProtocol": {
+                "value": "MQTT"
+              }
+            },
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.2"
+            },
+            "type": "docker"
+          },
+          "edgeHub": {
+            "env": {
+              "UpstreamProtocol": {
+                "value": "MQTT"
+              }
+            },
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.2",
+              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"443/tcp\":[{\"HostPort\":\"8443\"}],\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}]}}}"
+            },
+            "status": "running",
+            "type": "docker"
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "routes": {
+          "iothub": {
+            "route": "FROM /messages/* INTO $upstream"
+          }
+        },
+        "schemaVersion": "1.1",
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+Package: storeops-basic-custom-application
+Version: 0.0.1
+Maintainer: Checkpoint Systems, Inc.
+Architecture: amd64
+Description: Storeops Basics Custom Application
