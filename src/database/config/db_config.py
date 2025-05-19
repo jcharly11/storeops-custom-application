@@ -7,7 +7,7 @@ TABLE_MESSAGES = """
         message BLOB,
         status TEXT,
         type TEXT,
-        timestamp TIMESTAMP,
-        date_time_inserted TIMESTAMP
+        timestamp DATE,
+        date_time_inserted DATE
     );
     """

@@ -36,7 +36,7 @@ class SharepointUtils():
             year = today.year
             month =  str(today.month).zfill(2)
             day = str(today.day).zfill(2)
-            folder_name=f"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}/{uuid}"
+            folder_name=f"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}{month}{day}/{uuid}"
 
             self.logger.info(f"{self.SERVICE_ID}: Upload group id:{uuid}")
             for file_name in data:
@@ -144,9 +144,8 @@ class SharepointUtils():
             year = today.year
             month = str(today.month).zfill(2)
             day = str(today.day).zfill(2)
-
-            folder_base= F"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}"
-            folder_base= F"StoreOps_media_site/{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}/{month}/{year}{month}{day}"
+            
+            folder_base= F"{settings.ACCOUNT_NUMBER}/{settings.STORE_NUMBER}/{year}{month}{day}"
 
             url=f"{sharepointSettings.BASE_URL}/drives/{sharepointSettings.DRIVE_ID}/root:/{folder_base}:/children"
             

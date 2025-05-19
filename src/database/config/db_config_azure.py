@@ -6,7 +6,7 @@ TABLE_FILES = """
         request_uuid TEXT,
         files TEXT,
         link TEXT,
-        date_time_inserted TEXT,
+        date_time_inserted DATE,
         path TEXT
     );
     """

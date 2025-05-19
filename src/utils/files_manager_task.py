@@ -46,16 +46,6 @@ class FilesManagerTaks:
         return self.database.deleteFiles(uuid, path)
 
     def getItemsOlderThan(self, timestamp):
-        items = self.database.getFilesOlderThan()
-        result = []
-        for item in items:
-             if item[0] and item[1]:
-                uuid = item[0]
-                di =   item[1]
-                path = item[2]
-                date_inserted = datetime.datetime.strptime(di, "%Y-%m-%d %H:%M:%S.%f")
-                if  date_inserted <= timestamp:
-                    result.append({'uuid':uuid, 'path': path})       
-        return result
-         
+       return  self.database.getFilesOlderThan(date_time_inserted=timestamp) 
+                 
 

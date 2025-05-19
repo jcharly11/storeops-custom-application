@@ -24,7 +24,7 @@ class DataBaseFiles():
 
     def createDB(self):
        path = os.path.realpath(DB_AZURE_PATH)
-       self.connection = sqlite3.connect(path, check_same_thread=False, timeout=20)
+       self.connection = sqlite3.connect(path, check_same_thread=False, timeout=20, detect_types=sqlite3.PARSE_DECLTYPES)
        if self.connection is not None:
              self.connection.execute(TABLE_FILES)
 
@@ -51,7 +51,11 @@ class DataBaseFiles():
         try:
                date_time_inserted= datetime.datetime.now()
                self.cursor = self.connection.cursor()
-               self.cursor.execute('INSERT or REPLACE INTO files VALUES (?,?,?,?,?)',(request_uuid, files, link, date_time_inserted, path))
+               self.cursor.execute('INSERT or REPLACE INTO files VALUES (?,?,?,?,?)',(request_uuid, 
+                                                                                      files, 
+                                                                                      link, 
+                                                                                      date_time_inserted.strftime("%Y-%m-%d"), 
+                                                                                      path))
                self.connection.commit()
                return True
                   
@@ -72,14 +76,16 @@ class DataBaseFiles():
                self.logger.info(f"Error executing query insert files: ",ex.args)
                return False
         
-    def getFilesOlderThan(self):
+    def getFilesOlderThan(self, date_time_inserted):
           
           try:
                 self.cursor = self.connection.cursor()
-                self.cursor.execute("SELECT request_uuid, date_time_inserted, path from files")
+                self.cursor.execute("SELECT request_uuid, date_time_inserted, path from files WHERE  DATE(date_time_inserted) <= ?", (date_time_inserted,))
                 events = self.cursor.fetchall()
+                
 
                 return events
           
           except Exception as ex:
+               print(f"Error get files: ",ex)
                self.logger.info(f"Error get files: ",ex)

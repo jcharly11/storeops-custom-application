@@ -26,7 +26,7 @@ class DataBase():
 
     def createDB(self):
        path = os.path.realpath(DB_PATH)
-       self.connection = sqlite3.connect(path, check_same_thread=False, timeout=20)
+       self.connection = sqlite3.connect(path, check_same_thread=False, timeout=20, detect_types=sqlite3.PARSE_DECLTYPES)
        if self.connection is not None:
              self.connection.execute(TABLE_MESSAGES)
 
@@ -44,7 +44,7 @@ class DataBase():
     def getMessages(self, date , status = 'sent'):
           try:
                 self.cursor = self.connection.cursor()
-                self.cursor.execute("SELECT message FROM messages_storeops WHERE date_time_inserted <= ? and status = ?", (date, status ))
+                self.cursor.execute("SELECT message FROM messages_storeops WHERE  DATE(date_time_inserted)  <= ? and status = ?", (date, status, ))
                 messages = []
                 events = self.cursor.fetchall()
                 for event in events:
@@ -77,7 +77,7 @@ class DataBase():
                                                                                                     message_status, 
                                                                                                     message['type'], 
                                                                                                     message['message'].timestamp,
-                                                                                                    date_time_inserted))
+                                                                                                    date_time_inserted.strftime("%Y-%m-%d")))
                self.connection.commit()
                return True
                   
@@ -102,7 +102,7 @@ class DataBase():
         try:
                
                self.cursor = self.connection.cursor()
-               self.cursor.execute('DELETE FROM messages_storeops WHERE date_time_inserted <= ?', (date,))
+               self.cursor.execute('DELETE FROM messages_storeops WHERE DATE(date_time_inserted) <= ?', (date ,))
                self.connection.commit()
                return True
                   
